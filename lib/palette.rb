@@ -6,6 +6,7 @@ module TAC
 
     TIMECRAFTERS_PRIMARY = Gosu::Color.new(0xff008000)
     TIMECRAFTERS_SECONDARY = Gosu::Color.new(0xff006000)
+    TIMECRAFTERS_TERTIARY = Gosu::Color.new(0xff00d000)
 
     TACNET_PRIMARY = Gosu::Color.new(0xff000080)
     TACNET_SECONDARY = Gosu::Color.new(0xff000060)

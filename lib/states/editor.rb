@@ -2,6 +2,8 @@ module TAC
   class States
     class Editor < CyberarmEngine::GuiState
       def setup
+        theme(THEME)
+
         stack width: 1.0, height: 1.0 do
           stack width: 1.0, height: 0.1 do
             background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
@@ -11,21 +13,29 @@ module TAC
                 label TAC::NAME, color: Gosu::Color::BLACK, bold: true
 
                 flow do
-                  [:add, :delete, :clone, :create, :simulate].each do |b|
-                    button b.capitalize, text_size: 18
+                  button "Add Group", text_size: 18 do
+                    push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", subtitle: "Add Group", submit_label: "Add", callback: proc {|instance| instance.close })
+                  end
+                  button "Add Action", text_size: 18 do
+                    push_state(TAC::Dialog::NamePromptDialog, title: "Create Action", subtitle: "Add Action", submit_label: "Add", callback: proc {|instance| instance.close })
+                  end
+                  button "Add Value", text_size: 18 do
+                    push_state(TAC::Dialog::NamePromptDialog, title: "Create Value", subtitle: "Add Value", submit_label: "Add", callback: proc {|instance| instance.close })
                   end
                 end
               end
 
               flow width: 0.299 do
                 stack width: 0.5 do
-                  label "TACNET", color: TAC::Palette::TACNET_PRIMARY
-                  @tacnet_ip_address = label "192.168.49.1", color: TAC::Palette::TACNET_SECONDARY
+                  label "TACNET v#{TACNET::Packet::PROTOCOL_VERSION}", color: TAC::Palette::TACNET_PRIMARY
+                  @tacnet_ip_address = label "#{TACNET::DEFAULT_HOSTNAME}:#{TACNET::DEFAULT_PORT}", color: TAC::Palette::TACNET_SECONDARY
                 end
 
                 stack width: 0.499 do
                   @tacnet_status = label "Connection Error", background: TAC::Palette::TACNET_CONNECTION_ERROR, text_size: 18, padding: 5, margin_top: 2
-                  @tacnet_connection_button = button "Connect", text_size: 18
+                  @tacnet_connection_button = button "Connect", text_size: 18 do
+                    window.backend.tacnet.connect
+                  end
                 end
               end
             end
