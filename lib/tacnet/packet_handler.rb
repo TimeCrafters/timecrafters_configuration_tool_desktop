@@ -31,7 +31,7 @@ module TAC
 
       def handle_handshake(packet)
         if @host_is_a_connection
-          # TODO: Set Connection client id to received uuid
+          $window.backend.tacnet.client.uuid = packet.body
         end
       end
 

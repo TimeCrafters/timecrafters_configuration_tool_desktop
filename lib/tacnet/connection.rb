@@ -2,6 +2,7 @@ module TAC
   class TACNET
     class Connection
       TAG = "TACNET|Connection"
+      attr_reader :client
       def initialize(hostname = DEFAULT_HOSTNAME, port = DEFAULT_PORT)
         @hostname = hostname
         @port = port
@@ -16,7 +17,7 @@ module TAC
           handle_connection
         end
 
-        @packet_handler = PacketHandler.new
+        @packet_handler = PacketHandler.new(host_is_a_connection: true)
       end
 
       def connect(error_callback)
@@ -56,6 +57,14 @@ module TAC
             @client.puts(PacketHandler.packet_heartbeat)
           end
         end
+      end
+
+      def puts(packet)
+        @client.puts(packet)
+      end
+
+      def gets
+        @client.gets
       end
 
       def connected?

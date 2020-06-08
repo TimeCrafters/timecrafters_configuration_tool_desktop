@@ -65,7 +65,6 @@ module TAC
           if @active_client && @active_client.connected?
             log.i(TAG, "Too many clients, already have one connected!")
             client.close("Too many clients!")
-            pp @active_client.connected?
           else
             @active_client = client
             # TODO: Backup local config

@@ -8,7 +8,6 @@ module TAC
 
     def initialize
       @connection = nil
-      @server = nil
     end
 
     def connect(hostname = DEFAULT_HOSTNAME, port = DEFAULT_PORT, error_callback = proc {})
@@ -16,6 +15,28 @@ module TAC
 
       @connection = Connection.new(hostname, port)
       @connection.connect(error_callback)
+    end
+
+    def connected?
+      @connection && @connection.connected?
+    end
+
+    def client
+      if connected?
+        @connection.client
+      end
+    end
+
+    def puts(packet)
+      if connected?
+        @connection.puts(packet)
+      end
+    end
+
+    def gets
+      if connected?
+        @connection.gets
+      end
     end
   end
 end

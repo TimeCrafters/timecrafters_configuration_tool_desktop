@@ -19,6 +19,10 @@ module TAC
         @data_sent, @data_received = 0, 0
       end
 
+      def uuid=(id)
+        @uuid = id
+      end
+
       def socket=(socket)
         @socket = socket
 

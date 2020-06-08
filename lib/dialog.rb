@@ -6,6 +6,7 @@ module TAC
 
       @title = @options[:title] ? @options[:title] : "#{self.class}"
       @window_width, @window_height = window.width, window.height
+      @previous_state = window.previous_state
 
       @dialog_root = stack width: 250, height: 400, border_thickness: 2, border_color: [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY] do
         # Title bar
@@ -43,7 +44,7 @@ module TAC
     end
 
     def draw
-      $window.previous_state.draw
+      @previous_state.draw
       Gosu.flush
 
       super
