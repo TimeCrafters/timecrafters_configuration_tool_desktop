@@ -4,6 +4,17 @@ module TAC
     def initialize
       @config = load_config
       @tacnet = TACNET.new
+
+      @config_changed = false
+    end
+
+    def config_changed!
+      @config[:config][:updated_at] = Time.now
+      @config_changed = true
+    end
+
+    def config_changed?
+      @config_changed
     end
 
     def load_config
@@ -25,8 +36,17 @@ module TAC
 
       File.open(TAC::CONFIG_PATH, "w") { |f| f.write json }
 
+      @config_changed = false
+    end
+
+    def upload_config
       if @tacnet.connected?
         @tacnet.puts(TAC::TACNET::PacketHandler.packet_dump_config(json))
+      end
+    end
+
+    def download_config
+      if @tacnet.connected?
       end
     end
 
@@ -35,6 +55,8 @@ module TAC
         f.write JSON.dump(
           {
             config: {
+              created_at: Time.now,
+              updated_at: Time.now,
               spec_version: TAC::CONFIG_SPEC_VERSION,
               hostname: TACNET::DEFAULT_HOSTNAME,
               port: TACNET::DEFAULT_PORT,

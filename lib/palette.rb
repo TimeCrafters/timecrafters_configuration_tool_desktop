@@ -18,9 +18,9 @@ module TAC
     ACTIONS_SECONDARY = Gosu::Color.new(0xff040404)
 
     VALUES_PRIMARY = Gosu::Color.new(0xff660066)
-    VALUES_SECONDARY = Gosu::Color.new(0x040404ff)
+    VALUES_SECONDARY = Gosu::Color.new(0xff440044)
 
     EDITOR_PRIMARY = Gosu::Color.new(0xff446688)
-    EDITOR_SECONDARY = Gosu::Color.new(0x040404ff)
+    EDITOR_SECONDARY = Gosu::Color.new(0xff224466)
   end
 end
