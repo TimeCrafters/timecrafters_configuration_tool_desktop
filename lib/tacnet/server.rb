@@ -1,6 +1,7 @@
 module TAC
   class TACNET
     class Server
+      TAG = "TACNET|Server"
       attr_reader :active_client,
                   :packets_sent, :packets_received, :data_sent, :data_received,
                   :client_last_packets_sent, :client_last_packets_received, :client_last_data_sent, :client_last_data_received
@@ -28,28 +29,31 @@ module TAC
         @packet_handler = PacketHandler.new
       end
 
-      def start
-        Thread.new do
-          while !@socket && @connection_attempts < @max_connection_attempts
+      def start(run_on_main_thread: false)
+        thread = Thread.new do
+          while (!@socket && @connection_attempts < @max_connection_attempts)
             begin
+              log.i(TAG, "Starting server...")
               @socket = TCPServer.new(@port)
             rescue => error
-              p error
+              log.e(TAG, error)
 
               @connection_attempts += 1
-              retry
+              retry if @connection_attempts < @max_connection_attempts
             end
           end
 
-          while !@socket.closed?
+          while @socket && !@socket.closed?
             begin
               run_server
             rescue => error
               p error
-              @socket.close
+              @socket.close if @socket
             end
           end
         end
+
+        thread.join if run_on_main_thread
       end
 
       def run_server
@@ -58,9 +62,10 @@ module TAC
           client.sync_interval = @sync_interval
           client.socket = @socket.accept
 
-          unless @active_client && @active_client.closed?
-            warn "Too many clients, already have one connected!"
+          if @active_client && @active_client.connected?
+            log.i(TAG, "Too many clients, already have one connected!")
             client.close("Too many clients!")
+            pp @active_client.connected?
           else
             @active_client = client
             # TODO: Backup local config
@@ -69,6 +74,8 @@ module TAC
 
             @active_client.puts(PacketHandler.packet_handshake(@active_client.uuid))
             @active_client.puts(PacketHandler.packet_dump_config(config))
+
+            log.i(TAG, "Client connected!")
 
             Thread.new do
               while @active_client && @active_client.connected?
@@ -96,14 +103,14 @@ module TAC
         if @active_client && @active_client.connected?
           message = @active_client.gets
 
-          unless message.empty?
+          if message && !message.empty?
             @packet_handler.handle(message)
           end
 
           if Gosu.milliseconds > @last_heartbeat_sent + @heartbeat_interval
             @last_heartbeat_sent = Gosu.milliseconds
 
-            @active_client.puts(PacketHandler.packet_heartbeart)
+            @active_client.puts(PacketHandler.packet_heartbeat)
           end
         end
       end

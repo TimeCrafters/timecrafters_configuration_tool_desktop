@@ -34,7 +34,7 @@ module TAC
                 stack width: 0.499 do
                   @tacnet_status = label "Connection Error", background: TAC::Palette::TACNET_CONNECTION_ERROR, text_size: 18, padding: 5, margin_top: 2
                   @tacnet_connection_button = button "Connect", text_size: 18 do
-                    window.backend.tacnet.connect
+                    window.backend.tacnet.connect("localhost")
                   end
                 end
               end

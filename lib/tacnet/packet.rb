@@ -1,7 +1,7 @@
 module TAC
   class TACNET
     class Packet
-      PROTOCOL_VERSION = "0"
+      PROTOCOL_VERSION = 0
       PROTOCOL_HEADER_SEPERATOR = "|"
       PROTOCOL_HEARTBEAT = "heartbeat"
 
@@ -27,12 +27,12 @@ module TAC
         slice = message.split("|", 4)
 
         if slice.size < 4
-          warn "Failed to split packet along first 4 " + PROTOCOL_HEADER_SEPERATOR + ". Raw return: " + Arrays.toString(slice)
+          warn "Failed to split packet along first 4 " + PROTOCOL_HEADER_SEPERATOR + ". Raw return: " + slice.to_s
           return nil
         end
 
-        if slice.first != PROTOCOL_VERSION
-          warn "Incompatible protocol version received, expected: " + PROTOCOL_VERSION + " got: " + slice.first
+        if slice.first != PROTOCOL_VERSION.to_s
+          warn "Incompatible protocol version received, expected: " + PROTOCOL_VERSION.to_s + " got: " + slice.first
           return nil
         end
 
@@ -41,25 +41,27 @@ module TAC
           return nil
         end
 
-        version = slice[0]
+        protocol_version = Integer(slice[0])
         type = PACKET_TYPES.key(Integer(slice[1]))
         content_length = Integer(slice[2])
-        content = slice[3]
+        body = slice[3]
 
-        return Packet.new(version, type, content_length, body)
+        raise "Type is #{type.inspect} [#{type.class}]" unless type.is_a?(Symbol)
+
+        return Packet.new(protocol_version, type, content_length, body)
       end
 
       def self.create(packet_type, body)
-        Packet.new(PROTOCOL_VERSION, packet_type, body.length, body)
+        Packet.new(PROTOCOL_VERSION, PACKET_TYPES.key(packet_type), body.length, body)
       end
 
       def self.valid_packet_type?(packet_type)
         PACKET_TYPES.values.find { |t| t == packet_type }
       end
 
-      attr_reader :version, :type, :content_length, :body
-      def initialize(version, type, content_length, body)
-        @version = version
+      attr_reader :protocol_version, :type, :content_length, :body
+      def initialize(protocol_version, type, content_length, body)
+        @protocol_version = protocol_version
         @type = type
         @content_length = content_length
         @body = body
@@ -67,11 +69,11 @@ module TAC
 
       def encode_header
         string = ""
-        string += PROTOCOL_VERSION
+        string += protocol_version.to_s
         string += PROTOCOL_HEADER_SEPERATOR
-        string += packet_type
+        string += PACKET_TYPES[type].to_s
         string += PROTOCOL_HEADER_SEPERATOR
-        string += content_length
+        string += content_length.to_s
         string += PROTOCOL_HEADER_SEPERATOR
 
         return string

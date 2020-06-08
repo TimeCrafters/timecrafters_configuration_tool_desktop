@@ -1,6 +1,7 @@
 module TAC
   class TACNET
     class Connection
+      TAG = "TACNET|Connection"
       def initialize(hostname = DEFAULT_HOSTNAME, port = DEFAULT_PORT)
         @hostname = hostname
         @port = port
@@ -14,6 +15,8 @@ module TAC
         @connection_handler = proc do
           handle_connection
         end
+
+        @packet_handler = PacketHandler.new
       end
 
       def connect(error_callback)
@@ -24,6 +27,7 @@ module TAC
         Thread.new do
           begin
             @client.socket = Socket.tcp(@hostname, @port, connect_timeout: 5)
+            log.i(TAG, "Connected to: #{@hostname}:#{@port}")
 
             while @client && @client.connected?
               if Gosu.milliseconds > @last_sync_time + @sync_interval
@@ -44,14 +48,22 @@ module TAC
         if @client && @client.connected?
           message = @client.gets
 
-          PacketHandler.handle(message) if message
+          @packet_handler.handle(message) if message
 
           if Gosu.milliseconds > @last_heartbeat_sent + @heartbeat_interval
-            last_heartbeat_sent = Gosu.milliseconds
+            @last_heartbeat_sent = Gosu.milliseconds
 
-            client.puts(PacketHandler.packet_heartbeat)
+            @client.puts(PacketHandler.packet_heartbeat)
           end
         end
+      end
+
+      def connected?
+        !closed?
+      end
+
+      def closed?
+        @client.closed? if @client
       end
     end
   end

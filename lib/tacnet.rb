@@ -12,10 +12,9 @@ module TAC
     end
 
     def connect(hostname = DEFAULT_HOSTNAME, port = DEFAULT_PORT, error_callback = proc {})
-      return if @connection && @connect.connected?
+      return if @connection && @connection.connected?
 
       @connection = Connection.new(hostname, port)
-      puts "Connecting..."
       @connection.connect(error_callback)
     end
   end

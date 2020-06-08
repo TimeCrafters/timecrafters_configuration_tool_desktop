@@ -1,6 +1,7 @@
 module TAC
   class TACNET
     class PacketHandler
+      TAG = "TACNET|PacketHandler"
       def initialize(host_is_a_connection: false)
         @host_is_a_connection = host_is_a_connection
       end
@@ -11,7 +12,7 @@ module TAC
         if packet
           hand_off(packet)
         else
-          warn "Rejected raw packet: #{message}"
+          log.d(TAG, "Rejected raw packet: #{message}")
         end
       end
 
@@ -24,13 +25,17 @@ module TAC
         when :dump_config
           handle_dump_config(packet)
         else
-          warn "No hand off available for packet type: #{packet.type}"
+          log.d(TAG, "No hand off available for packet type: #{packet.type}")
         end
       end
 
       def handle_handshake(packet)
+        if @host_is_a_connection
+          # TODO: Set Connection client id to received uuid
+        end
       end
 
+      # TODO: Reset socket timeout
       def handle_heartbeat(packet)
       end
 
@@ -52,7 +57,7 @@ module TAC
       end
 
       def self.packet_heartbeat
-        Packet.create(Packet::PACKET_TYPES[:heartbeat], Packet::PROTOCOL_VERSION)
+        Packet.create(Packet::PACKET_TYPES[:heartbeat], Packet::PROTOCOL_HEARTBEAT)
       end
 
       def self.packet_dump_config(string)
