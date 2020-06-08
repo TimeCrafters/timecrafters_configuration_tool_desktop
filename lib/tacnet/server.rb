@@ -35,7 +35,7 @@ module TAC
             begin
               log.i(TAG, "Starting server...")
               @socket = TCPServer.new(@port)
-            rescue => error
+            rescue IOError => error
               log.e(TAG, error)
 
               @connection_attempts += 1
@@ -46,8 +46,8 @@ module TAC
           while @socket && !@socket.closed?
             begin
               run_server
-            rescue => error
-              p error
+            rescue IOError => error
+              log.e(TAG, error)
               @socket.close if @socket
             end
           end

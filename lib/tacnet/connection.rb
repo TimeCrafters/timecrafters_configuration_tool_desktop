@@ -7,6 +7,8 @@ module TAC
         @hostname = hostname
         @port = port
 
+        @client = nil
+
         @last_sync_time = 0
         @sync_interval = SYNC_INTERVAL
 
@@ -20,7 +22,7 @@ module TAC
         @packet_handler = PacketHandler.new(host_is_a_connection: true)
       end
 
-      def connect(error_callback)
+      def connect
         return if @client
 
         @client = Client.new
@@ -39,8 +41,13 @@ module TAC
             end
 
           rescue => error
-            p error
-            error_callback.call(error)
+            log.e(TAG, error)
+
+            if @client
+              @client.close
+              @client.last_socket_error = error
+              @client.socket_error = true
+            end
           end
         end
       end
@@ -68,11 +75,15 @@ module TAC
       end
 
       def connected?
-        !closed?
+        @client.connected? if @client
       end
 
       def closed?
         @client.closed? if @client
+      end
+
+      def close
+        @client.close if @client
       end
     end
   end

@@ -10,33 +10,66 @@ module TAC
       @connection = nil
     end
 
-    def connect(hostname = DEFAULT_HOSTNAME, port = DEFAULT_PORT, error_callback = proc {})
+    def connect(hostname = DEFAULT_HOSTNAME, port = DEFAULT_PORT)
       return if @connection && @connection.connected?
 
       @connection = Connection.new(hostname, port)
-      @connection.connect(error_callback)
+      @connection.connect
+    end
+
+    def status
+      if connected?
+        :connected
+      elsif @connection && !@connection.client.socket_error?
+        :connecting
+      elsif @connection && @connection.client.socket_error?
+        :connection_error
+      else
+        :not_connected
+      end
+    end
+
+    def full_status
+      _status = status.to_s.split("_").map { |c| c.capitalize }.join(" ")
+
+      if connected?
+        net_stats = ""
+        net_stats += "<b>Connection Statistics:</b>\n"
+        net_stats += "<b>Packets Sent:</b> #{client.packets_sent}\n"
+        net_stats += "<b>Packets Received:</b> #{client.packets_received}\n\n"
+        net_stats += "<b>Data Sent:</b> #{client.data_sent} bytes\n"
+        net_stats += "<b>Data Received:</b> #{client.data_received} bytes\n"
+
+        "<b>Status:</b> #{_status}\n\n#{net_stats}"
+      elsif @connection && @connection.client && @connection.client.socket_error?
+        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s.chars.each_slice(32).to_a.map { |c| c.join }.join("\n")}"
+      else
+        pp client
+        "<b>Status:</b> #{_status}"
+      end
     end
 
     def connected?
       @connection && @connection.connected?
     end
 
-    def client
+    def close
       if connected?
-        @connection.client
+        @connection.close
+        @connection = nil
       end
+    end
+
+    def client
+      @connection.client if connected?
     end
 
     def puts(packet)
-      if connected?
-        @connection.puts(packet)
-      end
+      @connection.puts(packet) if connected?
     end
 
     def gets
-      if connected?
-        @connection.gets
-      end
+      @connection.gets if connected?
     end
   end
 end

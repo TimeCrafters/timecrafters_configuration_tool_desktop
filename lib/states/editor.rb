@@ -50,9 +50,19 @@ module TAC
                 end
 
                 stack width: 0.499 do
-                  @tacnet_status = label "Connection Error", background: TAC::Palette::TACNET_CONNECTION_ERROR, text_size: 18, padding: 5, margin_top: 2
-                  @tacnet_connection_button = button "Connect", text_size: 18 do
-                    window.backend.tacnet.connect("localhost")
+                  @tacnet_status = label "Not Connected", background: TAC::Palette::TACNET_NOT_CONNECTED, width: 1.0, text_size: 18, padding: 5, margin_top: 2, border_thickness: 1, border_color: Gosu::Color::GRAY
+                  flow width: 1.0 do
+                    @tacnet_connection_button = button "Connect", width: 0.475, text_size: 18 do
+                      case window.backend.tacnet.status
+                      when :connected, :connecting
+                        window.backend.tacnet.close
+                      when :not_connected, :connection_error
+                        window.backend.tacnet.connect("localhost")
+                      end
+                    end
+                    button "Status", text_size: 18, width: 0.475 do
+                      push_state(Dialog::AlertDialog, title: "TACNET Status", message: window.backend.tacnet.full_status)
+                    end
                   end
                 end
               end
@@ -112,6 +122,37 @@ module TAC
         end
 
         populate_groups_list
+
+        @tacnet_status_monitor = CyberarmEngine::Timer.new(250) do
+          case window.backend.tacnet.status
+          when :connected
+            @tacnet_status.value = "Connected"
+            @tacnet_status.background = TAC::Palette::TACNET_CONNECTED
+
+            @tacnet_connection_button.value = "Disconnect"
+          when :connecting
+            @tacnet_status.value = "Connecting..."
+            @tacnet_status.background = TAC::Palette::TACNET_CONNECTING
+
+            @tacnet_connection_button.value = "Disconnect"
+          when :connection_error
+            @tacnet_status.value = "Connection Error"
+            @tacnet_status.background = TAC::Palette::TACNET_CONNECTION_ERROR
+
+            @tacnet_connection_button.value = "Connect"
+          when :not_connected
+            @tacnet_status.value = "Not Connected"
+            @tacnet_status.background = TAC::Palette::TACNET_NOT_CONNECTED
+
+            @tacnet_connection_button.value = "Connect"
+          end
+        end
+      end
+
+      def update
+        super
+
+        @tacnet_status_monitor.update
       end
 
       def create_group(name)

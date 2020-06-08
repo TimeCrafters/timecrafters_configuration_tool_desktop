@@ -7,13 +7,17 @@ module TAC
       attr_reader :uuid, :read_queue, :write_queue, :socket,
                   :packets_sent, :packets_received,
                   :data_sent, :data_received
-      attr_accessor :sync_interval
+      attr_accessor :sync_interval, :last_socket_error, :socket_error
       def initialize
         @uuid = SecureRandom.uuid
         @read_queue = []
         @write_queue = []
 
         @sync_interval = 100
+
+        @last_socket_error = nil
+        @socket_error = false
+        @bound = false
 
         @packets_sent, @packets_received = 0, 0
         @data_sent, @data_received = 0, 0
@@ -25,6 +29,7 @@ module TAC
 
       def socket=(socket)
         @socket = socket
+        @bound = true
 
         listen
       end
@@ -82,12 +87,16 @@ module TAC
         end
       end
 
-      def connected?
-        !closed?
+      def socket_error?
+        @socket_error
       end
 
-      def bound?
-        @socket.bound? if @socket
+      def connected?
+        if closed? == true || closed? == nil
+          false
+        else
+          true
+        end
       end
 
       def closed?
@@ -97,7 +106,9 @@ module TAC
       def write(message)
         begin
           @socket.puts("#{message}\r\n\n")
-        rescue Errno::EPIPE, IOError => error
+        rescue => error
+          @last_socket_error = error
+          @socket_error = true
           log.e(TAG, error.message)
           close
         end
@@ -109,7 +120,10 @@ module TAC
         begin
           data = @socket.readpartial(CHUNK_SIZE)
           message += data
-        rescue Errno::EPIPE, EOFError
+        rescue => error
+          @last_socket_error = error
+          @socket_error = true
+
           message = ""
           break
         end until message.end_with?("\r\n\n")
