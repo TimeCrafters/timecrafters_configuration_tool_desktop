@@ -41,12 +41,14 @@ module TAC
 
     def upload_config
       if @tacnet.connected?
-        @tacnet.puts(TAC::TACNET::PacketHandler.packet_dump_config(json))
+        json = JSON.dump(@config)
+        @tacnet.puts(TAC::TACNET::PacketHandler.packet_upload_config(json))
       end
     end
 
     def download_config
       if @tacnet.connected?
+        @tacnet.puts(TAC::TACNET::PacketHandler.packet_download_config)
       end
     end
 

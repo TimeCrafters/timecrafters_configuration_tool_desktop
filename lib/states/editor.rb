@@ -37,7 +37,7 @@ module TAC
                       window.backend.upload_config
                     end
                     button "▼", text_size: 18, margin_left: 10, tip: "Download remote config, if connected." do
-                      push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Replace local config with\n remote config?", callback_method: proc { window.backend.download_config })
+                      window.backend.download_config
                     end
                   end
                 end
@@ -57,7 +57,7 @@ module TAC
                       when :connected, :connecting
                         window.backend.tacnet.close
                       when :not_connected, :connection_error
-                        window.backend.tacnet.connect("localhost")
+                        window.backend.tacnet.connect("localhost")#("192.168.1.5")
                       end
                     end
                     button "Status", text_size: 18, width: 0.475 do
@@ -77,8 +77,8 @@ module TAC
                 button "+", text_size: 18 do
                   push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", callback_method: method(:create_group))
                 end
-                button "Clone", text_size: 18
-                button "Create Preset", text_size: 18
+                button "Clone", text_size: 18, tip: "Clone currently selected group"
+                button "Create Preset", text_size: 18, tip: "Save group as preset"
               end
 
               @groups_list = stack width: 1.0 do
@@ -95,8 +95,8 @@ module TAC
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action,\nno group selected.")
                   end
                 end
-                button "Clone", text_size: 18
-                button "Create Preset", text_size: 18
+                button "Clone", text_size: 18, tip: "Clone currently selected action"
+                button "Create Preset", text_size: 18, tip: "Save action as preset"
               end
 
               @actions_list = stack width: 1.0 do

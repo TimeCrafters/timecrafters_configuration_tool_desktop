@@ -9,10 +9,10 @@ module TAC
 
         @client = nil
 
-        @last_sync_time = 0
+        @last_sync_time = Gosu.milliseconds
         @sync_interval = SYNC_INTERVAL
 
-        @last_heartbeat_sent = 0
+        @last_heartbeat_sent = Gosu.milliseconds
         @heartbeat_interval = HEARTBEAT_INTERVAL
 
         @connection_handler = proc do
@@ -63,6 +63,8 @@ module TAC
 
             @client.puts(PacketHandler.packet_heartbeat)
           end
+
+          sleep @sync_interval / 1000.0
         end
       end
 

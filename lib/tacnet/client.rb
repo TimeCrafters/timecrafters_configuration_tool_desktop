@@ -3,6 +3,7 @@ module TAC
     class Client
       TAG = "TACNET|Client"
       CHUNK_SIZE = 4096
+      PACKET_TAIL = "\r\n\n"
 
       attr_reader :uuid, :read_queue, :write_queue, :socket,
                   :packets_sent, :packets_received,
@@ -105,7 +106,7 @@ module TAC
 
       def write(message)
         begin
-          @socket.puts("#{message}\r\n\n")
+          @socket.puts("#{message}#{PACKET_TAIL}")
         rescue => error
           @last_socket_error = error
           @socket_error = true
@@ -115,18 +116,14 @@ module TAC
       end
 
       def read
-        message = ""
-
         begin
-          data = @socket.readpartial(CHUNK_SIZE)
-          message += data
+          message = @socket.gets
         rescue => error
           @last_socket_error = error
           @socket_error = true
 
           message = ""
-          break
-        end until message.end_with?("\r\n\n")
+        end
 
 
         return message.strip

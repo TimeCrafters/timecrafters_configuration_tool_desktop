@@ -22,8 +22,10 @@ module TAC
           handle_handshake(packet)
         when :heartbeat
           handle_heartbeat(packet)
-        when :dump_config
-          handle_dump_config(packet)
+        when :download_config
+          handle_download_config(packet)
+        when :upload_config
+          handle_upload_config(packet)
         else
           log.d(TAG, "No hand off available for packet type: #{packet.type}")
         end
@@ -39,16 +41,49 @@ module TAC
       def handle_heartbeat(packet)
       end
 
-      def handle_dump_config(packet)
+      def handle_upload_config(packet)
         begin
-          hash = JSON.parse(packet.body)
+          data = JSON.parse(packet.body, symbolize_names: true)
 
           if @host_is_a_connection
-            File.open("#{TAC::ROOT_PATH}/data/config.json", "w") { |f| f.write packet.body }
+            if data.is_a?(Array)
+              # OLDEST CONFIG, upgrade?
+              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Remote config to old.")
 
-            $window.backend.update_config
+            elsif data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
+              $window.push_state(TAC::Dialog::ConfirmDialog, title: "Replace Config", message: "Replace local config\nwith remote config?", callback_method: proc {
+                File.open("#{TAC::ROOT_PATH}/data/config.json", "w") { |f| f.write packet.body }
+
+                $window.backend.update_config
+              })
+
+            elsif data.is_a?(Hash) && data.dig(:config, :spec_version) < TAC::CONFIG_SPEC_VERSION
+              # OLD CONFIG, Upgrade?
+              $window.push_state(TAC::Dialog::ConfirmDialog, title: "Upgrade Config", message: "Remote config is an older\nspec version.\nTry to upgrade?", callback_method: proc {})
+
+            elsif data.is_a?(Hash) && data.dig(:config, :spec_version) > TAC::CONFIG_SPEC_VERSION
+              # NEWER CONFIG, Error Out
+              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Client outdated, check for\nupdates.\nSupported config spec:\nv#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
+
+            else
+              # CONFIG is unknown
+              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Remote config is not supported.")
+            end
           end
-        rescue JSON::ParserError
+        rescue JSON::ParserError => e
+          log.e(TAG, "JSON parsing error: #{e}")
+        end
+      end
+
+      def handle_download_config(packet)
+        if @host_is_a_connection
+          json = JSON.dump($window.backend.config)
+          $window.backend.tacnet.puts(PacketHandler.packet_upload_config(json))
+        else
+          if $server.active_client && $server.active_client.connected?
+            json = File.read(TAC::CONFIG_PATH)
+            $server.active_client.puts(PacketHandler.packet_upload_config(json))
+          end
         end
       end
 
@@ -60,10 +95,14 @@ module TAC
         Packet.create(Packet::PACKET_TYPES[:heartbeat], Packet::PROTOCOL_HEARTBEAT)
       end
 
-      def self.packet_dump_config(string)
+      def self.packet_download_config
+        Packet.create(Packet::PACKET_TYPES[:download_config], "")
+      end
+
+      def self.packet_upload_config(string)
         string = string.gsub("\n", " ")
 
-        Packet.create(Packet::PACKET_TYPES[:dump_config], string)
+        Packet.create(Packet::PACKET_TYPES[:upload_config], string)
       end
     end
   end

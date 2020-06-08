@@ -6,7 +6,7 @@ module TAC
 
       self.caption = "#{TAC::NAME} v#{TAC::VERSION} (#{TAC::RELEASE_NAME})"
       @backend = Backend.new
-      push_state(TAC::States::Editor)
+      push_state(TAC::States::Boot)
     end
 
     def needs_cursor?

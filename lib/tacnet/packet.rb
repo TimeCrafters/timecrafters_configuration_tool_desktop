@@ -1,26 +1,27 @@
 module TAC
   class TACNET
     class Packet
-      PROTOCOL_VERSION = 0
+      PROTOCOL_VERSION = 1
       PROTOCOL_HEADER_SEPERATOR = "|"
       PROTOCOL_HEARTBEAT = "heartbeat"
 
       PACKET_TYPES = {
         handshake: 0,
         heartbeat: 1,
-        dump_config: 2,
+        download_config: 2,
+        upload_config: 3,
 
-        add_group: 3,
-        update_group: 4,
-        delete_group: 5,
+        add_group: 20,
+        update_group: 21,
+        delete_group: 22,
 
-        add_action: 6,
-        update_action: 7,
-        delete_action: 8,
+        add_action: 30,
+        update_action: 31,
+        delete_action: 32,
 
-        add_variable: 9,
-        update_variable: 10,
-        delete_variable: 11,
+        add_variable: 40,
+        update_variable: 41,
+        delete_variable: 42,
       }
 
       def self.from_stream(message)

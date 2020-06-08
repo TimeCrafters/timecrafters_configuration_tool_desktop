@@ -6,6 +6,8 @@ module TAC
                   :packets_sent, :packets_received, :data_sent, :data_received,
                   :client_last_packets_sent, :client_last_packets_received, :client_last_data_sent, :client_last_data_received
       def initialize(port = DEFAULT_PORT)
+        $server = self
+
         @port = port
 
         @socket = nil
@@ -16,10 +18,10 @@ module TAC
         @packets_sent, @packets_received, @client_last_packets_sent, @client_last_packets_received = 0, 0, 0, 0
         @data_sent, @data_received, @client_last_data_sent, @client_last_data_received = 0, 0, 0, 0
 
-        @last_sync_time = 0
+        @last_sync_time = Gosu.milliseconds
         @sync_interval = SYNC_INTERVAL
 
-        @last_heartbeat_sent = 0
+        @last_heartbeat_sent = Gosu.milliseconds
         @heartbeat_interval = HEARTBEAT_INTERVAL
 
         @client_handler_proc = proc do
@@ -72,7 +74,7 @@ module TAC
             config = File.read(TAC::CONFIG_PATH)
 
             @active_client.puts(PacketHandler.packet_handshake(@active_client.uuid))
-            @active_client.puts(PacketHandler.packet_dump_config(config))
+            @active_client.puts(PacketHandler.packet_upload_config(config))
 
             log.i(TAG, "Client connected!")
 
@@ -111,6 +113,8 @@ module TAC
 
             @active_client.puts(PacketHandler.packet_heartbeat)
           end
+
+          sleep @sync_interval / 1000.0
         end
       end
 

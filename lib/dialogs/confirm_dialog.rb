@@ -10,9 +10,9 @@ module TAC
             close
           end
           button "Okay", width: 0.475, text_size: 18 do
-            @options[:callback_method].call
-
             close
+
+            @options[:callback_method].call
           end
         end
       end
