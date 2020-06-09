@@ -18,8 +18,8 @@ module TAC
     ACTIONS_PRIMARY = Gosu::Color.new(0xff_4444aa)
     ACTIONS_SECONDARY = Gosu::Color.new(0xff_040404)
 
-    VALUES_PRIMARY = Gosu::Color.new(0xff_660066)
-    VALUES_SECONDARY = Gosu::Color.new(0xff_440044)
+    VARIABLES_PRIMARY = Gosu::Color.new(0xff_660066)
+    VARIABLES_SECONDARY = Gosu::Color.new(0xff_440044)
 
     EDITOR_PRIMARY = Gosu::Color.new(0xff_446688)
     EDITOR_SECONDARY = Gosu::Color.new(0xff_224466)

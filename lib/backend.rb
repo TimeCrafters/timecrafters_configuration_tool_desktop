@@ -9,7 +9,7 @@ module TAC
     end
 
     def config_changed!
-      @config[:config][:updated_at] = Time.now
+      @config.config.updated_at = Time.now
       @config_changed = true
     end
 
@@ -19,7 +19,7 @@ module TAC
 
     def load_config
       if File.exist?(TAC::CONFIG_PATH)
-        return JSON.parse(File.read( TAC::CONFIG_PATH ), symbolize_names: true)
+        return TAC::Config.new
       else
         write_default_config
         load_config
@@ -32,7 +32,7 @@ module TAC
     end
 
     def save_config
-      json = JSON.dump(@config)
+      json = @config.to_json
 
       File.open(TAC::CONFIG_PATH, "w") { |f| f.write json }
 
@@ -41,7 +41,7 @@ module TAC
 
     def upload_config
       if @tacnet.connected?
-        json = JSON.dump(@config)
+        json = @config.to_json
         @tacnet.puts(TAC::TACNET::PacketHandler.packet_upload_config(json))
       end
     end
@@ -66,8 +66,6 @@ module TAC
             },
             data: {
               groups: [],
-              actions: [],
-              values: [],
             },
           }
         )

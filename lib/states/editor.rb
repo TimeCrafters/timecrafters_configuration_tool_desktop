@@ -103,19 +103,19 @@ module TAC
               end
             end
             stack width: 0.333, height: 1.0 do
-              background TAC::Palette::VALUES_PRIMARY
+              background TAC::Palette::VARIABLES_PRIMARY
               flow do
                 label "Values"
                 button "+", text_size: 18 do
                   if @active_action
-                    push_state(TAC::Dialog::VariableDialog, title: "Create Value", callback_method: method(:create_value))
+                    push_state(TAC::Dialog::VariableDialog, title: "Create Value", callback_method: method(:create_variable))
                   else
-                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create value,\nno action selected.")
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create variable,\nno action selected.")
                   end
                 end
               end
 
-              @values_list = stack width: 1.0 do
+              @variables_list = stack width: 1.0 do
               end
             end
           end
@@ -156,29 +156,21 @@ module TAC
       end
 
       def create_group(name)
-        window.backend.config[:data][:groups] << {id: rand(100), name: name}
+        window.backend.config.groups << TAC::Config::Group.new(name: name, actions: [])
         window.backend.config_changed!
 
         populate_groups_list
       end
 
-      def update_group(group_struct, name)
-        group = window.backend.config[:data][:groups].find { |g| g[:id] == group_struct.id }
-        group[:name] = name
-
+      def update_group(group, name)
+        group.name = name
         window.backend.config_changed!
 
         populate_groups_list
       end
 
-      def delete_group(group_struct)
-        group = window.backend.config[:data][:groups].find { |a| a[:id] == group_struct.id }
-        window.backend.config[:data][:groups].delete(group)
-
-        window.backend.config[:data][:actions].select { |a| a[:group_id] == group[:id] }.each do |action|
-          window.backend.config[:data][:actions].delete(action)
-          window.backend.config[:data][:values].delete_if { |v| v[:action_id] == action[:id] }
-        end
+      def delete_group(group)
+        window.backend.config.groups.delete(group)
         window.backend.config_changed!
 
         @active_group = nil
@@ -186,68 +178,62 @@ module TAC
         @active_action = nil
         @active_action_label.value = ""
         @actions_list.clear
-        @values_list.clear
+        @variables_list.clear
 
         populate_groups_list
       end
 
       def create_action(name)
-        window.backend.config[:data][:actions] << {id: rand(100), group_id: @active_group.id, name: name, enabled: true}
+        @active_group.actions << TAC::Config::Action.new(name: name, enabled: true, variables: [])
         window.backend.config_changed!
 
-        populate_actions_list(@active_group.id)
+        populate_actions_list(@active_group)
       end
 
-      def update_action(action_struct, name)
-        action = window.backend.config[:data][:actions].find { |a| a[:id] == action_struct.id }
-        action[:name] = name
-
+      def update_action(action, name)
+        action.name = name
         window.backend.config_changed!
 
-        populate_actions_list(@active_group.id)
+        populate_actions_list(@active_group)
       end
 
-      def delete_action(action_struct)
-        action = window.backend.config[:data][:actions].find { |a| a[:id] == actions_struct.id }
-        window.backend.config[:data][:actions].delete(action)
-        window.backend.config[:data][:values].delete_if { |v| v[:action_id] == action[:id] }
+      def delete_action(action)
+        @active_group.actions.delete(action)
         window.backend.config_changed!
 
         @active_action = nil
         @active_action_label.value = ""
-        @values_list.clear
+        @variables_list.clear
 
-        populate_actions_list(@active_group.id)
+        populate_actions_list(@active_group)
       end
 
-      def create_value(name, type, value)
-        window.backend.config[:data][:values] << {id: rand(100), action_id: @active_action.id, name: name, type: type, value: value}
+      def create_variable(name, type, value)
+        @active_action.variables << TAC::Config::Variable.new(name: name, type: type, value: value)
         window.backend.config_changed!
 
-        populate_values_list(@active_action.id)
+        populate_variables_list(@active_action)
       end
 
-      def update_value(value_struct, name, type, value)
-        _v = window.backend.config[:data][:values].find { |v| v[:id] == value_struct.id }
-        _v[:name] = name
-        _v[:type] = type
-        _v[:value] = value
+      def update_variable(variable, name, type, value)
+        variable.name = name
+        variable.type = type
+        variable.value = value
 
         window.backend.config_changed!
 
-        populate_values_list(@active_action.id)
+        populate_variables_list(@active_action)
       end
 
-      def delete_value(value_struct)
-        _v = window.backend.config[:data][:values].find { |v| v[:id] == value_struct.id }
-        window.backend.config[:data][:values].delete(_v)
+      def delete_variable(variable)
+        @active_action.variables.delete(variable)
         window.backend.config_changed!
 
-        populate_values_list(@active_action.id)
+        populate_variables_list(@active_action)
       end
 
       def populate_groups_list
-        groups = TAC::Storage.groups
+        groups = window.backend.config.groups
 
         @groups_list.clear do
           groups.each do |group|
@@ -258,23 +244,23 @@ module TAC
                 @active_action = nil
                 @active_action_label.value = ""
 
-                populate_actions_list(group.id)
-                @values_list.clear
+                populate_actions_list(group)
+                @variables_list.clear
               end
 
               button "E", text_size: 18 do
                 push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, callback_method: method(:update_group))
               end
               button "D", text_size: 18 do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all\nof its actions and values?", callback_method: proc { delete_group(group) })
+                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all\nof its actions and variables?", callback_method: proc { delete_group(group) })
               end
             end
           end
         end
       end
 
-      def populate_actions_list(group_id)
-        actions = TAC::Storage.actions(group_id)
+      def populate_actions_list(group)
+        actions = group.actions
 
         @actions_list.clear do
           actions.each do |action|
@@ -283,35 +269,35 @@ module TAC
                 @active_action = action
                 @active_action_label.value = action.name
 
-                populate_values_list(action.id)
+                populate_variables_list(action)
               end
 
               button "E", text_size: 18 do
                 push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, callback_method: method(:update_action))
               end
               button "D", text_size: 18 do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its values?", callback_method: proc { delete_action(action) })
+                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its variables?", callback_method: proc { delete_action(action) })
               end
             end
           end
         end
       end
 
-      def populate_values_list(action_id)
-        values = TAC::Storage.values(action_id)
+      def populate_variables_list(action)
+        variables = action.variables
 
-        @values_list.clear do
-          values.each_with_index do |value, i|
+        @variables_list.clear do
+          variables.each_with_index do |variable, i|
             flow width: 1.0 do
-              background TAC::Palette::VALUES_SECONDARY if i.odd?
+              background TAC::Palette::VARIABLES_SECONDARY if i.odd?
 
-              label value.name, text_size: 18, width: 0.855
+              label variable.name, text_size: 18, width: 0.855
 
               button "E", text_size: 18 do
-                push_state(Dialog::VariableDialog, title: "Edit Variable", value: value, callback_method: method(:update_value))
+                push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
               end
               button "D", text_size: 18 do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete value?", callback_method: proc { delete_value(value) })
+                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
               end
             end
           end

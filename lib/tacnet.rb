@@ -44,7 +44,6 @@ module TAC
       elsif @connection && @connection.client && @connection.client.socket_error?
         "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s.chars.each_slice(32).to_a.map { |c| c.join }.join("\n")}"
       else
-        pp client
         "<b>Status:</b> #{_status}"
       end
     end
