@@ -134,7 +134,7 @@ module TAC
       end
 
       def self.from_json(hash)
-        Variable.new(name: hash[:name], type: hash[:type], value: hash[:value])
+        Variable.new(name: hash[:name], type: hash[:type].to_sym, value: hash[:value])
       end
     end
   end
