@@ -26,17 +26,17 @@ module TAC
                   end
 
                   flow width: 0.395 do
-                    button "►", text_size: 18, margin_left: 10, tip: "Simulate robot path"
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), image_width: 18, margin_left: 10, tip: "Simulate robot path"
                     button "Presets", text_size: 18, margin_left: 10, tip: "Manage presets" do
                       push_state(ManagePresets)
                     end
-                    button "Save", text_size: 18, margin_left: 10, tip: "Save config to disk" do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: 18, margin_left: 10, tip: "Save config to disk" do
                       window.backend.save_config
                     end
-                    button "▲", text_size: 18, margin_left: 10, tip: "Upload local config to remote, if connected." do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/export.png"), image_width: 18, margin_left: 10, tip: "Upload local config to remote, if connected." do
                       window.backend.upload_config
                     end
-                    button "▼", text_size: 18, margin_left: 10, tip: "Download remote config, if connected." do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: 18, margin_left: 10, tip: "Download remote config, if connected." do
                       window.backend.download_config
                     end
                   end

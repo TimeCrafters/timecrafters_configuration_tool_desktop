@@ -1,7 +1,7 @@
 module TAC
   THEME = {
             Label: {
-              font: "#{TAC::ROOT_PATH}/media/DejaVuSansCondensed.ttf",
+              font: "#{TAC::ROOT_PATH}/media/fonts/DejaVuSansCondensed.ttf",
               text_size: 28
             },
             Button: {
