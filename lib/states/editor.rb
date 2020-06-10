@@ -8,7 +8,7 @@ module TAC
         theme(THEME)
 
         stack width: 1.0, height: 1.0 do
-          stack width: 1.0, height: 0.1 do
+          stack width: 1.0, height: 0.1, border_thickness: 1, border_color: [0, 0, Gosu::Color::BLACK, 0] do
             background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
 
             flow width: 1.0, height: 1.0 do
@@ -86,45 +86,76 @@ module TAC
           end
 
           flow width: 1.0, height: 0.9 do
-            stack width: 0.333, height: 1.0 do
+            stack width: 0.333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
               background TAC::Palette::GROUPS_PRIMARY
               flow do
                 label "Groups"
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 18, tip: "Add group" do
-                  push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", callback_method: method(:create_group))
+                  push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", list: window.backend.config.groups, callback_method: method(:create_group))
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: 18, tip: "Clone currently selected group"
+                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: 18, tip: "Clone currently selected group" do
+                  if @active_group
+                    push_state(Dialog::NamePromptDialog, title: "Clone Group", renaming: @active_group, accept_label: "Clone", list: window.backend.config.groups, callback_method: proc { |group, name|
+                      clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
+                      clone.name = "#{name}"
+                      window.backend.config.groups << clone
+                      window.backend.config_changed!
+
+                      populate_groups_list
+                    })
+                  end
+                end
                 button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: 18, tip: "Save group as preset"
               end
 
               @groups_list = stack width: 1.0 do
               end
             end
-            stack width: 0.333, height: 1.0 do
+            stack width: 0.333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
               background TAC::Palette::ACTIONS_PRIMARY
               flow do
                 label "Actions"
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 18, tip: "Add action" do
                   if @active_group
-                    push_state(TAC::Dialog::NamePromptDialog, title: "Create Action", callback_method: method(:create_action))
+                    push_state(TAC::Dialog::NamePromptDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action,\nno group selected.")
                   end
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: 18, tip: "Clone currently selected action"
+                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: 18, tip: "Clone currently selected action" do
+                  if @active_action
+                    clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
+                    clone.name = "#{clone.name}_copy"
+                    @active_group.actions << clone
+                    window.backend.config_changed!
+
+                    populate_actions_list(@active_group)
+                  end
+
+                  if @active_group
+                    push_state(Dialog::NamePromptDialog, title: "Clone Action", renaming: @active_action, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name|
+                    clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
+                    clone.name = name
+                    @active_group.actions << clone
+                    window.backend.config_changed!
+
+                    populate_actions_list(@active_group)
+                    })
+                  end
+                end
                 button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: 18, tip: "Save action as preset"
               end
 
               @actions_list = stack width: 1.0 do
               end
             end
-            stack width: 0.333, height: 1.0 do
+            stack width: 0.331, height: 1.0 do
               background TAC::Palette::VARIABLES_PRIMARY
               flow do
-                label "Values"
+                label "Variables"
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 18, tip: "Add variable" do
                   if @active_action
-                    push_state(TAC::Dialog::VariableDialog, title: "Create Value", callback_method: method(:create_variable))
+                    push_state(TAC::Dialog::VariableDialog, title: "Create Variable", callback_method: method(:create_variable))
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create variable,\nno action selected.")
                   end
@@ -265,7 +296,7 @@ module TAC
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit group" do
-                push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, callback_method: method(:update_group))
+                push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete group" do
                 push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all\nof its actions and variables?", callback_method: proc { delete_group(group) })
@@ -289,7 +320,7 @@ module TAC
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit action" do
-                push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, callback_method: method(:update_action))
+                push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, list: @active_group.actions, callback_method: method(:update_action))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete action" do
                 push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its variables?", callback_method: proc { delete_action(action) })
@@ -304,17 +335,22 @@ module TAC
 
         @variables_list.clear do
           variables.each_with_index do |variable, i|
-            flow width: 1.0 do
+            stack width: 1.0 do
+              background TAC::Palette::VARIABLES_PRIMARY if i.even?
               background TAC::Palette::VARIABLES_SECONDARY if i.odd?
 
-              label variable.name, text_size: 18, width: 0.855
+              flow width: 1.0 do
+                label variable.name, text_size: 18, width: 0.855
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit variable" do
-                push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
+                button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit variable" do
+                  push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
+                end
+                button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete variable" do
+                  push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
+                end
               end
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete variable" do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
-              end
+
+              label "Type: #{variable.type}, Value: #{variable.value}", text_size: 18
             end
           end
         end

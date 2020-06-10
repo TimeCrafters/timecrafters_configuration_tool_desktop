@@ -31,6 +31,12 @@ module TAC
 
         push_state(Editor) if @transition_color.alpha >= 255
       end
+
+      def button_up(id)
+        super
+
+        push_state(Editor)
+      end
     end
   end
 end

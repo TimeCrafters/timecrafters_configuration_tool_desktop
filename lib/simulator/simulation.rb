@@ -119,8 +119,8 @@ module TAC
         end
 
         def draw
-          Gosu.draw_line(@robot.position.x, @robot.position.y, Gosu::Color::GREEN, @goal.x, @goal.y, Gosu::Color::GREEN)
-          Gosu.draw_rect(@goal.x, @goal.y, 16, 16, Gosu::Color::RED)
+          Gosu.draw_line(@robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2, Gosu::Color::GREEN, @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, Gosu::Color::GREEN)
+          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 2), @goal.y + (@robot.depth / 2 - 2), 4, 4, Gosu::Color::RED)
         end
 
         def update(dt)

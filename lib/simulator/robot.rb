@@ -2,6 +2,7 @@ module TAC
   class Simulator
     class Robot
       attr_accessor :position, :angle
+      attr_reader :width, :depth
       def initialize(width:, depth:)
         @width, @depth = width, depth
 
