@@ -1,8 +1,8 @@
 module TAC
   class Config
-    attr_reader :config, :groups
+    attr_reader :configuration, :groups
     def initialize
-      @config = nil
+      @configuration = nil
       @groups = nil
 
       parse(File.read(TAC::CONFIG_PATH))
@@ -24,13 +24,13 @@ module TAC
     end
 
     def parse_spec_current(data)
-      @config = Configuration.from_json(data[:config])
+      @configuration = Configuration.from_json(data[:config])
       @groups = data.dig(:data, :groups).map { |g| Group.from_json(g) }
     end
 
     def to_json(*args)
       {
-        config: @config,
+        config: @configuration,
         data: {
           groups: @groups
         }

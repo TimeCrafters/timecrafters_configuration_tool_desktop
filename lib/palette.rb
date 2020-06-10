@@ -9,8 +9,8 @@ module TAC
     TIMECRAFTERS_SECONDARY = Gosu::Color.new(0xff_006000)
     TIMECRAFTERS_TERTIARY = Gosu::Color.new(0xff_00d000)
 
-    TACNET_PRIMARY = Gosu::Color.new(0xff_000080)
-    TACNET_SECONDARY = Gosu::Color.new(0xff_000060)
+    TACNET_PRIMARY = Gosu::Color.new(0xff_003f7f)
+    TACNET_SECONDARY = Gosu::Color.new(0xff_007f7f)
 
     GROUPS_PRIMARY = Gosu::Color.new(0xff_444444)
     GROUPS_SECONDARY = Gosu::Color.new(0xff_444444)

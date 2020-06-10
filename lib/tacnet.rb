@@ -70,5 +70,9 @@ module TAC
     def gets
       @connection.gets if connected?
     end
+
+    def self.milliseconds
+      Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
+    end
   end
 end

@@ -47,8 +47,20 @@ module TAC
 
               flow width: 0.399 do
                 stack width: 0.5 do
-                  label "TACNET v#{TACNET::Packet::PROTOCOL_VERSION}", color: TAC::Palette::TACNET_PRIMARY
-                  @tacnet_ip_address = label "#{TACNET::DEFAULT_HOSTNAME}:#{TACNET::DEFAULT_PORT}", color: TAC::Palette::TACNET_SECONDARY
+                  label "TACNET v#{TACNET::Packet::PROTOCOL_VERSION}", color: TAC::Palette::TACNET_PRIMARY, text_shadow: true, text_shadow_size: 1, text_shadow_color: Gosu::Color::BLACK
+                  flow width: 1.0 do
+                    @tacnet_hostname = edit_line "#{window.backend.config.configuration.hostname}", text_size: 18, width: 0.5, margin_right: 0
+                    @tacnet_hostname.subscribe(:changed) do |caller, value|
+                      window.backend.config.configuration.hostname = value
+                      window.backend.config_changed!
+                    end
+                    label ":", text_size: 18, margin: 0, padding: 0, padding_top: 3
+                    @tacnet_port = edit_line "#{window.backend.config.configuration.port}", text_size: 18, width: 0.2, margin_left: 0
+                    @tacnet_port.subscribe(:changed) do |caller, value|
+                      window.backend.config.configuration.port = Integer(value)
+                      window.backend.config_changed!
+                    end
+                  end
                 end
 
                 stack width: 0.499 do
@@ -59,7 +71,7 @@ module TAC
                       when :connected, :connecting
                         window.backend.tacnet.close
                       when :not_connected, :connection_error
-                        window.backend.tacnet.connect("localhost")#("192.168.1.5")
+                        window.backend.tacnet.connect(@tacnet_hostname.value, @tacnet_port.value)
                       end
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/information.png"), image_width: 18, width: 0.475 do

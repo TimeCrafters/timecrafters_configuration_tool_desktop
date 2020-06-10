@@ -2,8 +2,6 @@ require "json"
 require "socket"
 require "securerandom"
 
-require "gosu"
-
 require_relative "lib/tac"
 require_relative "lib/logger"
 

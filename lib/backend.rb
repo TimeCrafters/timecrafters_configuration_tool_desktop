@@ -9,7 +9,7 @@ module TAC
     end
 
     def config_changed!
-      @config.config.updated_at = Time.now
+      @config.configuration.updated_at = Time.now
       @config_changed = true
     end
 

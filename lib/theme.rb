@@ -14,6 +14,9 @@ module TAC
               active: {
                 background: TAC::Palette::TIMECRAFTERS_TERTIARY
               }
+            },
+            EditLine: {
+              caret_color: Gosu::Color.new(0xff_434343)
             }
           }
 end

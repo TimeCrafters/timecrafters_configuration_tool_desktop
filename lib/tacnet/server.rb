@@ -18,10 +18,10 @@ module TAC
         @packets_sent, @packets_received, @client_last_packets_sent, @client_last_packets_received = 0, 0, 0, 0
         @data_sent, @data_received, @client_last_data_sent, @client_last_data_received = 0, 0, 0, 0
 
-        @last_sync_time = Gosu.milliseconds
+        @last_sync_time = TACNET.milliseconds
         @sync_interval = SYNC_INTERVAL
 
-        @last_heartbeat_sent = Gosu.milliseconds
+        @last_heartbeat_sent = TACNET.milliseconds
         @heartbeat_interval = HEARTBEAT_INTERVAL
 
         @client_handler_proc = proc do
@@ -80,8 +80,8 @@ module TAC
 
             Thread.new do
               while @active_client && @active_client.connected?
-                if Gosu.milliseconds > @last_sync_time + @sync_interval
-                  @last_sync_time = Gosu.milliseconds
+                if TACNET.milliseconds > @last_sync_time + @sync_interval
+                  @last_sync_time = TACNET.milliseconds
 
                   @active_client.sync(@client_handler_proc)
                   update_stats
@@ -108,8 +108,8 @@ module TAC
             @packet_handler.handle(message)
           end
 
-          if Gosu.milliseconds > @last_heartbeat_sent + @heartbeat_interval
-            @last_heartbeat_sent = Gosu.milliseconds
+          if TACNET.milliseconds > @last_heartbeat_sent + @heartbeat_interval
+            @last_heartbeat_sent = TACNET.milliseconds
 
             @active_client.puts(PacketHandler.packet_heartbeat)
           end
