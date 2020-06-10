@@ -7,7 +7,7 @@ module TAC
         @field_container = field_container
 
         @robot = Simulator::Robot.new(width: 18, depth: 18)
-        @field = Field.new(robot: @robot, season: :skystone, container: @field_container)
+        @field = Field.new(simulation: self, robot: @robot, season: :skystone, container: @field_container)
         @queue = []
 
         @unit = :ticks
@@ -19,6 +19,11 @@ module TAC
 
       def __start
         self.instance_eval(@source_code)
+        @queue.first.start unless @queue.empty?
+      end
+
+      def __queue
+        @queue
       end
 
       def __draw
@@ -32,7 +37,10 @@ module TAC
         if state = @queue.first
           state.update((Gosu.milliseconds - @last_milliseconds) / 1000.0)
 
-          @queue.delete(state) if state.complete?
+          if state.complete?
+            @queue.delete(state)
+            @queue.first.start unless @queue.empty?
+          end
         end
 
         @last_milliseconds = Gosu.milliseconds
@@ -61,23 +69,29 @@ module TAC
         @ticks_per_revolution = Integer(ticks)
       end
 
-      def forward(distance, power)
+      def forward(distance, power = 0.5)
         @queue << Move.new(simulation: self, distance: distance, power: power)
       end
 
-      def backward(distance, power)
+      def backward(distance, power = 1.0)
         @queue << Move.new(simulation: self, distance: -distance, power: power)
       end
 
-      def turn(relative_angle, power)
+      def turn(relative_angle, power = 1.0)
         @queue << Turn.new(simulation: self, relative_angle: relative_angle, power: power)
       end
 
       def __speed
-        @ticks_per_revolution * @gear_ratio
+        @ticks_per_revolution / @gear_ratio
       end
 
       class State
+        def start
+        end
+
+        def draw
+        end
+
         def update(dt)
         end
 
@@ -92,26 +106,35 @@ module TAC
           @robot = @simulation.robot
           @distance = distance
           @power = power
+        end
 
+        def start
           @starting_position = @robot.position.clone
           @goal = @starting_position.clone
-          @goal.x += @distance * Math.cos(@robot.angle.gosu_to_radians)
-          @goal.y += @distance * Math.sin(@robot.angle.gosu_to_radians)
+          @goal.x += Math.cos(@robot.angle.gosu_to_radians) * @distance
+          @goal.y += Math.sin(@robot.angle.gosu_to_radians) * @distance
 
           @complete = false
           @allowable_error = 3.0
         end
 
+        def draw
+          Gosu.draw_line(@robot.position.x, @robot.position.y, Gosu::Color::GREEN, @goal.x, @goal.y, Gosu::Color::GREEN)
+          Gosu.draw_rect(@goal.x, @goal.y, 16, 16, Gosu::Color::RED)
+        end
+
         def update(dt)
-          target = @starting_position + @goal
           speed = (@distance > 0 ? @power * dt : -@power * dt) * @simulation.__speed
 
-          # TODO: Fix not stopping if travelling at an angle
-          if @robot.position.distance(target) <= @allowable_error
+          if @robot.position.distance(@goal) <= @allowable_error
             @complete = true
+            @robot.position = @goal
           else
-            @robot.position.x += Math.cos(@robot.angle.gosu_to_radians) * speed
-            @robot.position.y += Math.sin(@robot.angle.gosu_to_radians) * speed
+            if speed > 0
+              @robot.position -= (@robot.position - @goal).normalized * speed
+            else
+              @robot.position += (@robot.position - @goal).normalized * speed
+            end
           end
         end
       end
@@ -122,7 +145,9 @@ module TAC
           @robot = @simulation.robot
           @relative_angle = relative_angle
           @power = power
+        end
 
+        def start
           @starting_angle = @robot.angle
           @last_angle = @starting_angle
           @complete = false
@@ -134,8 +159,10 @@ module TAC
 
           if @robot.angle.between?(target_angle - @allowable_error, target_angle + @allowable_error)
             @complete = true
+            @robot.angle = target_angle
           elsif (@robot.angle - @last_angle).between?(target_angle - @allowable_error, target_angle + @allowable_error)
             @complete = true
+            @robot.angle = target_angle
           elsif target_angle > @starting_angle
             @robot.angle += @power * dt * @simulation.__speed
           elsif target_angle < @starting_angle
