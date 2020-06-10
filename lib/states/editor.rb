@@ -54,7 +54,9 @@ module TAC
                       window.backend.config.configuration.hostname = value
                       window.backend.config_changed!
                     end
+
                     label ":", text_size: 18, margin: 0, padding: 0, padding_top: 3
+
                     @tacnet_port = edit_line "#{window.backend.config.configuration.port}", text_size: 18, width: 0.2, margin_left: 0
                     @tacnet_port.subscribe(:changed) do |caller, value|
                       window.backend.config.configuration.port = Integer(value)
