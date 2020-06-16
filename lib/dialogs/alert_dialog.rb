@@ -3,9 +3,9 @@ module TAC
     class AlertDialog < Dialog
       def build
         background Gosu::Color::GRAY
-        label @options[:message], text_size: 18
+        label @options[:message]
 
-        button "Close", width: 1.0, text_size: 18 do
+        button "Close", width: 1.0 do
           close
         end
       end

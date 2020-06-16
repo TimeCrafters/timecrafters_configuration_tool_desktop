@@ -7,17 +7,17 @@ module TAC
         @type = @options[:variable].type if @options[:variable]
 
         label "Name"
-        @name_error = label "Error", text_size: 18, color: TAC::Palette::TACNET_CONNECTION_ERROR
+        @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
-        @name = edit_line @options[:variable] ? @options[:variable].name : "", text_size: 18
+        @name = edit_line @options[:variable] ? @options[:variable].name : ""
 
         label "Type"
-        @type_error = label "Error", text_size: 18, color: TAC::Palette::TACNET_CONNECTION_ERROR
+        @type_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @type_error.hide
         # TODO: Add dropdown menus to CyberarmEngine
         flow width: 1.0 do
           [:float, :double, :integer, :long, :string, :boolean].each do |btn|
-            button btn, text_size: 18 do
+            button btn do
               @type = btn
               @value_container.show
             end
@@ -26,17 +26,17 @@ module TAC
 
         @value_container = stack width: 1.0 do
           label "Value"
-          @value_error = label "Error", text_size: 18, color: TAC::Palette::TACNET_CONNECTION_ERROR
+          @value_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
           @value_error.hide
-          @value = edit_line @options[:variable] ? @options[:variable].value : "", text_size: 18
+          @value = edit_line @options[:variable] ? @options[:variable].value : ""
         end
 
         flow width: 1.0 do
-          button "Cancel", width: 0.475, text_size: 18 do
+          button "Cancel", width: 0.475 do
             close
           end
 
-          button @options[:variable] ? "Update" : "Add", width: 0.475, text_size: 18 do |b|
+          button @options[:variable] ? "Update" : "Add", width: 0.475 do |b|
             if valid?
               if @options[:variable]
                 @options[:callback_method].call(@options[:variable], @name.value.strip, @type, @value.value.strip)

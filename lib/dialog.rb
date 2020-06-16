@@ -14,13 +14,13 @@ module TAC
           background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
 
           # title
-          flow width: 0.9 do
-            label @title
+          flow width: 0.855 do
+            label @title, text_size: THEME_SUBHEADING_TEXT_SIZE
           end
 
           # Buttons
-          flow width: 0.1 do
-            button "X", text_size: 24 do
+          flow width: 0.145 do
+            button get_image("#{TAC::ROOT_PATH}/media/icons/cross.png"), image_width: 24, **THEME_DANGER_BUTTON do
               close
             end
           end

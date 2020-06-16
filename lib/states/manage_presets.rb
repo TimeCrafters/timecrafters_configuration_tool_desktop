@@ -5,9 +5,9 @@ module TAC
         theme(THEME)
 
         stack width: 1.0, height: 0.1 do
-          background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
-          label "#{TAC::NAME} ― Manage Presets", text_size: 28, color: Gosu::Color::BLACK
-          button "Close", text_size: 18 do
+          background THEME_HEADER_BACKGROUND
+          label "#{TAC::NAME} ― Manage Presets", bold: true, text_size: THEME_HEADING_TEXT_SIZE
+          button "Close" do
             pop_state
           end
         end
@@ -18,13 +18,13 @@ module TAC
             label "Group Presets"
             # TAC::Storage.group_presets.each do |preset|
             %w{ Hello World How Are You }.each do |preset|
-              button preset, width:1.0, text_size: 18
+              button preset, width:1.0
             end
 
             label "Action Presets"
             # TAC::Storage.action_presets.each do |preset|
             %w{ Hello World How Are You }.each do |preset|
-              button preset, width:1.0, text_size: 18
+              button preset, width:1.0
             end
           end
 

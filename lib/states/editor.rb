@@ -9,36 +9,36 @@ module TAC
 
         stack width: 1.0, height: 1.0 do
           stack width: 1.0, height: 0.1, border_thickness: 1, border_color: [0, 0, Gosu::Color::BLACK, 0] do
-            background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
+            background THEME_HEADER_BACKGROUND
 
             flow width: 1.0, height: 1.0 do
               stack width: 0.60 do
-                label TAC::NAME, color: Gosu::Color::BLACK, bold: true
+                label TAC::NAME, bold: true, text_size: THEME_HEADING_TEXT_SIZE
                 flow width: 1.0 do
                   flow width: 0.3 do
-                    label "Group: ", text_size: 18
-                    @active_group_label = label "", text_size: 18
+                    label "Group: "
+                    @active_group_label = label ""
                   end
 
                   flow width: 0.3 do
-                    label "Action: ", text_size: 18
-                    @active_action_label = label "", text_size: 18
+                    label "Action: "
+                    @active_action_label = label ""
                   end
 
                   flow width: 0.395 do
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), image_width: 18, margin_left: 10, tip: "Simulator" do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Simulator" do
                       push_state(Simulator)
                     end
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/menuList.png"), image_width: 18, margin_left: 10, tip: "Manage presets" do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/menuList.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Manage presets" do
                       push_state(ManagePresets)
                     end
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: 18, margin_left: 10, tip: "Save config to disk" do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Save config to disk" do
                       window.backend.save_config
                     end
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/export.png"), image_width: 18, margin_left: 10, tip: "Upload local config to remote, if connected." do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/export.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Upload local config to remote, if connected." do
                       window.backend.upload_config
                     end
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: 18, margin_left: 10, tip: "Download remote config, if connected." do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Download remote config, if connected." do
                       window.backend.download_config
                     end
                   end
@@ -49,15 +49,15 @@ module TAC
                 stack width: 0.5 do
                   label "TACNET v#{TACNET::Packet::PROTOCOL_VERSION}", color: TAC::Palette::TACNET_PRIMARY, text_shadow: true, text_shadow_size: 1, text_shadow_color: Gosu::Color::BLACK
                   flow width: 1.0 do
-                    @tacnet_hostname = edit_line "#{window.backend.config.configuration.hostname}", text_size: 18, width: 0.5, margin_right: 0
+                    @tacnet_hostname = edit_line "#{window.backend.config.configuration.hostname}", width: 0.5, margin_right: 0
                     @tacnet_hostname.subscribe(:changed) do |caller, value|
                       window.backend.config.configuration.hostname = value
                       window.backend.config_changed!
                     end
 
-                    label ":", text_size: 18, margin: 0, padding: 0, padding_top: 3
+                    label ":", margin: 0, padding: 0, padding_top: 3
 
-                    @tacnet_port = edit_line "#{window.backend.config.configuration.port}", text_size: 18, width: 0.2, margin_left: 0
+                    @tacnet_port = edit_line "#{window.backend.config.configuration.port}", width: 0.2, margin_left: 0
                     @tacnet_port.subscribe(:changed) do |caller, value|
                       window.backend.config.configuration.port = Integer(value)
                       window.backend.config_changed!
@@ -66,9 +66,9 @@ module TAC
                 end
 
                 stack width: 0.499 do
-                  @tacnet_status = label "Not Connected", background: TAC::Palette::TACNET_NOT_CONNECTED, width: 1.0, text_size: 18, padding: 5, margin_top: 2, border_thickness: 1, border_color: Gosu::Color::GRAY
+                  @tacnet_status = label "Not Connected", background: TAC::Palette::TACNET_NOT_CONNECTED, width: 1.0, padding: 5, margin_top: 2, border_thickness: 1, border_color: Gosu::Color::GRAY
                   flow width: 1.0 do
-                    @tacnet_connection_button = button "Connect", width: 0.475, text_size: 18 do
+                    @tacnet_connection_button = button "Connect", width: 0.475 do
                       case window.backend.tacnet.status
                       when :connected, :connecting
                         window.backend.tacnet.close
@@ -76,7 +76,7 @@ module TAC
                         window.backend.tacnet.connect(@tacnet_hostname.value, @tacnet_port.value)
                       end
                     end
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/information.png"), image_width: 18, width: 0.475 do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/information.png"), image_width: THEME_ICON_SIZE, width: 0.475 do
                       push_state(Dialog::AlertDialog, title: "TACNET Status", message: window.backend.tacnet.full_status)
                     end
                   end
@@ -86,14 +86,14 @@ module TAC
           end
 
           flow width: 1.0, height: 0.9 do
+            background THEME_CONTENT_BACKGROUND
             stack width: 0.333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
-              background TAC::Palette::GROUPS_PRIMARY
               flow do
-                label "Groups"
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 18, tip: "Add group" do
+                label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
                   push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", list: window.backend.config.groups, callback_method: method(:create_group))
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: 18, tip: "Clone currently selected group" do
+                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected group" do
                   if @active_group
                     push_state(Dialog::NamePromptDialog, title: "Clone Group", renaming: @active_group, accept_label: "Clone", list: window.backend.config.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
@@ -105,24 +105,23 @@ module TAC
                     })
                   end
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: 18, tip: "Save group as preset"
+                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save group as preset"
               end
 
               @groups_list = stack width: 1.0 do
               end
             end
             stack width: 0.333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
-              background TAC::Palette::ACTIONS_PRIMARY
               flow do
-                label "Actions"
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 18, tip: "Add action" do
+                label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
                   if @active_group
                     push_state(TAC::Dialog::NamePromptDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action,\nno group selected.")
                   end
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: 18, tip: "Clone currently selected action" do
+                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected action" do
                   if @active_action
                     clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
                     clone.name = "#{clone.name}_copy"
@@ -143,17 +142,16 @@ module TAC
                     })
                   end
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: 18, tip: "Save action as preset"
+                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save action as preset"
               end
 
               @actions_list = stack width: 1.0 do
               end
             end
             stack width: 0.331, height: 1.0 do
-              background TAC::Palette::VARIABLES_PRIMARY
               flow do
-                label "Variables"
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 18, tip: "Add variable" do
+                label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
                     push_state(TAC::Dialog::VariableDialog, title: "Create Variable", callback_method: method(:create_variable))
                   else
@@ -283,9 +281,11 @@ module TAC
         groups = window.backend.config.groups
 
         @groups_list.clear do
-          groups.each do |group|
-            flow width: 1.0 do
-              button group.name, text_size: 18, width: 0.855 do
+          groups.each_with_index do |group, i|
+            flow width: 1.0, padding_left: THEME_ITEM_PADDING, padding_right: THEME_ITEM_PADDING, padding_top: THEME_ITEM_PADDING, padding_bottom: THEME_ITEM_PADDING do
+              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+
+              button group.name, width: 0.855 do
                 @active_group = group
                 @active_group_label.value = group.name
                 @active_action = nil
@@ -295,10 +295,10 @@ module TAC
                 @variables_list.clear
               end
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit group" do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
                 push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
               end
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete group" do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
                 push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all\nof its actions and variables?", callback_method: proc { delete_group(group) })
               end
             end
@@ -310,19 +310,23 @@ module TAC
         actions = group.actions
 
         @actions_list.clear do
-          actions.each do |action|
-            flow width: 1.0 do
-              button action.name, text_size: 18, width: 0.855 do
+          actions.each_with_index do |action, i|
+            flow width: 1.0, padding_left: THEME_ITEM_PADDING, padding_right: THEME_ITEM_PADDING, padding_top: THEME_ITEM_PADDING, padding_bottom: THEME_ITEM_PADDING do
+              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+
+              button action.name, width: 0.8 do
                 @active_action = action
                 @active_action_label.value = action.name
 
                 populate_variables_list(action)
               end
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit action" do
+              toggle_button tip: "Enable action"
+
+              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
                 push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, list: @active_group.actions, callback_method: method(:update_action))
               end
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete action" do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
                 push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its variables?", callback_method: proc { delete_action(action) })
               end
             end
@@ -335,22 +339,15 @@ module TAC
 
         @variables_list.clear do
           variables.each_with_index do |variable, i|
-            stack width: 1.0 do
-              background TAC::Palette::VARIABLES_PRIMARY if i.even?
-              background TAC::Palette::VARIABLES_SECONDARY if i.odd?
+            flow width: 1.0, padding_left: THEME_ITEM_PADDING, padding_right: THEME_ITEM_PADDING, padding_top: THEME_ITEM_PADDING, padding_bottom: THEME_ITEM_PADDING do
+              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              flow width: 1.0 do
-                label variable.name, text_size: 18, width: 0.855
-
-                button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: 18, tip: "Edit variable" do
-                  push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
-                end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 18, tip: "Delete variable" do
-                  push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
-                end
+              button "#{variable.name} [Type: #{variable.type}, Value: #{variable.value}]", width: 0.925, tip: "Edit variable" do
+                push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
               end
-
-              label "Type: #{variable.type}, Value: #{variable.value}", text_size: 18
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do
+                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
+              end
             end
           end
         end
