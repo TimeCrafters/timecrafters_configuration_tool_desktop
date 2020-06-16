@@ -160,12 +160,11 @@ class State
           if @robot.angle.between?(target_angle - @allowable_error, target_angle + @allowable_error)
             @complete = true
             @robot.angle = target_angle
-          elsif (@robot.angle - @last_angle).between?(target_angle - @allowable_error, target_angle + @allowable_error)
-            @complete = true
-            @robot.angle = target_angle
-          elsif target_angle > @starting_angle
+
+          elsif Gosu.angle_diff(@starting_angle, target_angle) > 0
             @robot.angle += @power * dt * @robot.speed
-          elsif target_angle < @starting_angle
+
+          elsif Gosu.angle_diff(@starting_angle, target_angle) < 0
             @robot.angle -= @power * dt * @robot.speed
           end
 
