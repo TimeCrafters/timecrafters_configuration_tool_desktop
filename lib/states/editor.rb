@@ -109,7 +109,12 @@ module TAC
                     })
                   end
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save group as preset"
+                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save group as preset" do
+                  if @active_group
+                    push_state(Dialog::NamePromptDialog, title: "Save Group Preset", renaming: @active_group, accept_label: "Save", list: window.backend.config.presets.actions, callback_method: proc { |action, name|
+                    })
+                  end
+                end
               end
 
               @groups_list = stack width: 1.0 do
@@ -126,16 +131,7 @@ module TAC
                   end
                 end
                 button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected action" do
-                  if @active_action
-                    clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
-                    clone.name = "#{clone.name}_copy"
-                    @active_group.actions << clone
-                    window.backend.config_changed!
-
-                    populate_actions_list(@active_group)
-                  end
-
-                  if @active_group
+                  if @active_group && @active_action
                     push_state(Dialog::NamePromptDialog, title: "Clone Action", renaming: @active_action, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name|
                     clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
                     clone.name = name
@@ -146,7 +142,12 @@ module TAC
                     })
                   end
                 end
-                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save action as preset"
+                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save action as preset" do
+                  if @active_action
+                    push_state(Dialog::NamePromptDialog, title: "Save Action Preset", renaming: @active_action, accept_label: "Save", list: window.backend.config.presets.actions, callback_method: proc { |action, name|
+                    })
+                  end
+                end
               end
 
               @actions_list = stack width: 1.0 do
