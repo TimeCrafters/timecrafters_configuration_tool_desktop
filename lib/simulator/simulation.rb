@@ -1,13 +1,14 @@
 module TAC
   class Simulator
     class Simulation
-      attr_reader :robots
+      attr_reader :robots, :show_paths
       def initialize(source_code:, field_container:)
         @source_code = source_code
         @field_container = field_container
 
         @robots = []
         @field = Field.new(simulation: self, season: :skystone, container: @field_container)
+        @show_paths = false
 
         @last_milliseconds = Gosu.milliseconds
       end
@@ -33,6 +34,10 @@ module TAC
         @robots << robot
 
         return robot
+      end
+
+      def set_show_paths(boolean)
+        @show_paths = boolean
       end
     end
   end
