@@ -106,7 +106,7 @@ class State
         def initialize(robot:, distance:, power:)
           @robot = robot
           @distance = distance
-          @power = power
+          @power = power.clamp(-1.0, 1.0)
         end
 
         def start
@@ -116,12 +116,15 @@ class State
           @goal.y += Math.sin(@robot.angle.gosu_to_radians) * @distance
 
           @complete = false
-          @allowable_error = 3.0
+          @allowable_error = 1.0
         end
 
         def draw
-          Gosu.draw_line(@robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2, Gosu::Color::GREEN, @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, Gosu::Color::GREEN)
-          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 2), @goal.y + (@robot.depth / 2 - 2), 4, 4, Gosu::Color::RED)
+          Gosu.draw_line(
+            @robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY,
+            @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY
+          )
+          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 1), @goal.y + (@robot.depth / 2 - 1), 2, 2, Gosu::Color::RED)
         end
 
         def update(dt)
@@ -144,27 +147,58 @@ class State
         def initialize(robot:, relative_angle:, power:)
           @robot = robot
           @relative_angle = relative_angle
-          @power = power
+          @power = power.clamp(-1.0, 1.0)
         end
 
         def start
           @starting_angle = @robot.angle
           @last_angle = @starting_angle
+          @target_angle = (@starting_angle + @relative_angle) % 360.0
           @complete = false
           @allowable_error = 3.0
         end
 
+        def draw
+          Gosu.rotate(@target_angle, @robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2) do
+            fraction = 0
+            angle_difference = Gosu.angle_diff(@target_angle, @robot.angle)
+
+            if angle_difference > 0
+              fraction = angle_difference / 360.0
+            else
+              fraction = (angle_difference - 360 % 360) / 360.0
+            end
+
+            Gosu.draw_arc(
+              @robot.position.x + @robot.width / 2,
+              @robot.position.y + @robot.depth / 2,
+              @robot.width > @robot.depth ? @robot.width : @robot.depth,
+              fraction,
+              360,
+              1,
+              TAC::Palette::TIMECRAFTERS_TERTIARY
+            )
+          end
+
+          Gosu.draw_circle(
+            @robot.position.x + @robot.width / 2 + Gosu.offset_x(@target_angle, @robot.width > @robot.depth ? @robot.width : @robot.depth),
+            @robot.position.y + @robot.depth / 2 + Gosu.offset_y(@target_angle, @robot.width > @robot.depth ? @robot.width : @robot.depth),
+            1,
+            9,
+            Gosu::Color::RED
+          )
+          # Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, @alliance)
+        end
+
         def update(dt)
-          target_angle = (@starting_angle + @relative_angle) % 360.0
-
-          if @robot.angle.between?(target_angle - @allowable_error, target_angle + @allowable_error)
+          if @robot.angle.between?(@target_angle - @allowable_error, @target_angle + @allowable_error)
             @complete = true
-            @robot.angle = target_angle
+            @robot.angle = @target_angle
 
-          elsif Gosu.angle_diff(@starting_angle, target_angle) > 0
+          elsif Gosu.angle_diff(@starting_angle, @target_angle) > 0
             @robot.angle += @power * dt * @robot.speed
 
-          elsif Gosu.angle_diff(@starting_angle, target_angle) < 0
+          elsif Gosu.angle_diff(@starting_angle, @target_angle) < 0
             @robot.angle -= @power * dt * @robot.speed
           end
 

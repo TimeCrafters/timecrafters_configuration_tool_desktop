@@ -23,6 +23,7 @@ module TAC
             flow width: 1.0, height: 0.05 do
               button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), image_width: THEME_ICON_SIZE, width: 0.49, tip: "Run simulation" do
                 begin
+                  @simulation_start_time = Gosu.milliseconds
                   @simulation = TAC::Simulator::Simulation.new(source_code: @source_code.value, field_container: @field_container)
                   @simulation.start
                 rescue SyntaxError, NameError, NoMethodError, TypeError, ArgumentError => e
@@ -32,7 +33,7 @@ module TAC
                 end
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/stop.png"), image_width: THEME_ICON_SIZE, width: 0.49, tip: "Stop simulation" do
-                @simulation.queue.clear if @simulation
+                @simulation.robots.each { |robot| robot.queue.clear } if @simulation
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, width: 0.49, tip: "Save source code" do
                 File.open("#{TAC::ROOT_PATH}/data/simulator.rb", "w") { |f| f.write @source_code.value }
@@ -73,6 +74,7 @@ robot.forward 100"
         super
 
         @simulation.update if @simulation
+        @simulation_status.value = "Time: #{((Gosu.milliseconds - @simulation_start_time) / 1000.0).round(1)} seconds" if @simulation_start_time
       end
     end
   end
