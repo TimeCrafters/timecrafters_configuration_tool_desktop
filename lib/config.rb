@@ -38,12 +38,11 @@ module TAC
     end
 
     class Configuration
-      attr_accessor :created_at, :updated_at, :spec_version, :hostname, :port
+      attr_accessor :created_at, :updated_at, :spec_version
       attr_reader :presets
-      def initialize(created_at:, updated_at:, spec_version:, hostname:, port:, presets:)
+      def initialize(created_at:, updated_at:, spec_version:, presets:)
         @created_at, @updated_at = created_at, updated_at
         @spec_version = spec_version
-        @hostname, @port = hostname, port
         @presets = presets
       end
 
@@ -52,8 +51,6 @@ module TAC
           created_at: @created_at,
           updated_at: @updated_at,
           spec_version: @spec_version,
-          hostname: @hostname,
-          port: @port,
           presets: @presets
         }.to_json(*args)
       end
@@ -61,8 +58,7 @@ module TAC
       def self.from_json(hash)
         Configuration.new(
           created_at: hash[:created_at], updated_at: hash[:updated_at],
-          spec_version: hash[:spec_version], hostname: hash[:hostname],
-          port: hash[:port], presets: hash[:presets].map { |ps| Preset.from_json(ps) }
+          spec_version: hash[:spec_version], presets: hash[:presets].map { |ps| Preset.from_json(ps) }
         )
       end
     end

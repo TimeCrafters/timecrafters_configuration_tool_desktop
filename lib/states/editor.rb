@@ -32,8 +32,9 @@ module TAC
                     button get_image("#{TAC::ROOT_PATH}/media/icons/menuList.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Manage presets" do
                       push_state(ManagePresets)
                     end
-                    button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Save config to disk" do
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Save config and settings to disk" do
                       window.backend.save_config
+                      window.backend.save_settings
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/export.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Upload local config to remote, if connected." do
                       window.backend.upload_config
@@ -49,18 +50,18 @@ module TAC
                 stack width: 0.5 do
                   label "TACNET v#{TACNET::Packet::PROTOCOL_VERSION}", color: TAC::Palette::TACNET_PRIMARY, text_shadow: true, text_shadow_size: 1, text_shadow_color: Gosu::Color::BLACK
                   flow width: 1.0 do
-                    @tacnet_hostname = edit_line "#{window.backend.config.configuration.hostname}", width: 0.5, margin_right: 0
+                    @tacnet_hostname = edit_line "#{window.backend.settings.hostname}", width: 0.5, margin_right: 0
                     @tacnet_hostname.subscribe(:changed) do |caller, value|
-                      window.backend.config.configuration.hostname = value
-                      window.backend.config_changed!
+                      window.backend.settings.hostname = value
+                      window.backend.settings_changed!
                     end
 
                     label ":", margin: 0, padding: 0, padding_top: 3
 
-                    @tacnet_port = edit_line "#{window.backend.config.configuration.port}", width: 0.2, margin_left: 0
+                    @tacnet_port = edit_line "#{window.backend.settings.port}", width: 0.2, margin_left: 0
                     @tacnet_port.subscribe(:changed) do |caller, value|
-                      window.backend.config.configuration.port = Integer(value)
-                      window.backend.config_changed!
+                      window.backend.settings.port = Integer(value)
+                      window.backend.settings_changed!
                     end
                   end
                 end

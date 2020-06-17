@@ -1,11 +1,13 @@
 module TAC
   class Backend
-    attr_reader :config, :tacnet
+    attr_reader :config, :settings, :tacnet
     def initialize
       @config = load_config
+      @settings = load_settings
       @tacnet = TACNET.new
 
       @config_changed = false
+      @settings_changed = false
     end
 
     def config_changed!
@@ -81,6 +83,45 @@ module TAC
 
     def refresh_tacnet_status
       $window.current_state.refresh_tacnet_status
+    end
+
+
+    def settings_changed!
+      @settings_changed = true
+    end
+
+    def settings_changed?
+      @settings_changed
+    end
+
+    def load_settings
+      if File.exist?(TAC::SETTINGS_PATH)
+        return TAC::Settings.new
+      else
+        write_default_settings
+        load_settings
+      end
+    end
+
+    def save_settings
+      json = @settings.to_json
+
+      File.open(TAC::SETTINGS_PATH, "w") { |f| f.write json }
+
+      @settings_changed = false
+    end
+
+    def write_default_settings
+      File.open(TAC::SETTINGS_PATH, "w") do |f|
+        f.write JSON.dump(
+          {
+            data: {
+              hostname: TACNET::DEFAULT_HOSTNAME,
+              port: TACNET::DEFAULT_PORT,
+            }
+          }
+        )
+      end
     end
   end
 end
