@@ -71,7 +71,7 @@ module TAC
             @active_client = client
             # TODO: Backup local config
             # SEND CONFIG
-            config = File.read(TAC::CONFIG_PATH)
+            config = File.read(TAC::CONFIGS_PATH)
 
             @active_client.puts(PacketHandler.packet_handshake(@active_client.uuid))
             @active_client.puts(PacketHandler.packet_upload_config(config))

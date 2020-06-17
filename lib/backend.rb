@@ -2,8 +2,8 @@ module TAC
   class Backend
     attr_reader :config, :settings, :tacnet
     def initialize
-      @config = load_config
-      @settings = load_settings
+      load_settings
+      load_config(@settings.config) if @settings.config
       @tacnet = TACNET.new
 
       @config_changed = false
@@ -19,43 +19,35 @@ module TAC
       @config_changed
     end
 
-    def load_config
-      if File.exist?(TAC::CONFIG_PATH)
-        return TAC::Config.new
-      else
-        write_default_config
-        load_config
+    def load_config(name)
+      if File.exist?("#{TAC::CONFIGS_PATH}/#{name}.json")
+        @config = TAC::Config.new(name)
       end
     end
 
-    def update_config
-      @config = load_config
-      $window.current_state.populate_groups_list
-    end
-
-    def save_config
+    def save_config(name)
       json = @config.to_json
 
-      File.open(TAC::CONFIG_PATH, "w") { |f| f.write json }
+      File.open("#{TAC::CONFIGS_PATH}/#{name}.json", "w") { |f| f.write json }
 
       @config_changed = false
     end
 
     def upload_config
-      if @tacnet.connected?
+      if @config && @tacnet.connected?
         json = @config.to_json
         @tacnet.puts(TAC::TACNET::PacketHandler.packet_upload_config(json))
       end
     end
 
     def download_config
-      if @tacnet.connected?
+      if @config && @tacnet.connected?
         @tacnet.puts(TAC::TACNET::PacketHandler.packet_download_config)
       end
     end
 
-    def write_default_config
-      File.open(TAC::CONFIG_PATH, "w") do |f|
+    def write_new_config(name)
+      File.open("#{TAC::CONFIGS_PATH}/#{name}.json", "w") do |f|
         f.write JSON.dump(
           {
             config: {
@@ -64,21 +56,17 @@ module TAC
               spec_version: TAC::CONFIG_SPEC_VERSION,
               hostname: TACNET::DEFAULT_HOSTNAME,
               port: TACNET::DEFAULT_PORT,
-              presets: [],
             },
             data: {
               groups: [],
+              presets: {
+                groups: [],
+                actions: [],
+              },
             },
           }
         )
       end
-    end
-
-    def refresh_config
-      load_config
-
-      $window.states.clear
-      $window.push_state(Editor)
     end
 
     def refresh_tacnet_status
@@ -96,7 +84,7 @@ module TAC
 
     def load_settings
       if File.exist?(TAC::SETTINGS_PATH)
-        return TAC::Settings.new
+        @settings = TAC::Settings.new
       else
         write_default_settings
         load_settings
@@ -118,6 +106,7 @@ module TAC
             data: {
               hostname: TACNET::DEFAULT_HOSTNAME,
               port: TACNET::DEFAULT_PORT,
+              config: nil,
             }
           }
         )

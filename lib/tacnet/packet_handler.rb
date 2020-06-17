@@ -81,7 +81,7 @@ module TAC
           $window.backend.tacnet.puts(PacketHandler.packet_upload_config(json))
         else
           if $server.active_client && $server.active_client.connected?
-            json = File.read(TAC::CONFIG_PATH)
+            json = File.read(TAC::CONFIGS_PATH)
             $server.active_client.puts(PacketHandler.packet_upload_config(json))
           end
         end

@@ -40,6 +40,12 @@ module TAC
   THEME_HEADING_TEXT_SIZE = 32
   THEME_SUBHEADING_TEXT_SIZE = 28
   THEME_ITEM_PADDING = 8
+  THEME_ITEM_CONTAINER_PADDING = {
+    padding_left: THEME_ITEM_PADDING,
+    padding_right: THEME_ITEM_PADDING,
+    padding_top: THEME_ITEM_PADDING,
+    padding_bottom: THEME_ITEM_PADDING
+  }
   THEME_EVEN_COLOR = Gosu::Color.new(0xff_606060)
   THEME_ODD_COLOR = Gosu::Color.new(0xff_202020)
   THEME_CONTENT_BACKGROUND = Gosu::Color.new(0x88_007f3f)

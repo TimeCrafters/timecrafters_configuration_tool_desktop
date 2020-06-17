@@ -1,11 +1,12 @@
 module TAC
   class Config
-    attr_reader :configuration, :groups
-    def initialize
+    attr_reader :configuration, :groups, :presets
+    def initialize(name)
       @configuration = nil
       @groups = nil
+      @presets = nil
 
-      parse(File.read(TAC::CONFIG_PATH))
+      parse(File.read("#{TAC::CONFIGS_PATH}/#{name}.json"))
     end
 
     def parse(json)
@@ -26,24 +27,24 @@ module TAC
     def parse_spec_current(data)
       @configuration = Configuration.from_json(data[:config])
       @groups = data.dig(:data, :groups).map { |g| Group.from_json(g) }
+      @presets = Presets.from_json(data.dig(:data, :presets))
     end
 
     def to_json(*args)
       {
         config: @configuration,
         data: {
-          groups: @groups
+          groups: @groups,
+          presets: @presets,
         }
       }.to_json(*args)
     end
 
     class Configuration
       attr_accessor :created_at, :updated_at, :spec_version
-      attr_reader :presets
-      def initialize(created_at:, updated_at:, spec_version:, presets:)
+      def initialize(created_at:, updated_at:, spec_version:)
         @created_at, @updated_at = created_at, updated_at
         @spec_version = spec_version
-        @presets = presets
       end
 
       def to_json(*args)
@@ -51,26 +52,36 @@ module TAC
           created_at: @created_at,
           updated_at: @updated_at,
           spec_version: @spec_version,
-          presets: @presets
         }.to_json(*args)
       end
 
       def self.from_json(hash)
         Configuration.new(
-          created_at: hash[:created_at], updated_at: hash[:updated_at],
-          spec_version: hash[:spec_version], presets: hash[:presets].map { |ps| Preset.from_json(ps) }
+          created_at: hash[:created_at],
+          updated_at: hash[:updated_at],
+          spec_version: hash[:spec_version]
         )
       end
     end
 
-    class Preset
-      def initialize()
+    class Presets
+      attr_reader :groups, :actions
+      def initialize(groups:, actions:)
+        @groups, @actions = groups, actions
       end
 
       def to_json(*args)
+        {
+          groups: @groups,
+          actions: @actions,
+        }.to_json(*args)
       end
 
       def self.from_json(hash)
+        Presets.new(
+          groups: hash[:groups].map { |group| Group.from_json(group) },
+          actions: hash[:actions].map { |action| Action.from_json(action) },
+        )
       end
     end
 

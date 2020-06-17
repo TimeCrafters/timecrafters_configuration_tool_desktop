@@ -32,15 +32,18 @@ module TAC
                     button get_image("#{TAC::ROOT_PATH}/media/icons/menuList.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Manage presets" do
                       push_state(ManagePresets)
                     end
+                    button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Manage configurations" do
+                      push_state(ManageConfigurations)
+                    end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Save config and settings to disk" do
-                      window.backend.save_config
+                      window.backend.save_config(window.backend.settings.config)
                       window.backend.save_settings
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/export.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Upload local config to remote, if connected." do
-                      window.backend.upload_config
+                      window.backend.upload_config(window.backend.settings.config)
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Download remote config, if connected." do
-                      window.backend.download_config
+                      window.backend.download_config(window.backend.settings.config)
                     end
                   end
                 end
@@ -86,7 +89,7 @@ module TAC
             end
           end
 
-          flow width: 1.0, height: 0.9 do
+          @content = flow width: 1.0, height: 0.9 do
             background THEME_CONTENT_BACKGROUND
             stack width: 0.333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
               flow do
@@ -167,7 +170,11 @@ module TAC
           end
         end
 
-        populate_groups_list
+        unless window.backend.settings.config
+          push_state(ManageConfigurations)
+        else
+          populate_groups_list
+        end
 
         @tacnet_status_monitor = CyberarmEngine::Timer.new(250) do
           case window.backend.tacnet.status
@@ -283,7 +290,7 @@ module TAC
 
         @groups_list.clear do
           groups.each_with_index do |group, i|
-            flow width: 1.0, padding_left: THEME_ITEM_PADDING, padding_right: THEME_ITEM_PADDING, padding_top: THEME_ITEM_PADDING, padding_bottom: THEME_ITEM_PADDING do
+            flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
               button group.name, width: 0.855 do
@@ -296,7 +303,7 @@ module TAC
                 @variables_list.clear
               end
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
                 push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
@@ -312,7 +319,7 @@ module TAC
 
         @actions_list.clear do
           actions.each_with_index do |action, i|
-            flow width: 1.0, padding_left: THEME_ITEM_PADDING, padding_right: THEME_ITEM_PADDING, padding_top: THEME_ITEM_PADDING, padding_bottom: THEME_ITEM_PADDING do
+            flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
               button action.name, width: 0.8 do
@@ -324,7 +331,7 @@ module TAC
 
               toggle_button tip: "Enable action"
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/wrench.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
                 push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, list: @active_group.actions, callback_method: method(:update_action))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
@@ -340,7 +347,7 @@ module TAC
 
         @variables_list.clear do
           variables.each_with_index do |variable, i|
-            flow width: 1.0, padding_left: THEME_ITEM_PADDING, padding_right: THEME_ITEM_PADDING, padding_top: THEME_ITEM_PADDING, padding_bottom: THEME_ITEM_PADDING do
+            flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
               button "#{variable.name} [Type: #{variable.type}, Value: #{variable.value}]", width: 0.925, tip: "Edit variable" do
@@ -352,6 +359,19 @@ module TAC
             end
           end
         end
+      end
+
+      def refresh_config
+        @active_group = nil
+        @active_group_label.value = ""
+        @active_action = nil
+        @active_action_label.value = ""
+
+        @groups_list.clear
+        @actions_list.clear
+        @variables_list.clear
+
+        populate_groups_list
       end
     end
   end
