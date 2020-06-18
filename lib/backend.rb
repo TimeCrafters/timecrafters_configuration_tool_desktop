@@ -12,6 +12,7 @@ module TAC
 
     def config_changed!
       @config.configuration.updated_at = Time.now
+      @config.configuration.revision += 1
       @config_changed = true
     end
 

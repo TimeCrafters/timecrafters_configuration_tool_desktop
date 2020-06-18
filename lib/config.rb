@@ -41,10 +41,11 @@ module TAC
     end
 
     class Configuration
-      attr_accessor :created_at, :updated_at, :spec_version
-      def initialize(created_at:, updated_at:, spec_version:)
+      attr_accessor :created_at, :updated_at, :spec_version, :revision
+      def initialize(created_at:, updated_at:, spec_version:, revision:)
         @created_at, @updated_at = created_at, updated_at
         @spec_version = spec_version
+        @revision = revision
       end
 
       def to_json(*args)
@@ -52,6 +53,7 @@ module TAC
           created_at: @created_at,
           updated_at: @updated_at,
           spec_version: @spec_version,
+          revision: @revision,
         }.to_json(*args)
       end
 
@@ -59,7 +61,8 @@ module TAC
         Configuration.new(
           created_at: hash[:created_at],
           updated_at: hash[:updated_at],
-          spec_version: hash[:spec_version]
+          spec_version: hash[:spec_version],
+          revision: hash[:revision],
         )
       end
     end
