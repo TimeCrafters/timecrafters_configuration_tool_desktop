@@ -55,8 +55,7 @@ module TAC
               created_at: Time.now,
               updated_at: Time.now,
               spec_version: TAC::CONFIG_SPEC_VERSION,
-              hostname: TACNET::DEFAULT_HOSTNAME,
-              port: TACNET::DEFAULT_PORT,
+              revision: 0,
             },
             data: {
               groups: [],
