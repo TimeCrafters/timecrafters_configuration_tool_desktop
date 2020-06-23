@@ -5,7 +5,7 @@ module TAC
         background Gosu::Color::GRAY
         flow width: 1.0 do
           label "Name", width: 0.25
-          @name = edit_line @options[:renaming] ? @options[:renaming].name : "", width: 0.70
+          @name = edit_line @options[:renaming] ? @options[:renaming].name : "", filter: method(:filter), width: 0.70
         end
         @name_error = label "", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
@@ -36,6 +36,10 @@ module TAC
             end
           end
         end
+      end
+
+      def filter(text)
+        text.match(/[A-Za-z0-9,._\-]/) ? text : ""
       end
     end
   end

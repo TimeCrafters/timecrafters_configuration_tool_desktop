@@ -53,8 +53,23 @@ module TAC
 
               name = File.basename(config_file, ".json")
 
-              button "#{name}", width: 0.965 do
+              button "#{name}", width: 0.94 do
                 change_config(name)
+              end
+
+              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Rename configuration" do
+                push_state(Dialog::NamePromptDialog, title: "Rename Config", callback_method: proc { |new_name|
+                  FileUtils.mv(
+                    "#{TAC::CONFIGS_PATH}/#{name}.json",
+                    "#{TAC::CONFIGS_PATH}/#{new_name}.json"
+                    )
+
+                  if window.backend.settings.config == name
+                    change_config(new_name)
+                  end
+
+                  populate_configs
+                })
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, **THEME_DANGER_BUTTON, tip: "Delete configuration" do

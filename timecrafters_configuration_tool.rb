@@ -2,6 +2,7 @@ require_relative "../cyberarm_engine/lib/cyberarm_engine"
 require "socket"
 require "securerandom"
 require "json"
+require "fileutils"
 
 require_relative "lib/tac"
 require_relative "lib/palette"
