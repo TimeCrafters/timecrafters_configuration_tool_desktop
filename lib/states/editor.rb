@@ -171,7 +171,7 @@ module TAC
           end
         end
 
-        unless window.backend.settings.config
+        if window.backend.settings.config == nil || window.backend.config == nil
           push_state(ManageConfigurations)
         else
           populate_groups_list

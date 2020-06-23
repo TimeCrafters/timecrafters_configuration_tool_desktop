@@ -46,8 +46,11 @@ module TAC
       end
 
       def populate_configs
+        @config_files = Dir.glob("#{TAC::CONFIGS_PATH}/*.json")
+        @config_files_list = @config_files.map { |file| Dialog::NamePromptDialog::NameStub.new(File.basename(file, ".json")) }
+
         @configs_list.clear do
-          Dir.glob("#{TAC::CONFIGS_PATH}/*.json").each_with_index do |config_file, i|
+          @config_files.each_with_index do |config_file, i|
             flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
@@ -58,17 +61,21 @@ module TAC
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Rename configuration" do
-                push_state(Dialog::NamePromptDialog, title: "Rename Config", callback_method: proc { |new_name|
-                  FileUtils.mv(
-                    "#{TAC::CONFIGS_PATH}/#{name}.json",
-                    "#{TAC::CONFIGS_PATH}/#{new_name}.json"
-                    )
+                push_state(Dialog::NamePromptDialog, title: "Rename Config", renaming: @config_files_list.find { |c| c.name == name }, list: @config_files_list, accept_label: "Update", callback_method: proc { |old_name, new_name|
+                  if not File.exist?("#{TAC::CONFIGS_PATH}/#{new_name}.json")
+                    FileUtils.mv(
+                      "#{TAC::CONFIGS_PATH}/#{name}.json",
+                      "#{TAC::CONFIGS_PATH}/#{new_name}.json"
+                      )
 
-                  if window.backend.settings.config == name
-                    change_config(new_name)
+                    if window.backend.settings.config == name
+                      change_config(new_name)
+                    end
+
+                    populate_configs
+                  else
+                    push_state(Dialog::AlertDialog, title: "Config Rename Failed", message: "File already exists at\n#{TAC::CONFIGS_PATH}/#{new_name}.json}")
                   end
-
-                  populate_configs
                 })
               end
 

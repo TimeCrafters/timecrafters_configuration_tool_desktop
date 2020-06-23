@@ -3,7 +3,7 @@ module TAC
     attr_reader :config, :settings, :tacnet
     def initialize
       load_settings
-      load_config(@settings.config) if @settings.config
+      load_config(@settings.config) if @settings.config && File.exist?("#{TAC::CONFIGS_PATH}/#{@settings.config}.json")
       @tacnet = TACNET.new
 
       @config_changed = false
