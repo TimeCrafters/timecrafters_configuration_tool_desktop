@@ -34,16 +34,16 @@ module TAC
       @config_changed = false
     end
 
-    def upload_config
+    def upload_config(config_name)
       if @config && @tacnet.connected?
         json = @config.to_json
-        @tacnet.puts(TAC::TACNET::PacketHandler.packet_upload_config(json))
+        @tacnet.puts(TAC::TACNET::PacketHandler.packet_upload_config(config_name, json))
       end
     end
 
-    def download_config
+    def download_config(config_name)
       if @config && @tacnet.connected?
-        @tacnet.puts(TAC::TACNET::PacketHandler.packet_download_config)
+        @tacnet.puts(TAC::TACNET::PacketHandler.packet_download_config(config_name))
       end
     end
 

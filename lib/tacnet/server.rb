@@ -71,10 +71,11 @@ module TAC
             @active_client = client
             # TODO: Backup local config
             # SEND CONFIG
-            config = File.read(TAC::CONFIGS_PATH)
+            settings = TAC::Settings.new
+            config = File.read("#{TAC::CONFIGS_PATH}/#{settings.config}.json")
 
             @active_client.puts(PacketHandler.packet_handshake(@active_client.uuid))
-            @active_client.puts(PacketHandler.packet_upload_config(config))
+            @active_client.puts(PacketHandler.packet_upload_config(settings.config, config))
 
             log.i(TAG, "Client connected!")
 

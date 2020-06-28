@@ -22,6 +22,8 @@ module TAC
           handle_handshake(packet)
         when :heartbeat
           handle_heartbeat(packet)
+        when :error
+          handle_error(packet)
         when :download_config
           handle_download_config(packet)
         when :upload_config
@@ -41,9 +43,14 @@ module TAC
       def handle_heartbeat(packet)
       end
 
+      # TODO: Handle errors
+      def handle_error(packet)
+      end
+
       def handle_upload_config(packet)
         begin
-          data = JSON.parse(packet.body, symbolize_names: true)
+          config_name, json = packet.body.split(Packet::PROTOCOL_HEADER_SEPERATOR)
+          data = JSON.parse(json, symbolize_names: true)
 
           if @host_is_a_connection
             if data.is_a?(Array)
@@ -52,9 +59,9 @@ module TAC
 
             elsif data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
               $window.push_state(TAC::Dialog::ConfirmDialog, title: "Replace Config", message: "Replace local config\nwith remote config?", callback_method: proc {
-                File.open("#{TAC::ROOT_PATH}/data/config.json", "w") { |f| f.write packet.body }
+                File.open("#{TAC::CONFIGS_PATH}/#{config_name}.json", "w") { |f| f.write json }
 
-                $window.backend.update_config
+                $window.backend.load_config(config_name)
               })
 
             elsif data.is_a?(Hash) && data.dig(:config, :spec_version) < TAC::CONFIG_SPEC_VERSION
@@ -78,11 +85,20 @@ module TAC
       def handle_download_config(packet)
         if @host_is_a_connection
           json = JSON.dump($window.backend.config)
-          $window.backend.tacnet.puts(PacketHandler.packet_upload_config(json))
+          config = $window.backend.settings.config
+
+          $window.backend.tacnet.puts(PacketHandler.packet_upload_config(config, json))
         else
           if $server.active_client && $server.active_client.connected?
-            json = File.read(TAC::CONFIGS_PATH)
-            $server.active_client.puts(PacketHandler.packet_upload_config(json))
+            settings = TAC::Settings.new
+
+            if File.exist?("#{TAC::CONFIGS_PATH}/#{settings.config}.json")
+              json = File.read("#{TAC::CONFIGS_PATH}/#{settings.config}.json")
+
+              $server.active_client.puts(PacketHandler.packet_upload_config(settings.config, json))
+            else
+              $server.active_client.puts(PacketHandler.packet_error("NO_SUCH_CONFIG", "No config named #{settings.config}"))
+            end
           end
         end
       end
@@ -95,12 +111,16 @@ module TAC
         Packet.create(Packet::PACKET_TYPES[:heartbeat], Packet::PROTOCOL_HEARTBEAT)
       end
 
-      def self.packet_download_config
-        Packet.create(Packet::PACKET_TYPES[:download_config], "")
+      def self.packet_error(error_code, message)
+        Packet.create(Packet::PACKET_TYPES[:error], error_code.to_s, message.to_s)
       end
 
-      def self.packet_upload_config(string)
-        string = string.gsub("\n", " ")
+      def self.packet_download_config(config_name)
+        Packet.create(Packet::PACKET_TYPES[:download_config], "#{config_name}")
+      end
+
+      def self.packet_upload_config(config_name, json)
+        string = "#{config_name}#{Packet::PROTOCOL_HEADER_SEPERATOR}#{json.gsub("\n", " ")}"
 
         Packet.create(Packet::PACKET_TYPES[:upload_config], string)
       end

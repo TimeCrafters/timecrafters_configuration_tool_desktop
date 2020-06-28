@@ -4,6 +4,8 @@ require "securerandom"
 
 require_relative "lib/tac"
 require_relative "lib/logger"
+require_relative "lib/settings"
+require_relative "lib/config"
 
 require_relative "lib/tacnet"
 require_relative "lib/tacnet/packet"

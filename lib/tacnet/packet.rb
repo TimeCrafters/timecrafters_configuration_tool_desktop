@@ -8,8 +8,10 @@ module TAC
       PACKET_TYPES = {
         handshake: 0,
         heartbeat: 1,
-        download_config: 2,
-        upload_config: 3,
+        error: 2,
+
+        download_config: 10,
+        upload_config: 11,
 
         add_group: 20,
         update_group: 21,
