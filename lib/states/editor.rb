@@ -269,9 +269,8 @@ module TAC
         populate_variables_list(@active_action)
       end
 
-      def update_variable(variable, name, type, value)
+      def update_variable(variable, name, value)
         variable.name = name
-        variable.type = type
         variable.value = value
 
         window.backend.config_changed!
@@ -330,7 +329,11 @@ module TAC
                 populate_variables_list(action)
               end
 
-              toggle_button tip: "Enable action"
+              action_enabled_toggle = toggle_button tip: "Enable action", checked: action.enabled
+              action_enabled_toggle.subscribe(:changed) do |sender, value|
+                action.enabled = value
+                window.backend.config_changed!
+              end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
                 push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, list: @active_group.actions, callback_method: method(:update_action))
@@ -351,7 +354,7 @@ module TAC
             flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button "#{variable.name} [Type: #{variable.type}, Value: #{variable.value}]", width: 0.925, tip: "Edit variable" do
+              button "#{variable.name} [Type: #{variable.raw_type}, Value: #{variable.raw_value}]", width: 0.925, tip: "Edit variable" do
                 push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do

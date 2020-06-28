@@ -4,7 +4,7 @@ module TAC
       def build
         background Gosu::Color::GRAY
 
-        @type = @options[:variable].type if @options[:variable]
+        @type = @options[:variable].raw_type if @options[:variable]
 
         label "Name"
         @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
@@ -28,7 +28,7 @@ module TAC
           label "Value"
           @value_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
           @value_error.hide
-          @value = edit_line @options[:variable] ? @options[:variable].value : ""
+          @value = edit_line @options[:variable] ? @options[:variable].raw_value : ""
         end
 
         flow width: 1.0 do
@@ -39,9 +39,9 @@ module TAC
           button @options[:variable] ? "Update" : "Add", width: 0.475 do |b|
             if valid?
               if @options[:variable]
-                @options[:callback_method].call(@options[:variable], @name.value.strip, @type, @value.value.strip)
+                @options[:callback_method].call(@options[:variable], @name.value.strip, "#{TAC::Config::Variable.encode_type(@type)}x#{@value.value.strip}")
               else
-                @options[:callback_method].call(@name.value.strip, @type, @value.value.strip)
+                @options[:callback_method].call(@name.value.strip, "#{TAC::Config::Variable.encode_type(@type)}x#{@value.value.strip}")
               end
 
               close

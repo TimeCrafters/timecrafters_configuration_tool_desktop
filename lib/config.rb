@@ -130,21 +130,57 @@ module TAC
     end
 
     class Variable
-      attr_accessor :name, :type, :value
-      def initialize(name:, type:, value:)
-        @name, @type, @value = name, type, value
+      attr_accessor :name, :value
+      def initialize(name:, value:)
+        @name, @value = name, value
+      end
+
+      def raw_type
+        case @value.split("x").first.upcase
+        when "I"
+          :integer
+        when "F"
+          :float
+        when "D"
+          :double
+        when "L"
+          :long
+        when "S"
+          :string
+        when "B"
+          :boolean
+        end
+      end
+
+      def raw_value
+        split = @value.split("x")
+        v = split.last
+
+        case split.first
+        when "I", "L"
+          Integer(v)
+        when "F", "D"
+          Float(v)
+        when "S"
+          v
+        when "B"
+          v.downcase == "true"
+        end
       end
 
       def to_json(*args)
         {
           name: @name,
-          type: @type,
           value: @value
         }.to_json(*args)
       end
 
       def self.from_json(hash)
-        Variable.new(name: hash[:name], type: hash[:type].to_sym, value: hash[:value])
+        Variable.new(name: hash[:name], value: hash[:value])
+      end
+
+      def self.encode_type(symbol)
+        symbol.to_s.chars.first.upcase
       end
     end
   end
