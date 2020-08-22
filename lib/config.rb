@@ -130,13 +130,30 @@ module TAC
     end
 
     class Variable
-      attr_accessor :name, :value
-      def initialize(name:, value:)
-        @name, @value = name, value
+      attr_accessor :name, :type, :value
+      def initialize(name:, type:, value:)
+        @name, @type, @value = name, type, value
       end
 
-      def raw_type
-        case @value.split("x").first.upcase
+      def to_json(*args)
+        {
+          name: @name,
+          value: "#{Variable.encode_type(@type)}x#{@value}"
+        }.to_json(*args)
+      end
+
+      def self.from_json(hash)
+        type, value = hash[:value].split("x", 2)
+        type = Variable.decode_type(type)
+        Variable.new(name: hash[:name], type: type, value: value)
+      end
+
+      def self.encode_type(symbol)
+        symbol.to_s.chars.first.upcase
+      end
+
+      def self.decode_type(character)
+        case character.upcase
         when "I"
           :integer
         when "F"
@@ -152,35 +169,17 @@ module TAC
         end
       end
 
-      def raw_value
-        split = @value.split("x")
-        v = split.last
-
-        case split.first
-        when "I", "L"
-          Integer(v)
-        when "F", "D"
-          Float(v)
-        when "S"
-          v
-        when "B"
-          v.downcase == "true"
+      def self.decode_value(type, string)
+        case type
+        when "I", "L", :integer, :long
+          Integer(string)
+        when "F", "D", :float, :double
+          Float(string)
+        when "S", :string
+          string
+        when "B", :boolean
+          string.downcase == "true"
         end
-      end
-
-      def to_json(*args)
-        {
-          name: @name,
-          value: @value
-        }.to_json(*args)
-      end
-
-      def self.from_json(hash)
-        Variable.new(name: hash[:name], value: hash[:value])
-      end
-
-      def self.encode_type(symbol)
-        symbol.to_s.chars.first.upcase
       end
     end
   end
