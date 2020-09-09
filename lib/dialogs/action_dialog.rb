@@ -4,15 +4,15 @@ module TAC
       def build
         background Gosu::Color::GRAY
 
-        label "Name"
+        label "Name", width: 1.0, text_align: :center
         @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
-        @name = edit_line @options[:action] ? @options[:action].name : "", width: 1.0
+        @name = edit_line @options[:action] ? @options[:action].name : "", filter: method(:name_filter), width: 1.0
 
-        label "Comment"
+        label "Comment", width: 1.0, text_align: :center
         @comment = edit_line @options[:action] ? @options[:action].comment : "", width: 1.0
 
-        flow width: 1.0 do
+        flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           button "Cancel", width: 0.475 do
             close
           end

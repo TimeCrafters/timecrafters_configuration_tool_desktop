@@ -6,12 +6,12 @@ module TAC
 
         @type = @options[:variable].type if @options[:variable]
 
-        label "Name"
+        label "Name", width: 1.0, text_align: :center
         @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
-        @name = edit_line @options[:variable] ? @options[:variable].name : "", width: 1.0
+        @name = edit_line @options[:variable] ? @options[:variable].name : "", filter: method(:name_filter), width: 1.0
 
-        label "Type"
+        label "Type", width: 1.0, text_align: :center
         @type_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @type_error.hide
 
@@ -19,15 +19,17 @@ module TAC
           @type = item
         end
 
+        @type ||= @var_type.value.to_sym
+
         @value_container = stack width: 1.0 do
-          label "Value"
+          label "Value", width: 1.0, text_align: :center
           @value_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
           @value_error.hide
           @value = edit_line @options[:variable] ? @options[:variable].value : "", width: 1.0
           @value_boolean = check_box "Variable", checked: @options[:variable] ? @options[:variable].value == true : false
         end
 
-        flow width: 1.0 do
+        flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           button "Cancel", width: 0.475 do
             close
           end
@@ -69,7 +71,7 @@ module TAC
 
         if [:integer, :float, :double, :long].include?(@type)
           if @value.value.strip.empty?
-            @value_error.value = "Error: Value cannot be blank\n or only whitespace."
+            @value_error.value = "Error: Numeric value cannot be\nblank or only whitespace."
             @value_error.show
             valid = false
 
@@ -108,7 +110,7 @@ module TAC
           valid = false
 
         else
-          @value_error.value = "Error: Type not set."
+          @value_error.value = "Error: Type not set or\ntype #{@var_type.value.inspect} is not valid."
           @value_error.show
           valid = false
         end

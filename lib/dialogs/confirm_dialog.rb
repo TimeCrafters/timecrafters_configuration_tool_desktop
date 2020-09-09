@@ -8,7 +8,7 @@ module TAC
         background Gosu::Color::GRAY
         label @options[:message]
 
-        flow width: 1.0 do
+        flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           button "Cancel", width: 0.475 do
             close
           end

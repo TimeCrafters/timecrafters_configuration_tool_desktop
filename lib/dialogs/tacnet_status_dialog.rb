@@ -5,7 +5,7 @@ module TAC
         background Gosu::Color::GRAY
         @message_label = label $window.backend.tacnet.full_status
 
-        button "Close", width: 1.0 do
+        button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           close
         end
 

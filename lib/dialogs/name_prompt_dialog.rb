@@ -5,18 +5,16 @@ module TAC
 
       def build
         background Gosu::Color::GRAY
-        flow width: 1.0 do
-          label "Name", width: 0.25
-          @name = edit_line @options[:renaming] ? @options[:renaming].name : "", filter: method(:filter), width: 0.70
-        end
+        label "Name", width: 1.0, text_align: :center
         @name_error = label "", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
+        @name = edit_line @options[:renaming] ? @options[:renaming].name : "", filter: method(:name_filter), width: 1.0
 
         @name.subscribe(:changed) do |sender, value|
           valid?
         end
 
-        flow width: 1.0 do
+        flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           button "Cancel", width: 0.475 do
             close
           end
@@ -66,10 +64,6 @@ module TAC
 
           return true
         end
-      end
-
-      def filter(text)
-        text.match(/[A-Za-z0-9._\- ]/) ? text : ""
       end
     end
   end
