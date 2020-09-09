@@ -36,7 +36,7 @@ module TAC
                       push_state(ManageConfigurations)
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Save config and settings to disk" do
-                      window.backend.save_config(window.backend.settings.config)
+                      window.backend.save_config
                       window.backend.save_settings
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/export.png"), image_width: THEME_ICON_SIZE, margin_left: 10, tip: "Upload local config to remote, if connected." do
@@ -81,7 +81,7 @@ module TAC
                       end
                     end
                     button get_image("#{TAC::ROOT_PATH}/media/icons/information.png"), image_width: THEME_ICON_SIZE, width: 0.475 do
-                      push_state(Dialog::AlertDialog, title: "TACNET Status", message: window.backend.tacnet.full_status)
+                      push_state(Dialog::TACNETStatusDialog, title: "TACNET Status", message: window.backend.tacnet.full_status)
                     end
                   end
                 end
@@ -192,6 +192,10 @@ module TAC
           when :connection_error
             @tacnet_status.value = "Connection Error"
             @tacnet_status.background = TAC::Palette::TACNET_CONNECTION_ERROR
+
+            if @tacnet_connection_button.value != "Connect"
+              push_state(Dialog::TACNETDialog, title: "TACNET Error", message: window.backend.tacnet.full_status)
+            end
 
             @tacnet_connection_button.value = "Connect"
           when :not_connected

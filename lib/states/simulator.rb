@@ -73,8 +73,13 @@ robot.forward 100"
       def update
         super
 
-        @simulation.update if @simulation
-        @simulation_status.value = "Time: #{((Gosu.milliseconds - @simulation_start_time) / 1000.0).round(1)} seconds" if @simulation_start_time
+        if @simulation
+          @simulation.update
+
+          unless @simulation.robots.all? { |robot| robot.queue.empty? } # Only update clock if simulation is running
+            @simulation_status.value = "Time: #{((Gosu.milliseconds - @simulation_start_time) / 1000.0).round(1)} seconds" if @simulation_start_time
+          end
+        end
       end
     end
   end

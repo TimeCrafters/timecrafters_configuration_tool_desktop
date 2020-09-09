@@ -10,12 +10,12 @@ module TAC
 
       @dialog_root = stack width: 250, height: 400, border_thickness: 2, border_color: [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY] do
         # Title bar
-        flow width: 1.0, height: 0.1 do
+        @titlebar = flow width: 1.0, height: 0.1 do
           background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
 
           # title
           flow width: 0.855 do
-            label @title, text_size: THEME_SUBHEADING_TEXT_SIZE
+            label @title, text_size: THEME_SUBHEADING_TEXT_SIZE, text_shadow_color: Gosu::Color::BLACK
           end
 
           # Buttons
@@ -27,9 +27,12 @@ module TAC
         end
 
         # Dialog body
-        stack width: 1.0, height: 0.9 do
-          build
+        @dialog_content = stack width: 1.0, height: 0.9 do
         end
+      end
+
+      @dialog_content.clear do
+        build
       end
 
       center_dialog

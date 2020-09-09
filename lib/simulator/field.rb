@@ -9,7 +9,7 @@ module TAC
         @position = CyberarmEngine::Vector.new
         @scale = 1
         @size = 0
-        @field_size = 144 # inches [1 pxel = 1 inch]
+        @field_size = 144 # inches [1 pixel = 1 inch]
 
         @blue = Gosu::Color.new(0xff_004080)
         @red = Gosu::Color.new(0xff_800000)

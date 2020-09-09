@@ -46,8 +46,8 @@ module TAC
     padding_top: THEME_ITEM_PADDING,
     padding_bottom: THEME_ITEM_PADDING
   }
-  THEME_EVEN_COLOR = Gosu::Color.new(0xff_606060)
-  THEME_ODD_COLOR = Gosu::Color.new(0xff_202020)
+  THEME_EVEN_COLOR = Gosu::Color.new(0xff_202020)
+  THEME_ODD_COLOR = Gosu::Color.new(0xff_606060)
   THEME_CONTENT_BACKGROUND = Gosu::Color.new(0x88_007f3f)
   THEME_HEADER_BACKGROUND = [
     TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_PRIMARY,

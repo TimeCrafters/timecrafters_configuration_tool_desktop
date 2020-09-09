@@ -1,7 +1,8 @@
 module TAC
   class Config
-    attr_reader :configuration, :groups, :presets
+    attr_reader :name, :configuration, :groups, :presets
     def initialize(name)
+      @name = name
       @configuration = nil
       @groups = nil
       @presets = nil
@@ -109,23 +110,24 @@ module TAC
     end
 
     class Action
-      attr_accessor :name, :enabled
+      attr_accessor :name, :comment, :enabled
       attr_reader :variables
-      def initialize(name:, enabled:, variables:)
-        @name, @enabled = name, enabled
+      def initialize(name:, comment:, enabled:, variables:)
+        @name, @comment, @enabled = name, comment, enabled
         @variables = variables
       end
 
       def to_json(*args)
         {
           name: @name,
+          comment: @comment,
           enabled: @enabled,
           variables: @variables
         }.to_json(*args)
       end
 
       def self.from_json(hash)
-        Action.new(name: hash[:name], enabled: hash[:enabled], variables: hash[:variables].map { |h| Variable.from_json(h) })
+        Action.new(name: hash[:name], comment: hash[:comment], enabled: hash[:enabled], variables: hash[:variables].map { |h| Variable.from_json(h) })
       end
     end
 

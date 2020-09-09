@@ -2,7 +2,7 @@ module TAC
   class TACNET
     class Packet
       PROTOCOL_VERSION = 1
-      PROTOCOL_HEADER_SEPERATOR = "|"
+      PROTOCOL_SEPERATOR = "|"
       PROTOCOL_HEARTBEAT = "heartbeat"
 
       PACKET_TYPES = {
@@ -12,6 +12,11 @@ module TAC
 
         download_config: 10,
         upload_config: 11,
+        list_configs: 12,
+        select_config: 13,
+        add_config: 14,
+        update_config: 15,
+        delete_config: 16,
 
         add_group: 20,
         update_group: 21,
@@ -30,7 +35,7 @@ module TAC
         slice = message.split("|", 4)
 
         if slice.size < 4
-          warn "Failed to split packet along first 4 " + PROTOCOL_HEADER_SEPERATOR + ". Raw return: " + slice.to_s
+          warn "Failed to split packet along first 4 " + PROTOCOL_SEPERATOR + ". Raw return: " + slice.to_s
           return nil
         end
 
@@ -73,11 +78,11 @@ module TAC
       def encode_header
         string = ""
         string += protocol_version.to_s
-        string += PROTOCOL_HEADER_SEPERATOR
+        string += PROTOCOL_SEPERATOR
         string += PACKET_TYPES[type].to_s
-        string += PROTOCOL_HEADER_SEPERATOR
+        string += PROTOCOL_SEPERATOR
         string += content_length.to_s
-        string += PROTOCOL_HEADER_SEPERATOR
+        string += PROTOCOL_SEPERATOR
 
         return string
       end

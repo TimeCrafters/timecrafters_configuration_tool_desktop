@@ -14,6 +14,12 @@ module TAC
       @config.configuration.updated_at = Time.now
       @config.configuration.revision += 1
       @config_changed = true
+
+      save_config
+
+      if @tacnet.connected?
+        upload_config(@config.name)
+      end
     end
 
     def config_changed?
@@ -26,8 +32,9 @@ module TAC
       end
     end
 
-    def save_config(name)
-      json = @config.to_json
+    def save_config(name = nil, json = nil)
+      name = @config.name unless name
+      json = @config.to_json unless name && json
 
       File.open("#{TAC::CONFIGS_PATH}/#{name}.json", "w") { |f| f.write json }
 
@@ -35,15 +42,15 @@ module TAC
     end
 
     def upload_config(config_name)
-      if @config && @tacnet.connected?
-        json = @config.to_json
-        @tacnet.puts(TAC::TACNET::PacketHandler.packet_upload_config(config_name, json))
+      if @tacnet.connected?
+        json = Config.new(config_name).to_json
+        @tacnet.puts( TAC::TACNET::PacketHandler.packet_upload_config(config_name, json) )
       end
     end
 
     def download_config(config_name)
-      if @config && @tacnet.connected?
-        @tacnet.puts(TAC::TACNET::PacketHandler.packet_download_config(config_name))
+      if @tacnet.connected?
+        @tacnet.puts( TAC::TACNET::PacketHandler.packet_download_config(config_name) )
       end
     end
 

@@ -12,8 +12,8 @@ module TAC
     BLUE_ALLIANCE = Gosu::Color.new(0xff_000080)
     RED_ALLIANCE = Gosu::Color.new(0xff_800000)
 
-    TACNET_PRIMARY = Gosu::Color.new(0xff_003f7f)
-    TACNET_SECONDARY = Gosu::Color.new(0xff_007f7f)
+    TACNET_PRIMARY = Gosu::Color.new(0xff000080)
+    TACNET_SECONDARY = Gosu::Color.new(0xff000060)
 
     GROUPS_PRIMARY = Gosu::Color.new(0xff_444444)
     GROUPS_SECONDARY = Gosu::Color.new(0xff_444444)
@@ -26,5 +26,7 @@ module TAC
 
     EDITOR_PRIMARY = Gosu::Color.new(0xff_446688)
     EDITOR_SECONDARY = Gosu::Color.new(0xff_224466)
+
+    ALERT = TACNET_CONNECTING
   end
 end
