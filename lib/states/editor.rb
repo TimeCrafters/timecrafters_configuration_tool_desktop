@@ -125,20 +125,21 @@ module TAC
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
                   if @active_group
-                    push_state(TAC::Dialog::NamePromptDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
+                    push_state(TAC::Dialog::ActionDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action,\nno group selected.")
                   end
                 end
                 button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected action" do
                   if @active_group && @active_action
-                    push_state(Dialog::NamePromptDialog, title: "Clone Action", renaming: @active_action, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name|
-                    clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
-                    clone.name = name
-                    @active_group.actions << clone
-                    window.backend.config_changed!
+                    push_state(Dialog::ActionDialog, title: "Clone Action", action: @active_action, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name, comment|
+                      clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
+                      clone.name    = name
+                      clone.comment = comment
+                      @active_group.actions << clone
+                      window.backend.config_changed!
 
-                    populate_actions_list(@active_group)
+                      populate_actions_list(@active_group)
                     })
                   end
                 end
@@ -241,15 +242,16 @@ module TAC
         populate_groups_list
       end
 
-      def create_action(name)
-        @active_group.actions << TAC::Config::Action.new(name: name, enabled: true, variables: [])
+      def create_action(name, comment)
+        @active_group.actions << TAC::Config::Action.new(name: name, comment: comment, enabled: true, variables: [])
         window.backend.config_changed!
 
         populate_actions_list(@active_group)
       end
 
-      def update_action(action, name)
+      def update_action(action, name, comment)
         action.name = name
+        action.comment = comment
         window.backend.config_changed!
 
         populate_actions_list(@active_group)
@@ -324,28 +326,33 @@ module TAC
 
         @actions_list.clear do
           actions.each_with_index do |action, i|
-            flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
+            stack width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button action.name, width: 0.8 do
-                @active_action = action
-                @active_action_label.value = action.name
+              flow width: 1.0 do
+                button action.name, width: 0.8 do
+                  @active_action = action
+                  @active_action_label.value = action.name
 
-                populate_variables_list(action)
+                  populate_variables_list(action)
+                end
+
+                action_enabled_toggle = toggle_button tip: "Enable action", checked: action.enabled
+                action_enabled_toggle.subscribe(:changed) do |sender, value|
+                  action.enabled = value
+                  window.backend.config_changed!
+                end
+
+                button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
+                  push_state(Dialog::ActionDialog, title: "Rename Action", action: action, list: @active_group.actions, callback_method: method(:update_action))
+                end
+
+                button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
+                  push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its variables?", callback_method: proc { delete_action(action) })
+                end
               end
 
-              action_enabled_toggle = toggle_button tip: "Enable action", checked: action.enabled
-              action_enabled_toggle.subscribe(:changed) do |sender, value|
-                action.enabled = value
-                window.backend.config_changed!
-              end
-
-              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
-                push_state(Dialog::NamePromptDialog, title: "Rename Action", renaming: action, list: @active_group.actions, callback_method: method(:update_action))
-              end
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its variables?", callback_method: proc { delete_action(action) })
-              end
+              label "#{action.comment}" unless action.comment.empty?
             end
           end
         end

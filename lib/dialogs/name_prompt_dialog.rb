@@ -40,12 +40,22 @@ module TAC
       end
 
       def valid?
+        name = @name.value.strip
+
         if @name.value.strip.empty?
           @name_error.value = "Name cannot be blank.\nName cannot only be whitespace."
           @name_error.show
 
           return false
-        elsif @options[:list] && @options[:list].find { |i| i.name == @name.value.strip }
+
+        ### TODO: Handle case when renaming a cloned Group
+        # elsif @options[:renaming] && @options[:renaming].name == name
+        #   @name_error.value = ""
+        #   @name_error.hide
+
+        #   return true
+
+        elsif @options[:list] && @options[:list].find { |i| i.name == name }
           @name_error.value = "Name is not unique!"
           @name_error.show
 

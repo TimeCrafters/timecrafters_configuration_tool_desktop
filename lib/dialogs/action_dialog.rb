@@ -4,8 +4,6 @@ module TAC
       def build
         background Gosu::Color::GRAY
 
-        @type = @options[:action].type if @options[:action]
-
         label "Name"
         @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
@@ -19,7 +17,7 @@ module TAC
             close
           end
 
-          button @options[:action] ? "Update" : "Add", width: 0.475 do |b|
+          button @options[:action] ? @options[:accept_label] ? @options[:accept_label] : "Update" : "Add", width: 0.475 do |b|
             if valid?
               if @options[:action]
                 @options[:callback_method].call(@options[:action], @name.value.strip, @comment.value.strip)
@@ -35,11 +33,23 @@ module TAC
 
       def valid?
         valid = true
+        name = @name.value.strip
 
-        if @name.value.strip.empty?
+        if name.empty?
           @name_error.value = "Error: Name cannot be blank\n or only whitespace."
           @name_error.show
           valid = false
+
+        ### TODO: Handle case when renaming a cloned Action
+        # elsif @options[:action] && @options[:action].name == name
+        #   @name_error.value = ""
+        #   @name_error.hide
+
+        elsif @options[:list].find { |action| action.name == name}
+          @name_error.value = "Error: Name is not unique!"
+          @name_error.show
+          valid = false
+
         else
           @name_error.value = ""
           @name_error.hide
