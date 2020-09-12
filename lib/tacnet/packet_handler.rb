@@ -96,6 +96,11 @@ module TAC
               # CONFIG is unknown
               $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Remote config is not supported.")
             end
+
+          else
+            if data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
+              File.open("#{TAC::CONFIGS_PATH}/#{config_name}.json", "w") { |f| f.write json }
+            end
           end
         rescue JSON::ParserError => e
           log.e(TAG, "JSON parsing error: #{e}")
@@ -103,23 +108,20 @@ module TAC
       end
 
       def handle_download_config(packet)
-        if @host_is_a_connection
-          json = JSON.dump($window.backend.config)
-          config = $window.backend.settings.config
+        config_name = packet.body
+        log.i(TAG, config_name)
+        pkt = nil
 
-          $window.backend.tacnet.puts(PacketHandler.packet_upload_config(config, json))
+        if File.exist?("#{TAC::CONFIGS_PATH}/#{config_name}.json")
+          pkt = PacketHandler.packet_upload_config(config_name, Config.new(config_name).to_json)
         else
-          if $server.active_client && $server.active_client.connected?
-            settings = TAC::Settings.new
+          pkt = PacketHandler.packet_error("Remote config not found", "The requested config #{config_name} does not exist over here.")
+        end
 
-            if File.exist?("#{TAC::CONFIGS_PATH}/#{settings.config}.json")
-              json = File.read("#{TAC::CONFIGS_PATH}/#{settings.config}.json")
-
-              $server.active_client.puts(PacketHandler.packet_upload_config(settings.config, json))
-            else
-              $server.active_client.puts(PacketHandler.packet_error("NO_SUCH_CONFIG", "No config named #{settings.config}"))
-            end
-          end
+        if @host_is_a_connection
+          $window.backend.tacnet.puts(pkt)
+        else
+          $server.active_client.puts(pkt)
         end
       end
 
