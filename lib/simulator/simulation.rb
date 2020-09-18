@@ -7,7 +7,7 @@ module TAC
         @field_container = field_container
 
         @robots = []
-        @field = Field.new(simulation: self, season: :skystone, container: @field_container)
+        @field = Field.new(simulation: self, season: :ultimate_goal, container: @field_container)
         @show_paths = false
 
         @last_milliseconds = Gosu.milliseconds

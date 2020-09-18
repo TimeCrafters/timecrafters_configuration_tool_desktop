@@ -94,6 +94,74 @@ module TAC
         end
       end
 
+      def draw_field_ultimate_goal
+        # middle line
+        Gosu.draw_rect(0, @field_size / 2 - 13, @field_size, 2, Gosu::Color::WHITE)
+
+        # phantom center line to indict half field for remote season field
+        Gosu.draw_rect(@field_size / 2 - 0.5, 0, 1, @field_size, 0x88_448844)
+
+
+        # blue starting lines
+        Gosu.draw_rect(24 - 1, @field_size - 24, 2, 24, @blue)
+        Gosu.draw_rect(48 - 1, @field_size - 24, 2, 24, @blue)
+
+        # blue wobbly wobs
+        Gosu.draw_circle(24, @field_size - 24, 4, 32, @blue)
+        Gosu.draw_circle(48, @field_size - 24, 4, 32, @blue)
+
+        # blue starter stack
+        Gosu.draw_rect(36 - 1, @field_size - 50, 2, 2, @blue)
+
+        # blue target zones
+        # A
+        draw_tile_box(@blue)
+
+        # B
+        Gosu.translate(24, 24) do
+          draw_tile_box(@blue)
+        end
+
+        # C
+        Gosu.translate(0, 48) do
+          draw_tile_box(@blue)
+        end
+
+        # red starting lines
+        Gosu.draw_rect(@field_size - 24 - 1, @field_size - 24, 2, 24, @red)
+        Gosu.draw_rect(@field_size - 48 - 1, @field_size - 24, 2, 24, @red)
+
+        # red wobbly wobs
+        Gosu.draw_circle(@field_size - 24, @field_size - 24, 4, 32, @red)
+        Gosu.draw_circle(@field_size - 48, @field_size - 24, 4, 32, @red)
+
+        # red starter stack
+        Gosu.draw_rect(@field_size - 37, @field_size - 50, 2, 2, @red)
+
+        # red target zones
+        # A
+        Gosu.translate(@field_size - 24, 0) do
+          draw_tile_box(@red)
+        end
+
+        # B
+        Gosu.translate(@field_size - 48, 24) do
+          draw_tile_box(@red)
+        end
+
+        # C
+        Gosu.translate(@field_size - 24, 48) do
+          draw_tile_box(@red)
+        end
+      end
+
+      def draw_tile_box(color)
+        Gosu.draw_rect(0,  0, 24, 2, color)
+        Gosu.draw_rect(22, 2, 2, 22, color)
+        Gosu.draw_rect(0, 22, 22, 2, color)
+        Gosu.draw_rect(0,  2, 2, 22, color)
+      end
+
       def update
         @position.x, @position.y = @container.x, @container.y
         @size = @container.width
