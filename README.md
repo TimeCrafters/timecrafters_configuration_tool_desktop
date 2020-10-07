@@ -1,1 +1,1 @@
-# TimeCrafters Action Configurator for Desktop
+# TimeCrafters Configuration Tool for Desktop
