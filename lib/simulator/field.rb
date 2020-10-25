@@ -99,7 +99,7 @@ module TAC
         Gosu.draw_rect(0, @field_size / 2 - 13, @field_size, 2, Gosu::Color::WHITE)
 
         # phantom center line to indict half field for remote season field
-        Gosu.draw_rect(@field_size / 2 - 0.5, 0, 1, @field_size, 0x88_448844)
+        Gosu.draw_rect(@field_size / 2 - (0.5 + 24), 0, 1, @field_size, 0x88_448844)
 
 
         # blue starting lines
