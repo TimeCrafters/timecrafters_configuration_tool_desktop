@@ -5,12 +5,18 @@ module TAC
 
     attr_reader :menu_bar, :status_bar, :body
 
-    def initialize(host:, header_bar_label:, menu_bar:, status_bar:, body:)
+    def initialize(host:)
       @host = host
-      @header_bar_label = header_bar_label
-      @menu_bar = menu_bar
-      @status_bar = status_bar
-      @body = body
+      @header_bar_label = host.header_bar_label
+      @menu_bar = host.menu_bar
+      @status_bar = host.status_bar
+      @body = host.body
+
+      @options = {}
+    end
+
+    def options=(options)
+      @options = options
     end
 
     def page(klass)

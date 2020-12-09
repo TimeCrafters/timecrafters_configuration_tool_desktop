@@ -60,7 +60,7 @@ module TAC
     end
 
     def client
-      @connection.client if connected?
+      @connection.client
     end
 
     def puts(packet)

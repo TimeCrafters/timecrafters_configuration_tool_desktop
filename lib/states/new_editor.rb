@@ -1,5 +1,6 @@
 class NewEditor < CyberarmEngine::GuiState
   include CyberarmEngine::Theme # get access to deep_merge method
+  attr_reader :header_bar, :header_bar_label, :navigation, :content, :menu_bar, :status_bar, :body
 
   def setup
     @window_width = 0
@@ -129,7 +130,7 @@ class NewEditor < CyberarmEngine::GuiState
     request_recalculate
   end
 
-  def page(klass)
+  def page(klass, options = {})
     @menu_bar.clear
     @status_bar.clear
     @body.clear
@@ -146,9 +147,10 @@ class NewEditor < CyberarmEngine::GuiState
 
     @page.blur if @page
 
-    @pages[klass] = klass.new(host: self, header_bar_label: @header_bar_label, menu_bar: @menu_bar, status_bar: @status_bar, body: @body) unless @pages[klass]
+    @pages[klass] = klass.new(host: self) unless @pages[klass]
     @page = @pages[klass]
 
+    @page.options = options
     @page.setup
     @page.focus
   end

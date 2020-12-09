@@ -17,7 +17,7 @@ module TAC
       }
     },
     EditLine: {
-      caret_color: Gosu::Color.new(0xff_434343),
+      caret_color: Gosu::Color.new(0xff_88ef90),
     },
     ToggleButton: {
       width: 18,
