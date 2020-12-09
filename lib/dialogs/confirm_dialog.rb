@@ -12,7 +12,7 @@ module TAC
           button "Cancel", width: 0.475 do
             close
           end
-          button "Okay", width: 0.475, **TAC::THEME_DANGER_BUTTON do
+          button "Proceed", width: 0.475, **TAC::THEME_DANGER_BUTTON do
             close
 
             @options[:callback_method].call

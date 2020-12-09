@@ -11,6 +11,8 @@ module TAC
 
         @animator = CyberarmEngine::Animator.new(start_time: 0, duration: 3_000, from: 0, to: 255)
         @transition_color = Gosu::Color.new(0x00_000000)
+
+        @next_state = ARGV.include?("--redesign") ? NewEditor : Editor
       end
 
       def draw
@@ -29,13 +31,13 @@ module TAC
 
         @transition_color.alpha = @animator.transition(0, 255, :sine)
 
-        push_state(Editor) if @transition_color.alpha >= 255
+        push_state(@next_state) if @transition_color.alpha >= 255
       end
 
       def button_up(id)
         super
 
-        push_state(Editor)
+        push_state(@next_state)
       end
     end
   end

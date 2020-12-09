@@ -16,6 +16,8 @@ module TAC
       end
 
       def draw
+        Gosu.flush
+
         Gosu.clip_to(@position.x, @position.y, @size, @size) do
           Gosu.translate(@position.x, @position.y) do
             draw_field
