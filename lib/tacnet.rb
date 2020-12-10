@@ -42,7 +42,7 @@ module TAC
 
         "<b>Status:</b> #{_status}\n\n#{net_stats}"
       elsif @connection && @connection.client && @connection.client.socket_error?
-        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s.chars.each_slice(32).to_a.map { |c| c.join }.join("\n")}"
+        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s.chars.each_slice(80).to_a.map { |c| c.join }.join("\n")}"
       else
         "<b>Status:</b> #{_status}"
       end
