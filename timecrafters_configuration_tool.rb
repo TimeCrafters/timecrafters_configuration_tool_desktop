@@ -48,5 +48,5 @@ require_relative "lib/tacnet/server"
 # Thread.abort_on_exception = true
 
 if not defined?(Ocra)
-  TAC::Window.new(width: (Gosu.screen_width * 0.8).round, height: (Gosu.screen_height * 0.8).round, resizable: true).show
+  TAC::Window.new(width: (Gosu.screen_width * 0.8).round, height: (Gosu.screen_height * 0.8).round, resizable: true, borderless: true).show
 end

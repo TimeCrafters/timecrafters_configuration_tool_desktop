@@ -13,6 +13,24 @@ module TAC
       true
     end
 
+    def hit_test(x, y)
+      if y <= 4
+        return 2 if x <= 4
+        return 4 if x >= width - 4
+        return 3
+      end
+
+      if y >= height - 4
+        return 8 if x <= 4
+        return 6 if x >= width - 4
+        return 7
+      end
+
+      return 1 if y <= 36 && x <= width - 74
+
+      0
+    end
+
     def close
       if @backend.config_changed?
         push_state(Dialog::ConfirmDialog, title: "Unsaved Config", message: "Config has unsaved changes\nthat will be lost if you continue!", callback_method: proc { cleanup_and_close })
