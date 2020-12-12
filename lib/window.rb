@@ -26,7 +26,7 @@ module TAC
         return 7
       end
 
-      return 1 if y <= 36 && x <= width - 74
+      return 1 if y <= 36 && x <= width - (36 * 3 + 4 * 6)
 
       0
     end

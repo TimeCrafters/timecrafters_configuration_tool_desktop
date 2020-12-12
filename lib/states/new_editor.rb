@@ -36,7 +36,11 @@ class NewEditor < CyberarmEngine::GuiState
 
       @window_controls = flow(x: window.width - 36 * 2, y: 0, height: 1.0) do
         button get_image("#{TAC::ROOT_PATH}/media/icons/minus.png"), tip: "Minimize", image_height: 1.0 do
-          # window.minimize
+          window.minimize if window.respond_to?(:minimize)
+        end
+
+        button get_image("#{TAC::ROOT_PATH}/media/icons/larger.png"), tip: "Maximize", image_height: 1.0 do |btn|
+          window.maximize
         end
 
         button get_image("#{TAC::ROOT_PATH}/media/icons/cross.png"), tip: "Exit", image_height: 1.0, **TAC::THEME_DANGER_BUTTON do
