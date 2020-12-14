@@ -6,9 +6,9 @@ module TAC
         @titlebar.style.background = [ Palette::TACNET_PRIMARY, Palette::TACNET_SECONDARY ]
 
         background Gosu::Color::GRAY
-        label @options[:message]
+        label @options[:message], width: 1.0
 
-        @sound = Gosu::Sample.new(TAC::ROOT_PATH + "/media/error_alarm.ogg").play(1, 1, true)
+        @sound = Gosu::Sample.new("#{TAC::ROOT_PATH}/media/error_alarm.ogg").play(1, 1, true)
 
         button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           close

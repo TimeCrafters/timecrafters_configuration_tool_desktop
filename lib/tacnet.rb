@@ -41,15 +41,15 @@ module TAC
         net_stats += "<b>Data Received:</b> #{client.data_received} bytes\n"
 
         "<b>Status:</b> #{_status}\n\n#{net_stats}"
-      elsif @connection && @connection.client && @connection.client.socket_error?
-        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s.chars.each_slice(80).to_a.map { |c| c.join }.join("\n")}"
+      elsif @connection&.client && @connection.client.socket_error?
+        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s}"
       else
         "<b>Status:</b> #{_status}"
       end
     end
 
     def connected?
-      @connection && @connection.connected?
+      @connection&.connected?
     end
 
     def close

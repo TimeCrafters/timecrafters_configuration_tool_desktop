@@ -40,7 +40,7 @@ class NewEditor < CyberarmEngine::GuiState
         end
 
         button get_image("#{TAC::ROOT_PATH}/media/icons/larger.png"), tip: "Maximize", image_height: 1.0 do |btn|
-          window.maximize
+          window.maximize if window.respond_to?(:maximize)
         end
 
         button get_image("#{TAC::ROOT_PATH}/media/icons/cross.png"), tip: "Exit", image_height: 1.0, **TAC::THEME_DANGER_BUTTON do
