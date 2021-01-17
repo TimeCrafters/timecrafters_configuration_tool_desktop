@@ -61,7 +61,7 @@ class NewEditor < CyberarmEngine::GuiState
           page(TAC::Pages::Editor)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/signal3.png"), margin: 4, tip: "TACNET", image_width: 1.0 do
+        @tacnet_button = button get_image("#{TAC::ROOT_PATH}/media/icons/signal3.png"), margin: 4, tip: "TACNET", image_width: 1.0 do
           page(TAC::Pages::TACNET)
         end
 
@@ -112,6 +112,17 @@ class NewEditor < CyberarmEngine::GuiState
     super
 
     @page.update if @page
+
+    case window.backend.tacnet.status
+    when :not_connected
+      @tacnet_button.style.color = Gosu::Color::WHITE
+    when :connecting
+      @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTING
+    when :connected
+      @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTED
+    when :connection_error
+      @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTION_ERROR
+    end
 
     window.width = Gosu.available_width / 2 if window.width < Gosu.available_width / 2
     window.height = Gosu.available_height / 2 if window.height < Gosu.available_height / 2

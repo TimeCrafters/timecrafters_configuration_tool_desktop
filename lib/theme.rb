@@ -2,10 +2,11 @@ module TAC
   THEME = {
     Label: {
       font: "#{TAC::ROOT_PATH}/media/fonts/DejaVuSansCondensed.ttf",
-      text_size: 18,
+      text_size: 22,
       color: Gosu::Color.new(0xee_ffffff),
     },
     Button: {
+      text_size: 22,
       background: TAC::Palette::TIMECRAFTERS_PRIMARY,
       border_thickness: 1,
       border_color: Gosu::Color.new(0xff_111111),
@@ -37,7 +38,7 @@ module TAC
   }
 
   THEME_DIALOG_BUTTON_PADDING = 24
-  THEME_ICON_SIZE = 18
+  THEME_ICON_SIZE = 22
   THEME_HEADING_TEXT_SIZE = 32
   THEME_SUBHEADING_TEXT_SIZE = 28
   THEME_ITEM_PADDING = 8
