@@ -12,7 +12,7 @@ module TAC
         @animator = CyberarmEngine::Animator.new(start_time: 0, duration: 3_000, from: 0, to: 255)
         @transition_color = Gosu::Color.new(0x00_000000)
 
-        @next_state = ARGV.include?("--redesign") ? NewEditor : Editor
+        @next_state = USE_REDESIGN ? NewEditor : Editor
       end
 
       def draw

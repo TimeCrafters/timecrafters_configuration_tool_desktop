@@ -68,40 +68,16 @@ module TAC
           config_name, json = packet.body.split(Packet::PROTOCOL_SEPERATOR, 2)
           data = JSON.parse(json, symbolize_names: true)
 
-          if @host_is_a_connection
-            if data.is_a?(Array)
-              # OLDEST CONFIG, upgrade?
-              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Remote config to old.")
+          if data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
+            File.open("#{TAC::CONFIGS_PATH}/#{config_name}.json", "w") { |f| f.write json }
 
-            elsif data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
-                File.open("#{TAC::CONFIGS_PATH}/#{config_name}.json", "w") { |f| f.write json }
-
-                if $window.backend.config.name == config_name
-                  $window.backend.load_config(config_name)
-
-                  $window.instance_variable_get(:"@states").each do |state|
-                    state.populate_groups_list if state.is_a?(TAC::States::Editor)
-                  end
-                end
-
-            elsif data.is_a?(Hash) && data.dig(:config, :spec_version) < TAC::CONFIG_SPEC_VERSION
-              # OLD CONFIG, Upgrade?
-              $window.push_state(TAC::Dialog::ConfirmDialog, title: "Upgrade Config", message: "Remote config is an older\nspec version.\nTry to upgrade?", callback_method: proc {})
-
-            elsif data.is_a?(Hash) && data.dig(:config, :spec_version) > TAC::CONFIG_SPEC_VERSION
-              # NEWER CONFIG, Error Out
-              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Client outdated, check for\nupdates.\nSupported config spec:\nv#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
-
+            if $window.backend.config&.name == config_name
+              $window.backend.load_config(config_name)
             else
-              # CONFIG is unknown
-              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Remote config is not supported.")
-            end
-
-          else
-            if data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
-              File.open("#{TAC::CONFIGS_PATH}/#{config_name}.json", "w") { |f| f.write json }
-            end
+              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Supported config spec: v#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
+           end
           end
+
         rescue JSON::ParserError => e
           log.e(TAG, "JSON parsing error: #{e}")
         end
@@ -164,15 +140,45 @@ module TAC
       end
 
       def handle_select_config(packet)
+        config_name = packet.body
+
+        $window.backend.settings.config = config_name
+        $window.backend.save_settings
+        $window.backend.load_config(config_name)
       end
 
       def handle_add_config(packet)
+        config_name = packet.body
+
+        if $window.backend.configs_list.include?(config_name)
+          unless @host_is_a_connection
+            if $server.active_client&.connected?
+              $server.active_client.puts(PacketHandler.packet_error("Config already exists!", "A config with the name #{config_name} already exists over here."))
+            end
+          end
+        else
+          $window.backend.write_new_config(config_name)
+        end
       end
 
       def handle_update_config(packet)
+        old_config_name, new_config_name  = packet.body.split(PROTOCOL_SEPERATOR, 2)
+
+        if $window.backend.configs_list.include?(config_name)
+          unless @host_is_a_connection
+            if $server.active_client&.connected?
+              $server.active_client.puts(PacketHandler.packet_error("Config already exists!", "A config with the name #{config_name} already exists over here."))
+            end
+          end
+        else
+          $window.backend.move_config(old_config_name, new_config_name)
+        end
       end
 
       def handle_delete_config(packet)
+        config_name = packet.body
+
+        $window.backend.delete_config(config_name)
       end
 
       def self.packet_handshake(client_uuid)
