@@ -10,16 +10,18 @@ module TAC
             unless search.value.strip.empty?
               search_results = search_config(search.value.downcase.strip)
 
+              status_bar.clear do
+                if search_results.results.size.zero?
+                  subtitle "No results for: \"#{search.value.strip}\""
+                else
+                  subtitle "Search results for: \"#{search.value.strip}\""
+                end
+              end
+
               body.clear do
                 flow(width: 1.0, height: 1.0) do
-                  stack(width: 0.495, height: 1.0) do
+                  stack(width: 0.495, height: 1.0, scroll: true) do
                     shared_index = 0
-                    if search_results.results.size.zero?
-                      subtitle "No results for: \"#{search.value.strip}\""
-                    else
-                      subtitle "Search results for: \"#{search.value.strip}\""
-                    end
-
                     if search_results.groups.size.positive?
                       title "Groups"
 
@@ -70,7 +72,7 @@ module TAC
                     end
                   end
 
-                  stack(width: 0.495, height: 1.0) do
+                  stack(width: 0.495, height: 1.0, scroll: true) do
                     if search_results.group_presets.size.positive?
                       title "Group Presets"
 

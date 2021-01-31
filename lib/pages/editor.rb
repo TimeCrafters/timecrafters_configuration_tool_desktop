@@ -7,7 +7,13 @@ module TAC
         @active_action = nil
 
         menu_bar.clear do
-          title "Editing configuration: #{window.backend.config.name}"
+          if @options[:group_is_preset]
+            title "Editing group preset: #{@options[:group].name}"
+          elsif @options[:action_is_preset]
+            title "Editing action preset: #{@options[:action].name}"
+          else
+            title "Editing configuration: #{window.backend.config.name}"
+          end
         end
 
         status_bar.clear do
@@ -24,8 +30,8 @@ module TAC
 
         body.clear do
           flow(width: 1.0, height: 1.0) do
-            stack width: 0.33333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
-              flow(width: 1.0) do
+            stack width: 0.33333, height: 1.0, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
+              @groups_menu = flow(width: 1.0) do
                 label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
@@ -53,12 +59,12 @@ module TAC
                 end
               end
 
-              @groups_list = stack width: 1.0 do
+              @groups_list = stack width: 1.0, scroll: true do
               end
             end
 
-            stack width: 0.33333, height: 1.0, border_thickness: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
-              flow(width: 1.0) do
+            stack width: 0.33333, height: 1.0, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
+              @actions_menu = flow(width: 1.0) do
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
@@ -91,12 +97,12 @@ module TAC
                 end
               end
 
-              @actions_list = stack width: 1.0 do
+              @actions_list = stack width: 1.0, scroll: true do
               end
             end
 
             stack width: 0.331, height: 1.0 do
-              flow(width: 1.0) do
+              @variables_menu = flow(width: 1.0) do
                 label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
@@ -107,13 +113,41 @@ module TAC
                 end
               end
 
-              @variables_list = stack width: 1.0 do
+              @variables_list = stack width: 1.0, scroll: true do
               end
             end
           end
         end
 
         populate_groups_list
+
+        if @options[:group]
+          @active_group = @options[:group]
+          @active_group_label.value = @active_group.name
+
+          populate_actions_list(@active_group)
+
+          if @options[:action]
+            @active_action = @options[:action]
+            @active_action_label.value = @active_action.name
+
+            populate_variables_list(@active_action)
+
+            if @options[:variable]
+              # Scroll into view?
+            end
+          end
+        end
+
+        body.root.subscribe(:window_size_changed) do
+          set_list_heights
+        end
+      end
+
+      def set_list_heights
+        @groups_list.style.height = body.height - @groups_menu.height
+        @actions_list.style.height = body.height - @actions_menu.height
+        @variables_list.style.height = body.height - @variables_menu.height
       end
 
       def create_group(name)
@@ -221,6 +255,8 @@ module TAC
             end
           end
         end
+
+        set_list_heights
       end
 
       def populate_actions_list(group)
@@ -258,6 +294,8 @@ module TAC
             end
           end
         end
+
+        set_list_heights
       end
 
       def populate_variables_list(action)
@@ -283,6 +321,8 @@ module TAC
             end
           end
         end
+
+        set_list_heights
       end
     end
   end

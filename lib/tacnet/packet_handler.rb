@@ -60,6 +60,8 @@ module TAC
         if @host_is_a_connection
           title, message = packet.body.split(Packet::PROTOCOL_SEPERATOR, 2)
           $window.push_state(TAC::Dialog::TACNETDialog, title: title, message: message)
+        else
+          log.e(TAG, "Remote error: #{title}: #{message}")
         end
       end
 
@@ -75,7 +77,9 @@ module TAC
               $window.backend.load_config(config_name)
             else
               $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Supported config spec: v#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
-           end
+            end
+          else
+            raise "Invalid Config!"
           end
 
         rescue JSON::ParserError => e

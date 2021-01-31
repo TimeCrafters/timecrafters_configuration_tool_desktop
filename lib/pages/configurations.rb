@@ -13,8 +13,6 @@ module TAC
               populate_configs
             })
           end
-
-          # label "Manage Configurations", text_size: 36
         end
 
         status_bar.clear do
@@ -23,7 +21,7 @@ module TAC
         end
 
         body.clear do
-          @configs_list = stack width: 1.0 do
+          @configs_list = stack width: 1.0, height: 1.0, scroll: true do
           end
         end
 
