@@ -26,7 +26,9 @@ module TAC
                       search_results.groups.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button result.highlight(result.group.name), width: 1.0
+                          button result.highlight(result.group.name), width: 1.0 do
+                            page(TAC::Pages::Editor, { group: result.group, is_search: true })
+                          end
                         end
 
                         shared_index += 1
@@ -39,7 +41,9 @@ module TAC
                       search_results.actions.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button result.highlight(result.action.name), width: 1.0
+                          button result.highlight(result.action.name), width: 1.0 do
+                            page(TAC::Pages::Editor, { group: result.group, action: result.action, is_search: true })
+                          end
 
                           if result.from_comment?
                             para result.highlight(result.action.comment), width: 1.0
@@ -56,7 +60,9 @@ module TAC
                       search_results.variables.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button "#{result.highlight(result.variable.name)} [#{result.highlight(result.variable.value)}]", width: 1.0
+                          button "#{result.highlight(result.variable.name)} [#{result.highlight(result.variable.value)}]", width: 1.0 do
+                            page(TAC::Pages::Editor, { group: result.group, action: result.action, variable: result.variable, is_search: true })
+                          end
                         end
 
                         shared_index += 1
@@ -71,7 +77,9 @@ module TAC
                       search_results.group_presets.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button result.highlight(result.group.name), width: 1.0
+                          button result.highlight(result.group.name), width: 1.0 do
+                            page(TAC::Pages::Editor, { group: result.group, group_is_preset: true, is_search: true })
+                          end
                         end
 
                         shared_index += 1
@@ -85,7 +93,13 @@ module TAC
                       search_results.action_presets.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button result.highlight(result.action.name), width: 1.0
+                          button result.highlight(result.action.name), width: 1.0 do
+                            if result.group.nil?
+                              page(TAC::Pages::Editor, { action: result.action, action_is_preset: true, is_search: true })
+                            else
+                              page(TAC::Pages::Editor, { group: result.group, action: result.action, group_is_preset: true, is_search: true })
+                            end
+                          end
 
                           if result.from_comment?
                             para result.highlight(result.action.comment), width: 1.0
@@ -102,7 +116,13 @@ module TAC
                       search_results.variables_from_presets.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button "#{result.highlight(result.variable.name)} [#{result.highlight(result.variable.value)}]", width: 1.0
+                          button "#{result.highlight(result.variable.name)} [#{result.highlight(result.variable.value)}]", width: 1.0 do
+                            if result.group.nil?
+                              page(TAC::Pages::Editor, { action: result.action, variable: result.variable, action_is_preset: true, is_search: true })
+                            else
+                              page(TAC::Pages::Editor, { group: result.group, action: result.action, variable: result.variable, group_is_preset: true, is_search: true })
+                            end
+                          end
                         end
 
                         shared_index += 1

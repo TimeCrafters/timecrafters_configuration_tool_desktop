@@ -17,6 +17,13 @@ module TAC
 
         @var_type = list_box items: [:float, :double, :integer, :long, :string, :boolean], choose: @type ? @type : :double, width: 1.0 do |item|
           @type = item
+          if @type == :boolean
+            @value.hide
+            @value_boolean.show
+          else
+            @value.show
+            @value_boolean.hide
+          end
         end
 
         @type ||= @var_type.value.to_sym
@@ -26,7 +33,13 @@ module TAC
           @value_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
           @value_error.hide
           @value = edit_line @options[:variable] ? @options[:variable].value : "", width: 1.0
-          @value_boolean = check_box "Variable", checked: @options[:variable] ? @options[:variable].value == true : false
+          @value_boolean = check_box "Boolean", checked: @options[:variable] ? @options[:variable].value == "true" : false
+
+          unless @options[:variable] && @options[:variable].type == :boolean
+            @value_boolean.hide
+          else
+            @value.hide
+          end
         end
 
         flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
@@ -36,10 +49,12 @@ module TAC
 
           button @options[:variable] ? "Update" : "Add", width: 0.475 do |b|
             if valid?
+              value = @type == :boolean ? @value_boolean.value.to_s : @value.value.strip
+
               if @options[:variable]
-                @options[:callback_method].call(@options[:variable], @name.value.strip, @type, @value.value.strip)
+                @options[:callback_method].call(@options[:variable], @name.value.strip, @type, value)
               else
-                @options[:callback_method].call(@name.value.strip, @type, @value.value.strip)
+                @options[:callback_method].call(@name.value.strip, @type, value)
               end
 
               close
@@ -105,9 +120,6 @@ module TAC
           end
 
         elsif @type == :boolean
-          @value_error.value = "Error: Boolean not yet supported."
-          @value_error.show
-          valid = false
 
         else
           @value_error.value = "Error: Type not set or\ntype #{@var_type.value.inspect} is not valid."

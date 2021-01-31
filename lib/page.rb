@@ -19,8 +19,8 @@ module TAC
       @options = options
     end
 
-    def page(klass)
-      @host.page(klass)
+    def page(klass, options = {})
+      @host.page(klass, options)
     end
 
     def header_bar(text)
