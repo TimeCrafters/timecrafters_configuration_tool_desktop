@@ -91,6 +91,7 @@ module TAC
 
       def update_group_preset(group, name)
         group.name = name
+        window.backend.config.presets.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
         populate_group_presets
@@ -98,6 +99,7 @@ module TAC
 
       def delete_group_preset(group)
         window.backend.config.presets.groups.delete(group)
+        window.backend.config.presets.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
         populate_group_presets
@@ -105,13 +107,15 @@ module TAC
 
       def update_action_preset(action, name)
         action.name = name
+        window.backend.config.presets.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
-        populate_group_presets
+        populate_action_presets
       end
 
       def delete_action_preset(action)
-        window.backend.config.presets.action.delete(action)
+        window.backend.config.presets.actions.delete(action)
+        window.backend.config.presets.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
         populate_action_presets

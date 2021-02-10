@@ -59,6 +59,7 @@ module TAC
                       clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
                       clone.name = "#{name}"
                       window.backend.config.presets.groups << clone
+                      window.backend.config.presets.groups.sort_by! { |g| g.name.downcase }
                       window.backend.config_changed!
 
                       window.toast("Saved Group Preset", "Saved preset: #{name}")
@@ -107,6 +108,7 @@ module TAC
                       clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
                       clone.name = "#{name}"
                       window.backend.config.presets.actions << clone
+                      window.backend.config.presets.actions.sort_by! { |a| a.name.downcase }
                       window.backend.config_changed!
 
                       window.toast("Saved Action Preset", "Saved preset: #{name}")
@@ -190,6 +192,7 @@ module TAC
 
       def create_group(name)
         window.backend.config.groups << TAC::Config::Group.new(name: name, actions: [])
+        window.backend.config.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
         populate_groups_list
@@ -197,6 +200,7 @@ module TAC
 
       def update_group(group, name)
         group.name = name
+        window.backend.config.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
         populate_groups_list
@@ -204,6 +208,7 @@ module TAC
 
       def delete_group(group)
         window.backend.config.groups.delete(group)
+        window.backend.config.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
         @active_group = nil
@@ -218,6 +223,7 @@ module TAC
 
       def create_action(name, comment)
         @active_group.actions << TAC::Config::Action.new(name: name, comment: comment, enabled: true, variables: [])
+        @active_group.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
         populate_actions_list(@active_group)
@@ -233,6 +239,7 @@ module TAC
 
       def delete_action(action)
         @active_group.actions.delete(action)
+        @active_group.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
         @active_action = nil
@@ -244,6 +251,7 @@ module TAC
 
       def create_variable(name, type, value)
         @active_action.variables << TAC::Config::Variable.new(name: name, type: type, value: value)
+        @active_action.variables.sort_by! { |v| v.name.downcase }
         window.backend.config_changed!
 
         populate_variables_list(@active_action)
@@ -254,6 +262,8 @@ module TAC
         variable.type = type
         variable.value = value
 
+        @active_action.variables.sort_by! { |v| v.name.downcase }
+
         window.backend.config_changed!
 
         populate_variables_list(@active_action)
@@ -261,6 +271,7 @@ module TAC
 
       def delete_variable(variable)
         @active_action.variables.delete(variable)
+        @active_action.variables.sort_by! { |v| v.name.downcase }
         window.backend.config_changed!
 
         populate_variables_list(@active_action)
