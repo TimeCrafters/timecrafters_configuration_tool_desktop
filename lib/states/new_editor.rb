@@ -99,6 +99,8 @@ class NewEditor < CyberarmEngine::GuiState
       end
     end
 
+    @window_controls.hide unless BORDERLESS
+
     page(TAC::Pages::Home)
   end
 

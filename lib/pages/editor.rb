@@ -53,7 +53,13 @@ module TAC
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save group as preset" do
                   if @active_group
-                    push_state(Dialog::NamePromptDialog, title: "Save Group Preset", renaming: @active_group, accept_label: "Save", list: window.backend.config.presets.actions, callback_method: proc { |action, name|
+                    push_state(Dialog::NamePromptDialog, title: "Save Group Preset", renaming: @active_group, accept_label: "Save", list: window.backend.config.presets.groups, callback_method: proc { |group, name|
+                      clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
+                      clone.name = "#{name}"
+                      window.backend.config.presets.groups << clone
+                      window.backend.config_changed!
+
+                      window.toast("Saved Group Preset", "Saved preset: #{name}")
                     })
                   end
                 end
@@ -92,6 +98,12 @@ module TAC
                 button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save action as preset" do
                   if @active_action
                     push_state(Dialog::NamePromptDialog, title: "Save Action Preset", renaming: @active_action, accept_label: "Save", list: window.backend.config.presets.actions, callback_method: proc { |action, name|
+                      clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
+                      clone.name = "#{name}"
+                      window.backend.config.presets.actions << clone
+                      window.backend.config_changed!
+
+                      window.toast("Saved Action Preset", "Saved preset: #{name}")
                     })
                   end
                 end

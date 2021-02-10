@@ -1,7 +1,8 @@
 module TAC
+  THEME_FONT = "#{TAC::ROOT_PATH}/media/fonts/DejaVuSansCondensed.ttf"
   THEME = {
     Label: {
-      font: "#{TAC::ROOT_PATH}/media/fonts/DejaVuSansCondensed.ttf",
+      font: THEME_FONT,
       text_size: 22,
       color: Gosu::Color.new(0xee_ffffff),
     },
@@ -55,4 +56,8 @@ module TAC
     TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_PRIMARY,
     TAC::Palette::TIMECRAFTERS_SECONDARY, TAC::Palette::TIMECRAFTERS_SECONDARY,
   ]
+  THEME_NOTIFICATION_EDGE_COLOR = Gosu::Color.new(0xff_008000)
+  THEME_NOTIFICATION_BACKGROUND = Gosu::Color.new(0xff_102010)
+  THEME_NOTIFICATION_TITLE_COLOR = Gosu::Color::WHITE
+  THEME_NOTIFICATION_TAGLINE_COLOR = Gosu::Color::WHITE
 end

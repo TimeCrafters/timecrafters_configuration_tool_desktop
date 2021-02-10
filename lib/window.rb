@@ -1,19 +1,49 @@
 module TAC
   class Window < CyberarmEngine::Window
-    attr_reader :backend
+    attr_reader :backend, :notification_manager
     def initialize(**args)
       super(**args)
 
       self.caption = "#{TAC::NAME} v#{TAC::VERSION} (#{TAC::RELEASE_NAME})"
       @backend = Backend.new
+      @notification_manager = GosuNotifications::NotificationManager.new(window: self, edge: :bottom)
+
       push_state(TAC::States::Boot)
+    end
+
+    def draw
+      super
+
+      Gosu.flush
+      @notification_manager.draw
+    end
+
+    def update
+      super
+
+      @notification_manager.update
     end
 
     def needs_cursor?
       true
     end
 
+    def toast(title, message = nil)
+      @notification_manager.create_notification(
+        priority: GosuNotifications::Notification::PRIORITY_HIGH,
+        title: title,
+
+        tagline: message ? message : "",
+        edge_color: THEME_NOTIFICATION_EDGE_COLOR,
+        background_color: THEME_NOTIFICATION_BACKGROUND,
+        title_color: THEME_NOTIFICATION_TITLE_COLOR,
+        tagline_color: THEME_NOTIFICATION_TAGLINE_COLOR
+      )
+    end
+
     def hit_test(x, y)
+      return 0 unless BORDERLESS
+
       if y <= 4
         return 2 if x <= 4
         return 4 if x >= width - 4
