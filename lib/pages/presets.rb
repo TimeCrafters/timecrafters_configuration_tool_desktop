@@ -29,7 +29,9 @@ module TAC
             flow(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button group.name, width: 0.895
+              button group.name, width: 0.895 do
+                page(TAC::Pages::Editor,{ group: group, group_is_preset: true })
+              end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group preset" do
                 push_state(
@@ -60,7 +62,9 @@ module TAC
             flow(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button action.name, width: 0.895
+              button action.name, width: 0.895 do
+                page(TAC::Pages::Editor,{ action: action, action_is_preset: true })
+              end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action preset" do
                 push_state(

@@ -48,6 +48,8 @@ module TAC
 
                       populate_groups_list
                     })
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to clone group, no group selected.")
                   end
                 end
 
@@ -61,6 +63,8 @@ module TAC
 
                       window.toast("Saved Group Preset", "Saved preset: #{name}")
                     })
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create group preset, no group selected.")
                   end
                 end
               end
@@ -77,7 +81,7 @@ module TAC
                   if @active_group
                     push_state(TAC::Dialog::ActionDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
                   else
-                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action,\nno group selected.")
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action, no group selected.")
                   end
                 end
 
@@ -92,6 +96,8 @@ module TAC
 
                       populate_actions_list(@active_group)
                     })
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to clone action, no action selected.")
                   end
                 end
 
@@ -105,6 +111,8 @@ module TAC
 
                       window.toast("Saved Action Preset", "Saved preset: #{name}")
                     })
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action preset, no action selected.")
                   end
                 end
               end
@@ -133,20 +141,38 @@ module TAC
 
         populate_groups_list
 
-        if @options[:group]
+        if @options[:group_is_preset]
           @active_group = @options[:group]
           @active_group_label.value = @active_group.name
-
           populate_actions_list(@active_group)
 
-          if @options[:action]
-            @active_action = @options[:action]
-            @active_action_label.value = @active_action.name
+          @groups_menu.hide
 
-            populate_variables_list(@active_action)
+        elsif @options[:action_is_preset]
+          @active_action = @options[:action]
+          @active_action_label.value = @active_action.name
 
-            if @options[:variable]
-              # Scroll into view?
+          populate_variables_list(@options[:action])
+
+          @groups_menu.hide
+          @actions_menu.hide
+
+        else
+          if @options[:group]
+            @active_group = @options[:group]
+            @active_group_label.value = @active_group.name
+
+            populate_actions_list(@active_group)
+
+            if @options[:action]
+              @active_action = @options[:action]
+              @active_action_label.value = @active_action.name
+
+              populate_variables_list(@active_action)
+
+              if @options[:variable]
+                # Scroll into view?
+              end
             end
           end
         end
@@ -241,7 +267,11 @@ module TAC
       end
 
       def populate_groups_list
-        groups = window.backend.config.groups
+        groups = []
+
+        unless @options[:group_is_preset] || @options[:action_is_preset]
+          groups = window.backend.config.groups
+        end
 
         @groups_list.clear do
           groups.each_with_index do |group, i|
@@ -262,7 +292,7 @@ module TAC
                 push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all\nof its actions and variables?", callback_method: proc { delete_group(group) })
+                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all of its actions and variables?", callback_method: proc { delete_group(group) })
               end
             end
           end
