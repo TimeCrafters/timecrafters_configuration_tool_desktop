@@ -218,6 +218,14 @@ module TAC
           list
         )
       end
+
+      def self.packet_select_config(config_name)
+        Packet.create(Packet::PACKET_TYPES[:select_config], config_name)
+      end
+
+      def self.packet_delete_config(config_name)
+        Packet.create(Packet::PACKET_TYPES[:delete_config], config_name)
+      end
     end
   end
 end

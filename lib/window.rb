@@ -63,9 +63,9 @@ module TAC
 
     def close
       if @backend.config_changed?
-        push_state(Dialog::ConfirmDialog, title: "Unsaved Config", message: "Config has unsaved changes\nthat will be lost if you continue!", callback_method: proc { cleanup_and_close })
+        push_state(Dialog::ConfirmDialog, title: "Unsaved Config", message: "Config has unsaved changes that will be lost if you continue!", callback_method: proc { cleanup_and_close })
       elsif @backend.settings_changed?
-        push_state(Dialog::ConfirmDialog, title: "Unsaved Settings", message: "Settings has unsaved changes\nthat will be lost if you continue!", callback_method: proc { cleanup_and_close })
+        push_state(Dialog::ConfirmDialog, title: "Unsaved Settings", message: "Settings has unsaved changes that will be lost if you continue!", callback_method: proc { cleanup_and_close })
       else
         cleanup_and_close
       end

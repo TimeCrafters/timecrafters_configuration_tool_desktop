@@ -41,6 +41,10 @@ module TAC
 
               button "#{name}", width: 0.94 do
                 change_config(name)
+
+                if window.backend.tacnet.connected?
+                  window.backend.tacnet.puts(TAC::TACNET::PacketHandler.packet_select_config(name))
+                end
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Rename configuration" do
@@ -67,7 +71,11 @@ module TAC
                   File.delete("#{TAC::CONFIGS_PATH}/#{name}.json")
 
                   if window.backend.settings.config == name
-                    change_config(nil)
+                    change_config("")
+                  end
+
+                  if window.backend.tacnet.connected?
+                    window.backend.tacnet.puts(TAC::TACNET::PacketHandler.packet_delete_config(name))
                   end
 
                   populate_configs

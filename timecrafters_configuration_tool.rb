@@ -1,4 +1,8 @@
-require_relative "../cyberarm_engine/lib/cyberarm_engine"
+begin
+  require_relative "../cyberarm_engine/lib/cyberarm_engine"
+rescue LoadError
+  require "cyberarm_engine"
+end
 require "gosu_notifications"
 require "socket"
 require "securerandom"
