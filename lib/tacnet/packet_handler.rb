@@ -75,11 +75,9 @@ module TAC
 
             if $window.backend.config&.name == config_name
               $window.backend.load_config(config_name)
-            else
-              $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Supported config spec: v#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
             end
           else
-            raise "Invalid Config!"
+            $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Supported config spec: v#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
           end
 
         rescue JSON::ParserError => e
