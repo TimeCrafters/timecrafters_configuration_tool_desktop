@@ -68,6 +68,20 @@ module TAC
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create group preset, no group selected.")
                   end
                 end
+
+                button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import group from preset" do
+                  push_state(Dialog::PickPresetDialog, title: "Pick Group Preset", limit: :groups, callback_method: proc { |preset|
+                    push_state(Dialog::NamePromptDialog, title: "Name Group", renaming: preset, accept_label: "Add", list: window.backend.config.groups, callback_method: proc { |group, name|
+                      clone = TAC::Config::Group.from_json( JSON.parse( group.to_json, symbolize_names: true ))
+                      clone.name = "#{name}"
+                      window.backend.config.groups << clone
+                      window.backend.config.groups.sort_by! { |g| g.name.downcase }
+                      window.backend.config_changed!
+
+                      populate_groups_list
+                    })
+                  })
+                end
               end
 
               @groups_list = stack width: 1.0, scroll: true do
@@ -115,6 +129,24 @@ module TAC
                     })
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create action preset, no action selected.")
+                  end
+                end
+
+                button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import action from preset" do
+                  if @active_group
+                    push_state(Dialog::PickPresetDialog, title: "Pick Action Preset", limit: :actions, callback_method: proc { |preset|
+                      push_state(Dialog::NamePromptDialog, title: "Name Action", renaming: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name|
+                        clone = TAC::Config::Action.from_json( JSON.parse( action.to_json, symbolize_names: true ))
+                        clone.name = "#{name}"
+                        @active_group.actions << clone
+                        @active_group.actions.sort_by! { |a| a.name.downcase }
+                        window.backend.config_changed!
+
+                        populate_actions_list(@active_group)
+                      })
+                    })
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to import action preset, no group selected.")
                   end
                 end
               end
