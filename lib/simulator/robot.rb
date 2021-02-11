@@ -75,6 +75,14 @@ module TAC
         @queue << Move.new(robot: self, distance: -distance, power: power)
       end
 
+      def strafe_right(distance, power = 1.0)
+        @queue << Strafe.new(robot: self, distance: distance, power: power)
+      end
+
+      def strafe_left(distance, power = 1.0)
+        @queue << Strafe.new(robot: self, distance: -distance, power: power)
+      end
+
       def turn(relative_angle, power = 1.0)
         @queue << Turn.new(robot: self, relative_angle: relative_angle, power: power)
       end
@@ -114,6 +122,52 @@ class State
           @goal = @starting_position.clone
           @goal.x += Math.cos(@robot.angle.gosu_to_radians) * @distance
           @goal.y += Math.sin(@robot.angle.gosu_to_radians) * @distance
+
+          @complete = false
+          @allowable_error = 1.0
+        end
+
+        def draw
+          Gosu.draw_line(
+            @robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY,
+            @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY
+          )
+          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 1), @goal.y + (@robot.depth / 2 - 1), 2, 2, Gosu::Color::RED)
+        end
+
+        def update(dt)
+          speed = (@distance > 0 ? @power * dt : -@power * dt) * @robot.speed
+
+          if @robot.position.distance(@goal) <= @allowable_error
+            @complete = true
+            @robot.position = @goal
+          else
+            if speed > 0
+              @robot.position -= (@robot.position - @goal).normalized * speed
+            else
+              @robot.position += (@robot.position - @goal).normalized * speed
+            end
+          end
+        end
+      end
+
+      class Strafe < State
+        def initialize(robot:, distance:, power:)
+          @robot = robot
+          @distance = distance
+          @power = power.clamp(-1.0, 1.0)
+        end
+
+        def start
+          @starting_position = @robot.position.clone
+          @goal = @starting_position.clone
+          if @distance.positive?
+            @goal.x += Math.cos((@robot.angle + 90).gosu_to_radians) * @distance
+            @goal.y += Math.sin((@robot.angle + 90).gosu_to_radians) * @distance
+          else
+            @goal.x += Math.cos((@robot.angle - 90).gosu_to_radians) * @distance
+            @goal.y += Math.sin((@robot.angle - 90).gosu_to_radians) * @distance
+          end
 
           @complete = false
           @allowable_error = 1.0

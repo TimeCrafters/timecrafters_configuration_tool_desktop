@@ -57,6 +57,38 @@ module TAC
     def try_commit
     end
 
+    def focus_next_element
+      elements = []
+
+      _deep_dive_interactive_elements(@dialog_content, elements)
+
+      element_index = elements.find_index(self.focused)
+
+      if element_index && elements.size.positive?
+        element = elements[element_index + 1]
+        element ||= elements.first
+
+        if element
+          request_focus(element)
+        end
+      end
+    end
+
+    def _deep_dive_interactive_elements(element, list)
+      element.children.each do |child|
+        if child.visible? && child.is_a?(CyberarmEngine::Element::EditLine) ||
+          child.is_a?(CyberarmEngine::Element::EditBox) ||
+          child.is_a?(CyberarmEngine::Element::CheckBox) ||
+          child.is_a?(CyberarmEngine::Element::ToggleButton) ||
+          child.is_a?(CyberarmEngine::Element::ListBox)
+
+          list << child
+        elsif child.visible? && child.is_a?(CyberarmEngine::Element::Container)
+          _deep_dive_interactive_elements(child, list)
+        end
+      end
+    end
+
     def draw
       @previous_state.draw
       Gosu.flush
@@ -84,6 +116,8 @@ module TAC
         try_commit
       when Gosu::KB_ESCAPE
         close
+      when Gosu::KB_TAB
+        focus_next_element
       end
     end
 

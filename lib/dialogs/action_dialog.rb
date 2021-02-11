@@ -7,7 +7,10 @@ module TAC
         label "Name", width: 1.0, text_align: :center
         @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
-        @name = edit_line @options[:action] ? @options[:action].name : "", filter: method(:name_filter), width: 1.0
+        @name = edit_line @options[:action] ? @options[:action].name : "", filter: method(:name_filter), width: 1.0, autofocus: true
+        @name.subscribe(:changed) do |sender, value|
+          valid?
+        end
 
         label "Comment", width: 1.0, text_align: :center
         @comment = edit_line @options[:action] ? @options[:action].comment : "", width: 1.0

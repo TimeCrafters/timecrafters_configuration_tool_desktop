@@ -7,6 +7,8 @@ module TAC
 
         menu_bar.clear do
           button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), tip: "Run Simulation", image_height: 1.0 do
+            save_source
+
             begin
               @simulation_start_time = Gosu.milliseconds
               @simulation = TAC::Simulator::Simulation.new(source_code: @source_code.value, field_container: @field_container)
@@ -23,8 +25,7 @@ module TAC
           end
 
           button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), tip: "Save", image_height: 1.0 do
-            File.open(SOURCE_FILE_PATH, "w") { |f| f.write @source_code.value }
-            @simulation_status.value = "Saved source to #{SOURCE_FILE_PATH}"
+            save_source
           end
         end
 
@@ -57,8 +58,14 @@ robot.forward 100"
         end
       end
 
+      def save_source
+        File.open(SOURCE_FILE_PATH, "w") { |f| f.write @source_code.value }
+        @simulation_status.value = "Saved source to #{SOURCE_FILE_PATH}"
+      end
+
       def blur
         @simulation.robots.each { |robot| robot.queue.clear } if @simulation
+        save_source
       end
 
       def draw

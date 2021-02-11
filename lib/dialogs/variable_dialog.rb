@@ -9,7 +9,10 @@ module TAC
         label "Name", width: 1.0, text_align: :center
         @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
-        @name = edit_line @options[:variable] ? @options[:variable].name : "", filter: method(:name_filter), width: 1.0
+        @name = edit_line @options[:variable] ? @options[:variable].name : "", filter: method(:name_filter), width: 1.0, autofocus: true
+        @name.subscribe(:changed) do |sender, value|
+          valid?
+        end
 
         label "Type", width: 1.0, text_align: :center
         @type_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
@@ -24,6 +27,8 @@ module TAC
             @value.show
             @value_boolean.hide
           end
+
+          valid?
         end
 
         @type ||= @var_type.value.to_sym
@@ -34,6 +39,10 @@ module TAC
           @value_error.hide
           @value = edit_line @options[:variable] ? @options[:variable].value : "", width: 1.0
           @value_boolean = check_box "Boolean", checked: @options[:variable] ? @options[:variable].value == "true" : false
+
+          @value.subscribe(:changed) do |sender, value|
+            valid?
+          end
 
           unless @options[:variable] && @options[:variable].type == :boolean
             @value_boolean.hide
