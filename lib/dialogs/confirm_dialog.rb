@@ -2,8 +2,10 @@ module TAC
   class Dialog
     class ConfirmDialog < Dialog
       def build
-        @dialog_root.style.border_color = [ Palette::ALERT, darken(Palette::ALERT, 50) ]
-        @titlebar.style.background = [ Palette::ALERT, darken(Palette::ALERT, 50) ]
+        color = @options[:dangerous] ? Palette::DANGEROUS : Palette::ALERT
+
+        @dialog_root.style.border_color = [ color, darken(color, 50) ]
+        @titlebar.style.background = [ color, darken(color, 50) ]
 
         background Gosu::Color::GRAY
         label @options[:message]
@@ -12,7 +14,14 @@ module TAC
           button "Cancel", width: 0.475 do
             close
           end
+
           button "Proceed", width: 0.475, **TAC::THEME_DANGER_BUTTON do
+            try_commit(true)
+          end
+        end
+
+        def try_commit(force = false)
+          if not @options[:dangerous] || force
             close
 
             @options[:callback_method].call

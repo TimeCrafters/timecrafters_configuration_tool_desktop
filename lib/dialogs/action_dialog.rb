@@ -18,16 +18,20 @@ module TAC
           end
 
           button @options[:action] ? @options[:accept_label] ? @options[:accept_label] : "Update" : "Add", width: 0.475 do |b|
-            if valid?
-              if @options[:action]
-                @options[:callback_method].call(@options[:action], @name.value.strip, @comment.value.strip)
-              else
-                @options[:callback_method].call(@name.value.strip, @comment.value.strip)
-              end
-
-              close
-            end
+            try_commit
           end
+        end
+      end
+
+      def  try_commit
+        if valid?
+          if @options[:action]
+            @options[:callback_method].call(@options[:action], @name.value.strip, @comment.value.strip)
+          else
+            @options[:callback_method].call(@name.value.strip, @comment.value.strip)
+          end
+
+          close
         end
       end
 
@@ -36,14 +40,14 @@ module TAC
         name = @name.value.strip
 
         if name.empty?
-          @name_error.value = "Error: Name cannot be blank\n or only whitespace."
+          @name_error.value = "Error: Name cannot be blank or only whitespace."
           @name_error.show
           valid = false
 
         ### TODO: Handle case when renaming a cloned Action
-        # elsif @options[:action] && @options[:action].name == name
-        #   @name_error.value = ""
-        #   @name_error.hide
+        elsif !@options[:cloning] && @options[:action] && @options[:action].name == name
+          @name_error.value = ""
+          @name_error.hide
 
         elsif @options[:list].find { |action| action.name == name}
           @name_error.value = "Error: Name is not unique!"

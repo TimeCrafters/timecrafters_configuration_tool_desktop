@@ -28,5 +28,6 @@ module TAC
     EDITOR_SECONDARY = Gosu::Color.new(0xff_224466)
 
     ALERT = TACNET_CONNECTING
+    DANGEROUS = TACNET_CONNECTION_ERROR
   end
 end

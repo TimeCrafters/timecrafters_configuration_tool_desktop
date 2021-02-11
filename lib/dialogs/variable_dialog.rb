@@ -48,18 +48,22 @@ module TAC
           end
 
           button @options[:variable] ? "Update" : "Add", width: 0.475 do |b|
-            if valid?
-              value = @type == :boolean ? @value_boolean.value.to_s : @value.value.strip
-
-              if @options[:variable]
-                @options[:callback_method].call(@options[:variable], @name.value.strip, @type, value)
-              else
-                @options[:callback_method].call(@name.value.strip, @type, value)
-              end
-
-              close
-            end
+            try_commit
           end
+        end
+      end
+
+      def try_commit
+        if valid?
+          value = @type == :boolean ? @value_boolean.value.to_s : @value.value.strip
+
+          if @options[:variable]
+            @options[:callback_method].call(@options[:variable], @name.value.strip, @type, value)
+          else
+            @options[:callback_method].call(@name.value.strip, @type, value)
+          end
+
+          close
         end
       end
 

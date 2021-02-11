@@ -23,17 +23,20 @@ module TAC
           accept_label = @options[:accept_label] if @options[:accept_label]
 
           button accept_label, width: 0.475 do
-            unless valid?
-            else
-              if @options[:renaming]
-                @options[:callback_method].call(@options[:renaming], @name.value.strip)
-              else
-                @options[:callback_method].call(@name.value.strip)
-              end
-
-              close
-            end
+            try_commit
           end
+        end
+      end
+
+      def try_commit
+        if valid?
+          if @options[:renaming]
+            @options[:callback_method].call(@options[:renaming], @name.value.strip)
+          else
+            @options[:callback_method].call(@name.value.strip)
+          end
+
+          close
         end
       end
 

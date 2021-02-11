@@ -54,6 +54,9 @@ module TAC
       text.match(/[A-Za-z0-9._\- ]/) ? text : ""
     end
 
+    def try_commit
+    end
+
     def draw
       @previous_state.draw
       Gosu.flush
@@ -71,6 +74,17 @@ module TAC
       end
 
       center_dialog
+    end
+
+    def button_down(id)
+      super
+
+      case id
+      when Gosu::KB_ENTER, Gosu::KB_RETURN
+        try_commit
+      when Gosu::KB_ESCAPE
+        close
+      end
     end
 
     def close

@@ -18,6 +18,9 @@ module TAC
           end
         end
       end
+
+      def try_commit
+      end
     end
   end
 end

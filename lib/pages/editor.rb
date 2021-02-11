@@ -102,7 +102,7 @@ module TAC
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected action" do
                   if @active_group && @active_action
-                    push_state(Dialog::ActionDialog, title: "Clone Action", action: @active_action, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name, comment|
+                    push_state(Dialog::ActionDialog, title: "Clone Action", action: @active_action, cloning: true, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name, comment|
                       clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
                       clone.name    = name
                       clone.comment = comment
@@ -135,7 +135,7 @@ module TAC
                 button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import action from preset" do
                   if @active_group
                     push_state(Dialog::PickPresetDialog, title: "Pick Action Preset", limit: :actions, callback_method: proc { |preset|
-                      push_state(Dialog::NamePromptDialog, title: "Name Action", renaming: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name|
+                      push_state(Dialog::ActionDialog, title: "Name Action", action: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name|
                         clone = TAC::Config::Action.from_json( JSON.parse( action.to_json, symbolize_names: true ))
                         clone.name = "#{name}"
                         @active_group.actions << clone
@@ -335,7 +335,7 @@ module TAC
                 push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
               end
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
-                push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete group and all of its actions and variables?", callback_method: proc { delete_group(group) })
+                push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete group and all of its actions and variables?", callback_method: proc { delete_group(group) })
               end
             end
           end
@@ -371,7 +371,7 @@ module TAC
                 end
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
-                  push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete action and all\nof its variables?", callback_method: proc { delete_action(action) })
+                  push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete action and all of its variables?", callback_method: proc { delete_action(action) })
                 end
               end
 

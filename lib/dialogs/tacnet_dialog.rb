@@ -11,8 +11,12 @@ module TAC
         @sound = Gosu::Sample.new("#{TAC::ROOT_PATH}/media/error_alarm.ogg").play(1, 1, true)
 
         button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
-          close
+          try_commit
         end
+      end
+
+      def try_commit
+        close
       end
 
       def close

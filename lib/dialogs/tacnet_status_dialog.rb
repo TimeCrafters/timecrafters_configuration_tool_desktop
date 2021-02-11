@@ -6,12 +6,16 @@ module TAC
         @message_label = label $window.backend.tacnet.full_status
 
         button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
-          close
+          try_commit
         end
 
         @timer = CyberarmEngine::Timer.new(1000.0) do
           @message_label.value = $window.backend.tacnet.full_status
         end
+      end
+
+      def try_commit
+        close
       end
 
       def update

@@ -67,7 +67,7 @@ module TAC
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, **THEME_DANGER_BUTTON, tip: "Delete configuration" do
-                push_state(Dialog::ConfirmDialog, title: "Delete Config?", callback_method: proc {
+                push_state(Dialog::ConfirmDialog, title: "Delete Config?", dangerous: true, callback_method: proc {
                   File.delete("#{TAC::CONFIGS_PATH}/#{name}.json")
 
                   if window.backend.settings.config == name
