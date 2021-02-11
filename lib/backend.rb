@@ -137,7 +137,7 @@ module TAC
             data: {
               hostname: TACNET::DEFAULT_HOSTNAME,
               port: TACNET::DEFAULT_PORT,
-              config: nil,
+              config: "",
             }
           }
         )
