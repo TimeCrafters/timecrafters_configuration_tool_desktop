@@ -2,7 +2,11 @@ module TAC
   class Dialog
     class ConfirmDialog < Dialog
       def build
-        color = @options[:dangerous] ? Palette::DANGEROUS : Palette::ALERT
+        @dangerous = @options[:dangerous]
+        @dangerous ||= false
+
+        color = @dangerous ? Palette::DANGEROUS : Palette::ALERT
+
 
         @dialog_root.style.border_color = [ color, darken(color, 50) ]
         @titlebar.style.background = [ color, darken(color, 50) ]
@@ -21,7 +25,11 @@ module TAC
         end
 
         def try_commit(force = false)
-          if not @options[:dangerous] || force
+          if !@dangerous
+            close
+
+            @options[:callback_method].call
+          elsif @dangerous && force
             close
 
             @options[:callback_method].call
