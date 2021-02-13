@@ -19,9 +19,10 @@ module TAC
               end
 
               body.clear do
+                shared_index = 0
+
                 flow(width: 1.0, height: 1.0) do
                   stack(width: 0.495, height: 1.0, scroll: true) do
-                    shared_index = 0
                     if search_results.groups.size.positive?
                       title "Groups"
 
