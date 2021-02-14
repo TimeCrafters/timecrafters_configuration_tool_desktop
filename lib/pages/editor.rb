@@ -310,6 +310,8 @@ module TAC
       end
 
       def populate_groups_list
+        @groups_list.scroll_top = 0
+
         groups = []
 
         unless @options[:group_is_preset] || @options[:action_is_preset]
@@ -345,6 +347,8 @@ module TAC
       end
 
       def populate_actions_list(group)
+        @actions_list.scroll_top = 0
+
         actions = group.actions
 
         @actions_list.clear do
@@ -384,6 +388,8 @@ module TAC
       end
 
       def populate_variables_list(action)
+        @variables_list.scroll_top = 0
+
         variables = action.variables
 
         @variables_list.clear do
