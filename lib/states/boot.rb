@@ -9,8 +9,10 @@ module TAC
         @title_font = CyberarmEngine::Text.new(TAC::NAME, z: 100, size: 72, shadow: true, shadow_size: 3, font: THEME[:Label][:font])
         @logo = Gosu::Image.new("#{TAC::ROOT_PATH}/media/logo.png")
 
-        @animator = CyberarmEngine::Animator.new(start_time: 0, duration: 3_000, from: 0, to: 255)
-        @transition_color = Gosu::Color.new(0x00_000000)
+        @title_animator = CyberarmEngine::Animator.new(start_time: 0, duration: 750, from: 0.0, to: 1.0, tween: :swing_from_to)
+        @logo_animator = CyberarmEngine::Animator.new(start_time: 750, duration: 1_000, from: 0.0, to: 1.0, tween: :swing_to)
+        @transition_animator = CyberarmEngine::Animator.new(start_time: 2_250, duration: 750, from: 0, to: 255, tween: :ease_out)
+        @transition_color = Gosu::Color.new(0x00_111111)
 
         @next_state = NewEditor
       end
@@ -19,7 +21,7 @@ module TAC
         super
 
         @title_font.draw
-        @logo.draw(window.width / 2 - @logo.width / 2, window.height / 2 - @logo.height / 2, 99)
+        @logo.draw_rot(window.width / 2, window.height / 2, 99, 0, 0.5, 0.5, @logo_animator.transition, @logo_animator.transition)
         Gosu.draw_rect(0, 0, window.width, window.height, @transition_color, 10_00)
       end
 
@@ -27,9 +29,9 @@ module TAC
         super
 
         @title_font.x = window.width / 2 - @title_font.width / 2
-        @title_font.y = window.height / 2 - (@logo.height / 2 + @title_font.height)
+        @title_font.y = (window.height / 2 - (@logo.height / 2 + @title_font.height)) * @title_animator.transition
 
-        @transition_color.alpha = @animator.transition(0, 255, :sine)
+        @transition_color.alpha = @transition_animator.transition
 
         push_state(@next_state) if @transition_color.alpha >= 255
       end
