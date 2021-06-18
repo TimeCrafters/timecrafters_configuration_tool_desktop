@@ -19,7 +19,8 @@ module TAC
         @type_error.hide
 
         @var_type = list_box items: [:float, :double, :integer, :long, :string, :boolean], choose: @type ? @type : :double, width: 1.0 do |item|
-          @type = item
+          @type = item.value.to_sym
+
           if @type == :boolean
             @value.hide
             @value_boolean.show
@@ -52,11 +53,11 @@ module TAC
         end
 
         flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
-          button "Cancel", width: 0.475 do
+          button "Cancel", width: 0.5 do
             close
           end
 
-          button @options[:variable] ? "Update" : "Add", width: 0.475 do |b|
+          button @options[:variable] ? "Update" : "Add", width: 0.5 do |b|
             try_commit
           end
         end
@@ -80,7 +81,7 @@ module TAC
         valid = true
 
         if @name.value.strip.empty?
-          @name_error.value = "Error: Name cannot be blank\n or only whitespace."
+          @name_error.value = "Error: Name cannot be blank or only whitespace."
           @name_error.show
           valid = false
         else
@@ -99,7 +100,7 @@ module TAC
 
         if [:integer, :float, :double, :long].include?(@type)
           if @value.value.strip.empty?
-            @value_error.value = "Error: Numeric value cannot be\nblank or only whitespace."
+            @value_error.value = "Error: Numeric value cannot be blank or only whitespace."
             @value_error.show
             valid = false
 
@@ -107,7 +108,7 @@ module TAC
             begin
               Integer(@value.value.strip)
             rescue
-              @value_error.value = "Error: Invalid value,\nexpected whole number."
+              @value_error.value = "Error: Invalid value, expected whole number."
               @value_error.show
               valid = false
             end
@@ -116,7 +117,7 @@ module TAC
             begin
               Float(@value.value.strip)
             rescue
-              @value_error.value = "Error: Invalid value,\nexpected decimal number."
+              @value_error.value = "Error: Invalid value, expected decimal number."
               @value_error.show
               valid = false
             end
@@ -127,7 +128,7 @@ module TAC
 
         elsif @type == :string
           if @value.value.strip.empty?
-            @value_error.value = "Error: Value cannot be blank\n or only whitespace."
+            @value_error.value = "Error: Value cannot be blank  or only whitespace."
             @value_error.show
             valid = false
           end
@@ -135,7 +136,7 @@ module TAC
         elsif @type == :boolean
 
         else
-          @value_error.value = "Error: Type not set or\ntype #{@var_type.value.inspect} is not valid."
+          @value_error.value = "Error: Type not set or type #{@type.inspect} is not valid."
           @value_error.show
           valid = false
         end

@@ -6,7 +6,7 @@ module TAC
           background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY, TAC::Palette::TIMECRAFTERS_TERTIARY, TAC::Palette::TIMECRAFTERS_PRIMARY]
         end
 
-        @title_font = CyberarmEngine::Text.new(TAC::NAME, z: 100, size: 72, shadow: true, shadow_size: 3, font: THEME[:Label][:font])
+        @title_font = CyberarmEngine::Text.new(TAC::NAME, z: 100, size: 72, border: true, border_size: 3, font: THEME[:Label][:font])
         @logo = Gosu::Image.new("#{TAC::ROOT_PATH}/media/logo.png")
 
         @title_animator = CyberarmEngine::Animator.new(start_time: 0, duration: 750, from: 0.0, to: 1.0, tween: :swing_from_to)
@@ -14,7 +14,7 @@ module TAC
         @transition_animator = CyberarmEngine::Animator.new(start_time: 2_250, duration: 750, from: 0, to: 255, tween: :ease_out)
         @transition_color = Gosu::Color.new(0x00_111111)
 
-        @next_state = NewEditor
+        @next_state = Editor
       end
 
       def draw

@@ -16,11 +16,11 @@ module TAC
         @comment = edit_line @options[:action] ? @options[:action].comment : "", width: 1.0
 
         flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
-          button "Cancel", width: 0.475 do
+          button "Cancel", width: 0.5 do
             close
           end
 
-          button @options[:action] ? @options[:accept_label] ? @options[:accept_label] : "Update" : "Add", width: 0.475 do |b|
+          button @options[:action] ? @options[:accept_label] ? @options[:accept_label] : "Update" : "Add", width: 0.5 do |b|
             try_commit
           end
         end

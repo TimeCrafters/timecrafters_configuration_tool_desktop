@@ -162,7 +162,7 @@ module TAC
                   if @active_action
                     push_state(TAC::Dialog::VariableDialog, title: "Create Variable", callback_method: method(:create_variable))
                   else
-                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create variable,\nno action selected.")
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create variable, no action selected.")
                   end
                 end
               end

@@ -15,7 +15,7 @@ module TAC
 
           # title
           flow width: 0.9 do
-            label @title, text_size: THEME_SUBHEADING_TEXT_SIZE, width: 1.0, text_align: :center, text_shadow: true, text_shadow_color: 0xff_222222, text_shadow_size: 1
+            label @title, text_size: THEME_SUBHEADING_TEXT_SIZE, width: 1.0, text_align: :center, text_border: true, text_border_color: 0xff_222222, text_border_size: 1
           end
 
           # Buttons

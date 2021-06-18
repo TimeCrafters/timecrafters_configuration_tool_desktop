@@ -15,14 +15,14 @@ module TAC
         end
 
         flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
-          button "Cancel", width: 0.475 do
+          button "Cancel", width: 0.5 do
             close
           end
 
           accept_label = @options[:renaming] ? "Update" : "Add"
           accept_label = @options[:accept_label] if @options[:accept_label]
 
-          button accept_label, width: 0.475 do
+          button accept_label, width: 0.5 do
             try_commit
           end
         end
@@ -44,7 +44,7 @@ module TAC
         name = @name.value.strip
 
         if @name.value.strip.empty?
-          @name_error.value = "Name cannot be blank.\nName cannot only be whitespace."
+          @name_error.value = "Name cannot be blank. Name cannot only be whitespace."
           @name_error.show
 
           return false

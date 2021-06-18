@@ -61,7 +61,7 @@ module TAC
 
                     populate_configs
                   else
-                    push_state(Dialog::AlertDialog, title: "Config Rename Failed", message: "File already exists at\n#{TAC::CONFIGS_PATH}/#{new_name}.json}")
+                    push_state(Dialog::AlertDialog, title: "Config Rename Failed", message: "File already exists at #{TAC::CONFIGS_PATH}/#{new_name}.json}")
                   end
                 })
               end
