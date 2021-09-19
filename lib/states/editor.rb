@@ -50,7 +50,7 @@ class Editor < CyberarmEngine::GuiState
     end
 
     @container = flow(width: 1.0, height: 1.0) do
-      @navigation = stack(width: 64, height: 1.0) do
+      @navigation = stack(width: 64, height: 1.0, scroll: true) do
         background 0xff_333333
 
         button get_image("#{TAC::ROOT_PATH}/media/icons/home.png"), margin: 4, tip: "Home", image_width: 1.0 do
@@ -79,6 +79,10 @@ class Editor < CyberarmEngine::GuiState
 
         button get_image("#{TAC::ROOT_PATH}/media/icons/zoom.png"), margin: 4, tip: "Search", image_width: 1.0 do
           page(TAC::Pages::Search)
+        end
+
+        button get_image("#{TAC::ROOT_PATH}/media/icons/joystickLeft.png"), margin: 4, tip: "Field Planner", image_width: 1.0 do
+          page(TAC::Pages::FieldPlanner)
         end
       end
 
@@ -135,6 +139,18 @@ class Editor < CyberarmEngine::GuiState
 
       recalc
     end
+  end
+
+  def button_down(id)
+    super
+
+    @page&.button_down(id)
+  end
+
+  def button_up(id)
+    super
+
+    @page&.button_up(id)
   end
 
   def recalc

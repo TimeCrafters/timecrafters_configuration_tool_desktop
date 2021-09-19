@@ -1,6 +1,8 @@
 module TAC
   class Simulator
     class Field
+      attr_reader :scale
+
       def initialize(container:, season:, simulation:)
         @container = container
         @season = season
@@ -24,8 +26,8 @@ module TAC
             Gosu.scale(@scale) do
               self.send(:"draw_field_#{@season}")
 
-              @simulation.robots.each(&:draw)
-              @simulation.robots.each { |robot| robot.queue.first.draw if robot.queue.first && @simulation.show_paths }
+              @simulation&.robots&.each(&:draw)
+              @simulation&.robots&.each { |robot| robot.queue.first.draw if robot.queue.first && @simulation.show_paths }
             end
           end
         end
@@ -165,8 +167,9 @@ module TAC
       end
 
       def update
-        @position.x, @position.y = @container.x, @container.y
-        @size = @container.width
+        @position.x = @container.x
+        @position.y = @container.y
+        @size = [@container.width, @container.height].min
         @scale = @size.to_f / @field_size
       end
     end
