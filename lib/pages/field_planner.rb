@@ -4,6 +4,47 @@ module TAC
       def setup
         header_bar("Field Planner")
 
+        menu_bar.clear do
+          flow(width: 1.0, height: 1.0) do
+            button "Inches", text_size: THEME_HEADING_TEXT_SIZE do
+              @unit = :inches
+              refresh_panel
+            end
+
+            button "Feet", text_size: THEME_HEADING_TEXT_SIZE do
+              @unit = :feet
+              refresh_panel
+            end
+
+            button "Millimeters", text_size: THEME_HEADING_TEXT_SIZE do
+              @unit = :millimeters
+              refresh_panel
+            end
+
+            button "Centimeters", text_size: THEME_HEADING_TEXT_SIZE do
+              @unit = :centimeters
+              refresh_panel
+            end
+
+            button "Meters", text_size: THEME_HEADING_TEXT_SIZE do
+              @unit = :meters
+              refresh_panel
+            end
+          end
+        end
+
+        status_bar.clear do
+          flow(width: 1.0, height: 1.0) do
+            tagline "Nodes:"
+            @nodes_count_label = tagline "0"
+
+            tagline "Total Distance:"
+            @total_distance_label = tagline "0"
+
+            @units_label = tagline "Inches"
+          end
+        end
+
         body.clear do
           flow(width: 1.0, height: 1.0) do
             @field_container = stack width: 0.5, height: 1.0 do
@@ -114,12 +155,43 @@ module TAC
       end
 
       def refresh_panel
-        @points_container.clear do
-          title "Nodes: #{@nodes.count} - Length: #{@total_distance.round}"
+        @nodes_count_label.value = "#{@nodes.count}"
+        @total_distance_label.value = "#{inches_to_unit(@total_distance).round(2)}"
+        @units_label.value = @unit.to_s.capitalize
 
-          @nodes.each do |v|
-            para "Vector #{v.x.round}:#{v.y.round}"
+        @points_container.clear do
+          v1 = @nodes.first
+          para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - 0 #{@unit.to_s.capitalize}"
+
+          @nodes.each_with_index do |v2, i|
+            next if i.zero?
+
+            distance = Gosu.distance(
+              v1.x + @field_container.x,
+              v1.y + @field_container.y,
+              v2.x + @field_container.x,
+              v2.y + @field_container.y
+            )
+
+            para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - #{inches_to_unit(distance).round(2)} #{@unit.to_s.capitalize}"
+
+            v1 = v2
           end
+        end
+      end
+
+      def inches_to_unit(inches)
+        case @unit
+        when :inches
+          inches
+        when :feet
+          inches / 12.0
+        when :millimeters
+          inches / 0.254
+        when :centimeters
+          inches / 2.54
+        when :meters
+          inches / 25.4
         end
       end
     end
