@@ -159,6 +159,113 @@ module TAC
         end
       end
 
+      def draw_field_freight_frenzy
+        # blue ZONE
+        Gosu.draw_rect(24, @field_size - 24, 2, 24, @blue)
+        Gosu.draw_rect(24, @field_size - 24, 24, 2, @blue)
+        Gosu.draw_rect(48 - 2, @field_size - 24, 2, 24, @blue)
+
+        # blue barcode 1
+        Gosu.draw_rect(36 - 1, @field_size - 24 - 4, 2, 2, @blue)
+        Gosu.draw_rect(36 - 1, @field_size - 36 - 1, 2, 2, @blue)
+        Gosu.draw_rect(36 - 1, @field_size - 48 + 2, 2, 2, @blue)
+
+        # blue barcode 2
+        Gosu.draw_rect(36 - 1, 48 + 2, 2, 2, @blue)
+        Gosu.draw_rect(36 - 1, 60 - 1, 2, 2, @blue)
+        Gosu.draw_rect(36 - 1, 72 - 4, 2, 2, @blue)
+
+        # blue wobble goal
+        Gosu.draw_circle(48, 84, 9, 32, @blue)
+
+        # blue shared wobble goal
+        Gosu.draw_circle(@field_size / 2, 24, 9, 32, @blue)
+
+        # red ZONE
+        Gosu.draw_rect(@field_size - 24 - 2, @field_size - 24, 2, 24, @red)
+        Gosu.draw_rect(@field_size - 48, @field_size - 24, 24, 2, @red)
+        Gosu.draw_rect(@field_size - 48, @field_size - 24, 2, 24, @red)
+
+        # red barcode 1
+        Gosu.draw_rect(@field_size - 36 - 1, @field_size - 24 - 4, 2, 2, @red)
+        Gosu.draw_rect(@field_size - 36 - 1, @field_size - 36 - 1, 2, 2, @red)
+        Gosu.draw_rect(@field_size - 36 - 1, @field_size - 48 + 2, 2, 2, @red)
+
+        # red barcode 2
+        Gosu.draw_rect(@field_size - 36 - 1, 48 + 2, 2, 2, @red)
+        Gosu.draw_rect(@field_size - 36 - 1, 60 - 1, 2, 2, @red)
+        Gosu.draw_rect(@field_size - 36 - 1, 72 - 4, 2, 2, @red)
+
+        # red wobble goal
+        Gosu.draw_circle(@field_size - 48, 84, 9, 32, @red)
+
+        # red shared wobble goal
+        Gosu.clip_to(@field_size / 2, 0, 10, 48) do
+          Gosu.draw_circle(@field_size / 2, 24, 9, 32, @red)
+        end
+
+        # white corner left
+        faint_white = Gosu::Color.rgb(240, 240, 240)
+
+        Gosu.draw_rect(0, 46 - 2, 46, 2, faint_white)
+        Gosu.draw_rect(46 - 2, 0, 2, 46, faint_white)
+        # white corner right
+        Gosu.draw_rect(@field_size - 46, 46 - 2, 46, 2, faint_white)
+        Gosu.draw_rect(@field_size - 46, 0, 2, 46, faint_white)
+
+        # cross bars
+        bar_gray = Gosu::Color.rgb(50, 50, 50)
+        #   MAIN
+        Gosu.draw_rect(13.75, 48 - 2, @field_size - 13.75 * 2, 1, bar_gray)
+        Gosu.draw_rect(13.75, 48 + 1, @field_size - 13.75 * 2, 1, bar_gray)
+        Gosu.draw_rect(13.75, 48 - 2, 1, 4, Gosu::Color::BLACK)
+        Gosu.draw_rect(@field_size - 13.75 - 1, 48 - 2, 1, 4, Gosu::Color::BLACK)
+
+        #   BLUE
+        Gosu.draw_rect(48 - 2, 13.75, 1, 48 - 13.75 - 2, bar_gray)
+        Gosu.draw_rect(48 + 1, 13.75, 1, 48 - 13.75 - 2, bar_gray)
+        Gosu.draw_rect(48 - 2, 13.75, 4, 1, Gosu::Color::BLACK)
+        Gosu.draw_rect(48 - 2, 48 - 3, 4, 1, Gosu::Color::BLACK)
+
+        #   RED
+        Gosu.draw_rect(@field_size - 48 - 2, 13.75, 1, 48 - 13.75 - 2, bar_gray)
+        Gosu.draw_rect(@field_size - 48 + 1, 13.75, 1, 48 - 13.75 - 2, bar_gray)
+        Gosu.draw_rect(@field_size - 48 - 2, 13.75, 4, 1, Gosu::Color::BLACK)
+        Gosu.draw_rect(@field_size - 48 - 2, 48 - 3, 4, 1, Gosu::Color::BLACK)
+
+        # Duck Delivery
+        Gosu.draw_circle(2, @field_size - 2, 9, 16, Gosu::Color.rgb(75, 75, 75))
+        Gosu.draw_circle(@field_size - 2, @field_size - 2, 9, 16, Gosu::Color.rgb(75, 75, 75))
+
+        # packages
+        soft_orange = Gosu::Color.rgb(255, 175, 0)
+
+        7.times do |y|
+          7.times do |x|
+            if x.even?
+              Gosu.draw_rect(x * 3 + 1, y * 3 + 1, 2, 2, soft_orange)
+            else
+              Gosu.draw_circle(x * 3 + 2, y * 3 + 2, 1, 16, faint_white)
+            end
+          end
+        end
+
+        7.times do |y|
+          7.times do |x|
+            if x.even?
+              Gosu.draw_rect((@field_size - 4) - x * 3 + 1, y * 3 + 1, 2, 2, soft_orange)
+            else
+              Gosu.draw_circle((@field_size - 4) - x * 3 + 2, y * 3 + 2, 1, 16, faint_white)
+            end
+          end
+        end
+
+        Gosu.draw_rect(0, 60 - 1, 2, 2, soft_orange)
+        Gosu.draw_rect(0, 108 - 1, 2, 2, soft_orange)
+        Gosu.draw_rect(@field_size - 2, 60 - 1, 2, 2, soft_orange)
+        Gosu.draw_rect(@field_size - 2, 108 - 1, 2, 2, soft_orange)
+      end
+
       def draw_tile_box(color)
         Gosu.draw_rect(0,  0, 24, 2, color)
         Gosu.draw_rect(22, 2, 2, 22, color)

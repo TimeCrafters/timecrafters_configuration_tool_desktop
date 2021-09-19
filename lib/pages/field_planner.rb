@@ -56,7 +56,7 @@ module TAC
           end
         end
 
-        @field = TAC::Simulator::Field.new(container: @field_container, season: :skystone, simulation: nil)
+        @field = TAC::Simulator::Field.new(container: @field_container, season: :freight_frenzy, simulation: nil)
         @nodes = []
         @unit = :inches
       end
@@ -161,6 +161,8 @@ module TAC
 
         @points_container.clear do
           v1 = @nodes.first
+          break unless v1
+
           para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - 0 #{@unit.to_s.capitalize}"
 
           @nodes.each_with_index do |v2, i|
