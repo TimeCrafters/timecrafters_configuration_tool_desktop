@@ -30,6 +30,11 @@ module TAC
               @unit = :meters
               refresh_panel
             end
+
+            button "Reset", text_size: THEME_HEADING_TEXT_SIZE, **THEME_DANGER_BUTTON do
+              @nodes.clear
+              refresh_panel
+            end
           end
         end
 
@@ -57,8 +62,16 @@ module TAC
         end
 
         @field = TAC::Simulator::Field.new(container: @field_container, season: :freight_frenzy, simulation: nil)
-        @nodes = []
+        @nodes ||= []
         @unit = :inches
+        @total_distance = 0
+
+        @node_color = Gosu::Color.rgb(200, 100, 50)
+        @segment_color = Gosu::Color.rgb(255, 127, 0)
+        @node_radius = 6
+        @segment_thickness = 2
+
+        refresh_panel
       end
 
       def draw
@@ -113,24 +126,44 @@ module TAC
 
       def display_path
         last_node = @nodes.first
+
         @nodes.each_with_index do |current_node, i|
           Gosu.draw_circle(
             current_node.x * @field.scale + @field_container.x,
             current_node.y * @field.scale + @field_container.y,
-            3, 7
+            @node_radius, 7, @node_color, 10
           )
 
           next if i.zero?
 
-          Gosu.draw_line(
-            last_node.x * @field.scale + @field_container.x,
-            last_node.y * @field.scale + @field_container.y,
-            Gosu::Color::GREEN,
-            current_node.x * @field.scale + @field_container.x,
-            current_node.y * @field.scale + @field_container.y,
-            Gosu::Color::GREEN,
-            3
+          angle = Gosu.angle(
+            last_node.x * @field.scale,
+            last_node.y * @field.scale,
+            current_node.x * @field.scale,
+            current_node.y * @field.scale
           )
+
+          distance = Gosu.distance(last_node.x, last_node.y, current_node.x, current_node.y) * @field.scale
+
+          Gosu.rotate(angle, last_node.x * @field.scale, last_node.y * @field.scale) do
+            Gosu.draw_rect(
+              (@field_container.x + last_node.x * @field.scale) - (@segment_thickness / 2.0),
+              (@field_container.y + last_node.y * @field.scale) - distance,
+              @segment_thickness,
+              distance,
+              @segment_color
+            )
+          end
+
+          # Gosu.draw_line(
+          #   last_node.x * @field.scale + @field_container.x,
+          #   last_node.y * @field.scale + @field_container.y,
+          #   @segment_color,
+          #   current_node.x * @field.scale + @field_container.x,
+          #   current_node.y * @field.scale + @field_container.y,
+          #   @segment_color,
+          #   3
+          # )
 
           last_node = current_node
         end
