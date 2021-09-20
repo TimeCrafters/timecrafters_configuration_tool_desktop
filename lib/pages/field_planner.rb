@@ -66,11 +66,13 @@ module TAC
         @unit = :inches
         @total_distance = 0
 
-        @node_color = Gosu::Color.rgb(200, 100, 50)
-        @segment_color = Gosu::Color.rgb(255, 127, 0)
+        @node_color = 0xff_00f000
+        @node_hover_color = Gosu::Color::YELLOW
+        @segment_color = 0xaa_00f000
         @node_radius = 6
         @segment_thickness = 2
 
+        measure_path
         refresh_panel
       end
 
@@ -107,12 +109,7 @@ module TAC
 
           when Gosu::MS_RIGHT # Delete Node
             result = @nodes.find do |node|
-              Gosu.distance(
-                node.x,
-                node.y,
-                x,
-                y
-              ) <= 1.5
+              Gosu.distance(node.x, node.y, x, y) <= @node_radius * 0.25
             end
 
             @nodes.delete(result) if result
@@ -125,13 +122,18 @@ module TAC
       end
 
       def display_path
+        x = (window.mouse_x - @field_container.x) / @field.scale
+        y = (window.mouse_y - @field_container.y) / @field.scale
+
         last_node = @nodes.first
 
         @nodes.each_with_index do |current_node, i|
+          mouse_near = Gosu.distance(current_node.x, current_node.y, x, y) <= @node_radius * 0.25
+
           Gosu.draw_circle(
             current_node.x * @field.scale + @field_container.x,
             current_node.y * @field.scale + @field_container.y,
-            @node_radius, 7, @node_color, 10
+            @node_radius, 7, mouse_near ? @node_hover_color : @node_color, 10
           )
 
           next if i.zero?
@@ -145,7 +147,7 @@ module TAC
 
           distance = Gosu.distance(last_node.x, last_node.y, current_node.x, current_node.y) * @field.scale
 
-          Gosu.rotate(angle, last_node.x * @field.scale, last_node.y * @field.scale) do
+          Gosu.rotate(angle, last_node.x * @field.scale + @field_container.x, last_node.y * @field.scale + @field_container.y) do
             Gosu.draw_rect(
               (@field_container.x + last_node.x * @field.scale) - (@segment_thickness / 2.0),
               (@field_container.y + last_node.y * @field.scale) - distance,
@@ -154,16 +156,6 @@ module TAC
               @segment_color
             )
           end
-
-          # Gosu.draw_line(
-          #   last_node.x * @field.scale + @field_container.x,
-          #   last_node.y * @field.scale + @field_container.y,
-          #   @segment_color,
-          #   current_node.x * @field.scale + @field_container.x,
-          #   current_node.y * @field.scale + @field_container.y,
-          #   @segment_color,
-          #   3
-          # )
 
           last_node = current_node
         end
@@ -192,27 +184,27 @@ module TAC
         @total_distance_label.value = "#{inches_to_unit(@total_distance).round(2)}"
         @units_label.value = @unit.to_s.capitalize
 
-        @points_container.clear do
-          v1 = @nodes.first
-          break unless v1
+        # @points_container.clear do
+          # v1 = @nodes.first
+          # break unless v1
 
-          para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - 0 #{@unit.to_s.capitalize}"
+          # para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - 0 #{@unit.to_s.capitalize}"
 
-          @nodes.each_with_index do |v2, i|
-            next if i.zero?
+          # @nodes.each_with_index do |v2, i|
+          #   next if i.zero?
 
-            distance = Gosu.distance(
-              v1.x + @field_container.x,
-              v1.y + @field_container.y,
-              v2.x + @field_container.x,
-              v2.y + @field_container.y
-            )
+          #   distance = Gosu.distance(
+          #     v1.x + @field_container.x,
+          #     v1.y + @field_container.y,
+          #     v2.x + @field_container.x,
+          #     v2.y + @field_container.y
+          #   )
 
-            para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - #{inches_to_unit(distance).round(2)} #{@unit.to_s.capitalize}"
+            # para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - #{inches_to_unit(distance).round(2)} #{@unit.to_s.capitalize}"
 
-            v1 = v2
-          end
-        end
+            # v1 = v2
+          # end
+        # end
       end
 
       def inches_to_unit(inches)
