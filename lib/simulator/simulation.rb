@@ -1,7 +1,8 @@
 module TAC
   class Simulator
     class Simulation
-      attr_reader :robots, :show_paths
+      attr_reader :robots, :show_paths, :simulation_time
+
       def initialize(source_code:, field_container:)
         @source_code = source_code
         @field_container = field_container
@@ -11,6 +12,9 @@ module TAC
         @show_paths = false
 
         @last_milliseconds = Gosu.milliseconds
+        @simulation_step = 1.0 / 60.0
+        @accumulator = 0.0
+        @simulation_time = 0.0
       end
 
       def start
@@ -23,8 +27,15 @@ module TAC
       end
 
       def update
-        @field.update
-        @robots.each { |robot| robot.update((Gosu.milliseconds - @last_milliseconds) / 1000.0) }
+        @accumulator += (Gosu.milliseconds - @last_milliseconds) / 1000.0
+
+        while(@accumulator > @simulation_step)
+          @field.update
+          @robots.each { |robot| robot.update(@simulation_step) }
+
+          @accumulator -= @simulation_step
+          @simulation_time += @simulation_step
+        end
 
         @last_milliseconds = Gosu.milliseconds
       end

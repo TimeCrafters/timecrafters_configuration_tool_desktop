@@ -10,7 +10,6 @@ module TAC
             save_source
 
             begin
-              @simulation_start_time = Gosu.milliseconds
               @simulation = TAC::Simulator::Simulation.new(source_code: @source_code.value, field_container: @field_container)
               @simulation.start
             rescue SyntaxError, NameError, NoMethodError, TypeError, ArgumentError => e
@@ -78,7 +77,7 @@ robot.forward 100"
         @simulation.update
 
         unless @simulation.robots.all? { |robot| robot.queue.empty? } # Only update clock if simulation is running
-          @simulation_status.value = "Time: #{((Gosu.milliseconds - @simulation_start_time) / 1000.0).round(1)} seconds" if @simulation_start_time
+          @simulation_status.value = "Time: #{(@simulation.simulation_time).round(1)} seconds"
         end
       end
     end
