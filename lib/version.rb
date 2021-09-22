@@ -1,5 +1,5 @@
 module TAC
   NAME = "TimeCrafters Configuration Tool"
-  VERSION = "0.2.0"
-  RELEASE_NAME = "IN-DEV"
+  VERSION = "0.4.0"
+  RELEASE_NAME = "Beta"
 end
