@@ -2,3 +2,4 @@ pkg/*
 data/**/*.json
 data/settings.json
 data/simulator.rb
+data/*.csv

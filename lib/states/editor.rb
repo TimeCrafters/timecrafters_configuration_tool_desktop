@@ -84,6 +84,10 @@ class Editor < CyberarmEngine::GuiState
         button get_image("#{TAC::ROOT_PATH}/media/icons/joystickLeft.png"), margin: 4, tip: "Field Planner", image_width: 1.0 do
           page(TAC::Pages::FieldPlanner)
         end
+
+        button get_image("#{TAC::ROOT_PATH}/media/icons/massiveMultiplayer.png"), margin: 4, tip: "Drive Team Rotation Generator", image_width: 1.0 do
+          page(TAC::Pages::DriveTeamRotationGenerator)
+        end
       end
 
       @content = stack(width: window.width - @navigation.style.width, height: 1.0) do
