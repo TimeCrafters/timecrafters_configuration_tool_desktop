@@ -1,4 +1,5 @@
 begin
+  raise LoadError if defined?(Ocra)
   require_relative "../cyberarm_engine/lib/cyberarm_engine"
 rescue LoadError
   require "cyberarm_engine"

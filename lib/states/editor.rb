@@ -172,14 +172,11 @@ class Editor < CyberarmEngine::GuiState
     @status_bar.clear
     @body.clear
 
-    if window.backend.settings.config.empty?
-      if [TAC::Pages::Home, TAC::Pages::TACNET, TAC::Pages::Simulator, TAC::Pages::Configurations].include?(klass)
-      else
-        push_state(TAC::Dialog::AlertDialog, title: "No Config Loaded", message: "A config must be loaded.")
-        page(TAC::Pages::Configurations)
+    if window.backend.settings.config.empty? && page_requires_configuration?(klass)
+      push_state(TAC::Dialog::AlertDialog, title: "No Config Loaded", message: "A config must be loaded.")
+      page(TAC::Pages::Configurations)
 
-        return
-      end
+      return
     end
 
     @page.blur if @page
@@ -190,5 +187,13 @@ class Editor < CyberarmEngine::GuiState
     @page.options = options
     @page.setup
     @page.focus
+  end
+
+  def page_requires_configuration?(klass)
+    [
+      TAC::Pages::Editor,
+      TAC::Pages::Presets,
+      TAC::Pages::Search
+    ].include?(klass)
   end
 end
