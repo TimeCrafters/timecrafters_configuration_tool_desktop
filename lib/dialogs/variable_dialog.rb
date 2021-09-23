@@ -19,7 +19,7 @@ module TAC
         @type_error.hide
 
         @var_type = list_box items: [:float, :double, :integer, :long, :string, :boolean], choose: @type ? @type : :double, width: 1.0 do |item|
-          @type = item.value.to_sym
+          @type = item.to_sym
 
           if @type == :boolean
             @value.hide
@@ -84,18 +84,12 @@ module TAC
           @name_error.value = "Error: Name cannot be blank or only whitespace."
           @name_error.show
           valid = false
-        else
-          @name_error.value = ""
-          @name_error.hide
         end
 
         if not @type
           @type_error.value = "Error: Type not set."
           @type_error.show
           valid = false
-        else
-          @type_error.value = ""
-          @type_error.hide
         end
 
         if [:integer, :float, :double, :long].include?(@type)
@@ -121,14 +115,11 @@ module TAC
               @value_error.show
               valid = false
             end
-          else
-            @value_error.value = ""
-            @value_error.hide
           end
 
         elsif @type == :string
           if @value.value.strip.empty?
-            @value_error.value = "Error: Value cannot be blank  or only whitespace."
+            @value_error.value = "Error: Value cannot be blank or only whitespace."
             @value_error.show
             valid = false
           end
@@ -139,6 +130,13 @@ module TAC
           @value_error.value = "Error: Type not set or type #{@type.inspect} is not valid."
           @value_error.show
           valid = false
+        end
+
+        if valid
+          @value_error.value = ""
+          @value_error.hide
+          @type_error.value = ""
+          @type_error.hide
         end
 
         return valid
