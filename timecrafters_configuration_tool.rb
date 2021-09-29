@@ -77,3 +77,5 @@ BORDERLESS = ARGV.include?("--borderless")
 if not defined?(Ocra)
   TAC::Window.new(width: (Gosu.screen_width * 0.8).round, height: (Gosu.screen_height * 0.8).round, resizable: true, borderless: BORDERLESS).show
 end
+
+Process.wait($clock_pid) if $clock_pid

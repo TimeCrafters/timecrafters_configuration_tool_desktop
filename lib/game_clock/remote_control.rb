@@ -116,10 +116,9 @@ module TAC
                 RemoteControl.connection.puts(ClockNet::PacketHandler.packet_abort_clock)
               end
 
-              button "Shutdown", width: 1.0, **DANGEROUS_BUTTON do
+              button "Shutdown", width: 1.0, **TAC::THEME_DANGER_BUTTON do
                 RemoteControl.connection.puts(ClockNet::PacketHandler.packet_shutdown)
                 sleep 1 # let packet escape before closing
-                exit
               end
             end
 
@@ -222,7 +221,7 @@ module TAC
                   @randomizer_label = title "Not Visible"
                 end
 
-                button "Randomizer", width: 1.0, **DANGEROUS_BUTTON do
+                button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do
                   @randomizer_visible = !@randomizer_visible
 
                   RemoteControl.connection.puts(ClockNet::PacketHandler.packet_randomizer_visible(@randomizer_visible))

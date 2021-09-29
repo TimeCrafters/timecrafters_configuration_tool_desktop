@@ -32,7 +32,7 @@ module TAC
       end
 
       def abort_clock
-        $window.current_state&.get_sample("media/fogblast.wav")&.play if @clock.active?
+        @clock.controller&.play_sound(:abort_match) if @clock.active?
         @clock.controller = nil
       end
 

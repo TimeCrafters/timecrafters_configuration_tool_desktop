@@ -11,6 +11,7 @@ module TAC
         @escape_counter = 0
 
         @background_image = get_image("#{ROOT_PATH}/media/background.png")
+        @menu_background = 0xaa004000
         @mouse = Mouse.new(window)
         @clock = Clock.new
         @clock.controller = nil
@@ -26,7 +27,7 @@ module TAC
 
         @menu_container = flow width: 1.0 do
           stack(width: 0.35, padding: 5) do
-            background 0x55004159
+            background @menu_background
 
             title "Match", width: 1.0, text_align: :center
             button "Start Match", width: 1.0, margin_bottom: 50 do
@@ -54,7 +55,7 @@ module TAC
               @clock_proxy.abort_clock
             end
 
-            button "Close", width: 1.0, **DANGEROUS_BUTTON do
+            button "Close", width: 1.0, **TAC::THEME_DANGER_BUTTON do
               if window.instance_variable_get(:"@states").size == 1
                 window.close
               else
@@ -67,7 +68,7 @@ module TAC
           end
 
           stack width: 0.4, padding_left: 50 do
-            background 0x55004159
+            background @menu_background
 
             flow do
               label "♫ Now playing:"
@@ -135,7 +136,7 @@ module TAC
             end
 
             stack width: 1.0 do
-              button "Randomizer", width: 1.0, **DANGEROUS_BUTTON do
+              button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do
                 unless @clock.active?
                   push_state(Randomizer)
                 end
@@ -226,8 +227,12 @@ module TAC
           if @escape_counter >= 3
             @server&.close
 
-            window.fullscreen = false
-            window.pop_state
+            if window.instance_variable_get(:"@states").size == 1
+              window.close
+            else
+              window.fullscreen = false
+              window.pop_state
+            end
           end
         else
           @escape_counter = 0

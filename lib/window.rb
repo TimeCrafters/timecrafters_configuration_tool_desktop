@@ -1,6 +1,7 @@
 module TAC
   class Window < CyberarmEngine::Window
     attr_reader :backend, :notification_manager
+
     def initialize(**args)
       super(**args)
 
@@ -8,7 +9,11 @@ module TAC
       @backend = Backend.new
       @notification_manager = GosuNotifications::NotificationManager.new(window: self, edge: :bottom)
 
-      push_state(TAC::States::Boot)
+      if ARGV.join.include?("--game-clock-remote-display")
+        push_state(PracticeGameClock::View, remote_control_mode: true)
+      else
+        push_state(TAC::States::Boot)
+      end
     end
 
     def draw

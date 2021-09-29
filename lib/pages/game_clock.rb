@@ -20,7 +20,17 @@ module TAC
                   window.fullscreen = true
                 end
 
-                button "Dual Screen Game Clock", width: 1.0, enabled: false do
+                button "Dual Screen Game Clock", width: 1.0 do
+                  # Spawn game clock window
+                  $clock_pid = Process.spawn(
+                    RbConfig.ruby,
+                    "#{ROOT_PATH}/timecrafters_configuration_tool.rb",
+                    "--game-clock-remote-display"
+                  )
+
+
+                  # switch to remote control
+                  push_state(PracticeGameClock::RemoteControl::NetConnect)
                 end
 
                 title "Remote", width: 1.0, text_align: :center, margin_top: 32
