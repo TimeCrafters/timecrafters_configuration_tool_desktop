@@ -6,24 +6,31 @@ module TAC
       def setup
         @roll = SecureRandom.random_number(1..6)
 
-        @position = CyberarmEngine::Vector.new
-
         @dimple_color = 0xff_008000
         @dimple_res = 36
 
         @size = [window.width, window.height].min / 2.0
 
-        @rings = []
+        @ducks = []
 
         case @roll
         when 1, 4
+          # Blue: Right
+          # Red: Left
+
+          @ducks << Ducky.new(alliance: :blue, slot: 3, speed: 512, die_size: @size)
+          @ducks << Ducky.new(alliance: :red, slot: 1, speed: 512, die_size: @size)
         when 2, 5
-          @rings << Ring.new(position: CyberarmEngine::Vector.new(-@size, window.height * 0.9), speed: 512)
+          #Blue and Red: Center
+
+          @ducks << Ducky.new(alliance: :blue, slot: 2, speed: 512, die_size: @size)
+          @ducks << Ducky.new(alliance: :red, slot: 2, speed: 512, die_size: @size)
         when 3, 6
-          @rings << Ring.new(position: CyberarmEngine::Vector.new(-@size, window.height * 0.9), speed: 512)
-          @rings << Ring.new(position: CyberarmEngine::Vector.new(-@size * 1.25, window.height * 0.8), speed: 512)
-          @rings << Ring.new(position: CyberarmEngine::Vector.new(-@size * 1.50, window.height * 0.7), speed: 512)
-          @rings << Ring.new(position: CyberarmEngine::Vector.new(-@size * 1.75, window.height * 0.6), speed: 512)
+          # Blue: Left
+          # Red: Right
+
+          @ducks << Ducky.new(alliance: :blue, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(alliance: :red, slot: 3, speed: 512, die_size: @size)
         end
       end
 
@@ -41,7 +48,26 @@ module TAC
           self.send(:"dice_#{@roll}", @size)
         end
 
-        @rings.each { |r| r.draw(@size) }
+        @ducks.each { |o| o.draw(@size) }
+      end
+
+      def dimple(size)
+        size / 9.0
+      end
+
+      def update
+        window.previous_state&.update_non_gui
+
+        @ducks.each { |o| o.update(window, @size) }
+
+        @size = [window.width, window.height].min / 2.0
+      end
+
+      def button_down(id)
+        case id
+        when Gosu::MS_LEFT, Gosu::KB_ESCAPE, Gosu::KB_SPACE
+          pop_state
+        end
       end
 
       def dice_1(size)
@@ -83,43 +109,67 @@ module TAC
         Gosu.draw_circle(size * 0.75, size * 0.80, dimple(size), @dimple_res, @dimple_color)
       end
 
-      def dimple(size)
-        size / 9.0
-      end
+      class Ducky
+        SIZE = 0.20
+        HALF_SIZE = SIZE * 0.5
 
-      def update
-        window.previous_state&.update_non_gui
-
-        @rings.each { |r| r.update(window, @size) }
-
-        @size = [window.width, window.height].min / 2.0
-      end
-
-      def button_down(id)
-        case id
-        when Gosu::MS_LEFT, Gosu::KB_ESCAPE, Gosu::KB_SPACE
-          pop_state
-        end
-      end
-
-      class Ring
-        def initialize(position:, speed: 1)
-          @position = position
+        def initialize(alliance:, slot:, speed:, die_size:)
+          @alliance = alliance
+          @slot = slot
           @speed = speed
-          @color = 0xff_ffaa00
+
+          @image = $window.get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
+
+          if @alliance == :blue
+            @position = CyberarmEngine::Vector.new($window.width, die_size)
+          else
+            @position = CyberarmEngine::Vector.new(-die_size, die_size + die_size * 0.40)
+          end
         end
 
         def draw(size)
           Gosu.translate(@position.x, @position.y) do
-            Gosu.draw_rect(0, 0, size, size * 0.10, @color)
+            Gosu.draw_rect(0, size * SIZE, size * SIZE, size * SIZE, alliance_color)
+            Gosu.draw_rect(size * 0.5 - size * HALF_SIZE, size * SIZE, size * SIZE, size * SIZE, alliance_color)
+            Gosu.draw_rect(size * (1.0 - SIZE), size * SIZE, size * SIZE, size * SIZE, alliance_color)
+
+            duck_scale = (size * (SIZE + HALF_SIZE)) / @image.width
+            duck_scale_x = @alliance == :blue ? -duck_scale : duck_scale
+            @image.draw_rot(slot_position(size), size * SIZE + float_y(size), 1, 0, 0.5, 0.5, duck_scale_x, duck_scale)
           end
         end
 
         def update(window, size)
           center = window.width * 0.5 - size * 0.5
 
-          @position.x += @speed * window.dt
-          @position.x = center if @position.x > center
+          if @position.x > center
+            @position.x -= @speed * window.dt
+            @position.x = center if @position.x < center
+          elsif @position.x < center
+            @position.x += @speed * window.dt
+            @position.x = center if @position.x > center
+          end
+        end
+
+        def alliance_color
+          @alliance == :blue ? 0xff_000080 : 0xff_800000
+        end
+
+        def slot_position(size)
+          case @slot
+          when 1
+            size * HALF_SIZE
+          when 2
+            size * 0.5
+          when 3
+            size * (1.0 - HALF_SIZE)
+          else
+            raise "Slot value of: #{@slot.inspect} is invalid!"
+          end
+        end
+
+        def float_y(size)
+          Math.sin(Gosu.milliseconds / 100.0) * (size * 0.01)
         end
       end
     end
