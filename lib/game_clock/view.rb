@@ -51,7 +51,7 @@ module TAC
               @clock_proxy.start_clock(:endgame_only)
             end
 
-            button "Abort Clock", width: 1.0, margin_top: 50 do
+            button "Abort Match", width: 1.0, margin_top: 50 do
               @clock_proxy.abort_clock
             end
 

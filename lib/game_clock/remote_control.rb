@@ -112,7 +112,7 @@ module TAC
                 start_clock(:endgame_only)
               end
 
-              button "Abort Clock", width: 1.0 do
+              button "Abort Match", width: 1.0 do
                 RemoteControl.connection.puts(ClockNet::PacketHandler.packet_abort_clock)
               end
 
@@ -260,6 +260,7 @@ module TAC
         end
 
         def randomizer_changed(boolean)
+          puts "Randomizer is visable? #{boolean}"
           @randomizer_label.value = "Visible" if boolean
           @randomizer_label.value = "Not Visible" unless boolean
         end

@@ -103,7 +103,7 @@ module TAC
 
     def handle_get_clock_title(packet)
       unless @host_is_a_connection
-        $RemoteControl.server.active_client.puts(Packet.clock_title(@proxy_object.clock.title))
+        RemoteControl.server.active_client.puts(Packet.clock_title(@proxy_object.clock.title))
       end
     end
 
@@ -111,7 +111,7 @@ module TAC
       unless @host_is_a_connection
         @proxy_object.jukebox_previous_track
 
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
       end
     end
 
@@ -119,7 +119,7 @@ module TAC
       unless @host_is_a_connection
         @proxy_object.jukebox_next_track
 
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
       end
     end
 
@@ -127,7 +127,7 @@ module TAC
       unless @host_is_a_connection
         @proxy_object.jukebox_play
 
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
       end
     end
 
@@ -135,7 +135,7 @@ module TAC
       unless @host_is_a_connection
         @proxy_object.jukebox_pause
 
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
       end
     end
 
@@ -143,7 +143,7 @@ module TAC
       unless @host_is_a_connection
         @proxy_object.jukebox_stop
 
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
       end
     end
 
@@ -155,7 +155,7 @@ module TAC
         @proxy_object.jukebox_set_volume(float)
 
         float = @proxy_object.jukebox_volume
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
       end
     end
 
@@ -163,7 +163,7 @@ module TAC
       unless @host_is_a_connection
         float = @proxy_object.jukebox_volume
 
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
       end
     end
 
@@ -202,13 +202,13 @@ module TAC
 
       unless @host_is_a_connection
         # Send confirmation to client
-        $RemoteControl.server.active_client.puts(PacketHandler.packet_randomizer_visible(boolean))
+        RemoteControl.server.active_client.puts(PacketHandler.packet_randomizer_visible(boolean))
       end
     end
 
     def handle_shutdown(packet)
       unless @host_is_a_connection
-        # $RemoteControl.server.close
+        # RemoteControl.server.close
         # $window.close
         Gosu::Song.current_song&.stop
         exit
