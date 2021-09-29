@@ -94,7 +94,7 @@ class Editor < CyberarmEngine::GuiState
           page(TAC::Pages::DriveTeamRotationGenerator)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/trophy.png"), margin: 4, tip: "Game Clock", image_width: 1.0 do
+        button get_image("#{TAC::ROOT_PATH}/media/icons/custom_stopWatch.png"), margin: 4, tip: "Game Clock", image_width: 1.0 do
           page(TAC::Pages::GameClock)
         end
 

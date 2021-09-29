@@ -159,7 +159,9 @@ module TAC
       end
 
       def draw
-        @background_image.draw(0, 0, -3)
+        background_image_scale = [window.width.to_f / @background_image.width, window.height.to_f / @background_image.height].max
+
+        @background_image.draw(0, 0, -3, background_image_scale, background_image_scale)
         @particle_emitters.each(&:draw)
         @clock.draw
 
