@@ -1,0 +1,28 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    clipboard (1.3.6)
+    cyberarm_engine (0.19.1)
+      clipboard (~> 1.3.5)
+      excon (~> 0.78.0)
+      gosu (~> 1.1)
+      gosu_more_drawables (~> 0.3)
+    excon (0.78.1)
+    ffi (1.15.4)
+    gosu (1.2.0)
+    gosu_more_drawables (0.3.1)
+    gosu_notifications (0.1.0)
+    ocra (1.3.11)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  clipboard
+  cyberarm_engine
+  ffi
+  gosu_notifications
+  ocra
+
+BUNDLED WITH
+   2.2.19

@@ -2,14 +2,41 @@ module TAC
   class Pages
     class GameClock < Page
       def setup
-        header_bar("Practice Game Clock")
+        header_bar("Game Clock")
 
         body.clear do
-          stack(width: 1.0, height: 1.0) do
-            label TAC::NAME, width: 1.0, text_size: 48, text_align: :center
+          flow(width: 1.0, height: 1.0) do
+            @command_options = flow(width: 1.0) do
+              stack(width: 0.3) do
+              end
 
-            stack(width: 1.0, height: 8) do
-              background 0xff_006000
+              stack(width: 0.4) do
+                banner "Choose Mode", width: 1.0, text_align: :center
+                title "Local", width: 1.0, text_align: :center
+
+                button "Game Clock", width: 1.0 do
+                  push_state(PracticeGameClock::View)
+
+                  window.fullscreen = true
+                end
+
+                button "Dual Screen Game Clock", width: 1.0, enabled: false do
+                end
+
+                title "Remote", width: 1.0, text_align: :center, margin_top: 32
+                button "Game Clock Display", width: 1.0 do
+                  push_state(PracticeGameClock::View, remote_control_mode: true)
+
+                  window.fullscreen = true
+                end
+
+                button "Game Clock Remote Control", width: 1.0 do
+                  push_state(PracticeGameClock::RemoteControl::NetConnect)
+                end
+              end
+
+              stack(width: 0.3) do
+              end
             end
           end
         end

@@ -42,7 +42,7 @@ module TAC
 
               flow(width: 1.0, margin_bottom: 20) do
                 @role_name = edit_line "", placeholder: "Add role", width: 0.9
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 0.1 do
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 0.1, tip: "Add role" do
                   if @role_name.value.strip.length.positive?
                     @roles.push(@role_name.value.strip)
                     @role_name.value = ""
@@ -61,7 +61,7 @@ module TAC
 
               flow(width: 1.0, margin_bottom: 20) do
                 @roster_name = edit_line "", placeholder: "Add name", width: 0.9
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 0.1 do
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 0.1, tip: "Add name" do
                   if @roster_name.value.strip.length.positive?
                     @roster.push(@roster_name.value.strip)
                     @roster_name.value = ""
@@ -96,7 +96,7 @@ module TAC
               background i.even? ? 0xff_007000 : 0xff_006000
 
               tagline name, width: 0.9
-              button "<b>X</b>", width: 0.1, text_size: 18, **THEME_DANGER_BUTTON do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 0.1, tip: "Remove role", **THEME_DANGER_BUTTON do
                 @roles.delete(name)
                 populate_roles
               end
@@ -112,7 +112,7 @@ module TAC
               background i.even? ? 0xff_007000 : 0xff_006000
 
               tagline name, width: 0.9
-              button "<b>X</b>", width: 0.1, text_size: 18, **THEME_DANGER_BUTTON do
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 0.1, tip: "Remove name", **THEME_DANGER_BUTTON do
                 @roster.delete(name)
                 populate_roster
               end

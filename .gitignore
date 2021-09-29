@@ -3,3 +3,9 @@ data/**/*.json
 data/settings.json
 data/simulator.rb
 data/*.csv
+media/sounds/*
+!media/sounds/.gitkeep
+media/particles/*
+!media/particles/.gitkeep
+media/music/*
+!media/music/.gitkeep

@@ -51,6 +51,24 @@ require_relative "lib/tacnet/client"
 require_relative "lib/tacnet/connection"
 require_relative "lib/tacnet/server"
 
+require_relative "lib/game_clock/view"
+require_relative "lib/game_clock/clock"
+require_relative "lib/game_clock/event_handlers"
+require_relative "lib/game_clock/clock_controller"
+require_relative "lib/game_clock/jukebox"
+require_relative "lib/game_clock/theme"
+require_relative "lib/game_clock/clock_proxy"
+require_relative "lib/game_clock/logger"
+require_relative "lib/game_clock/particle_emitter"
+require_relative "lib/game_clock/randomizer"
+require_relative "lib/game_clock/remote_control"
+require_relative "lib/game_clock/remote_proxy"
+require_relative "lib/game_clock/net/client"
+require_relative "lib/game_clock/net/server"
+require_relative "lib/game_clock/net/connection"
+require_relative "lib/game_clock/net/packet_handler"
+require_relative "lib/game_clock/net/packet"
+
 # Thread.abort_on_exception = true
 
 USE_REDESIGN = ARGV.include?("--redesign")
