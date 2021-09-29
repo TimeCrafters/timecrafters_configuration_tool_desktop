@@ -65,10 +65,6 @@ class Editor < CyberarmEngine::GuiState
           page(TAC::Pages::TACNET)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), margin: 4, tip: "Simulator", image_width: 1.0 do
-          page(TAC::Pages::Simulator)
-        end
-
         button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), margin: 4, tip: "Configurations", image_width: 1.0 do
           page(TAC::Pages::Configurations)
         end
@@ -81,12 +77,25 @@ class Editor < CyberarmEngine::GuiState
           page(TAC::Pages::Search)
         end
 
+        stack(margin_left: 4, width: 1.0, margin_right: 4) do
+          background 0xff_444444
+          para "Tools", width: 1.0, text_align: :center
+        end
+
+        button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), margin: 4, tip: "Simulator", image_width: 1.0 do
+          page(TAC::Pages::Simulator)
+        end
+
         button get_image("#{TAC::ROOT_PATH}/media/icons/joystickLeft.png"), margin: 4, tip: "Field Planner", image_width: 1.0 do
           page(TAC::Pages::FieldPlanner)
         end
 
         button get_image("#{TAC::ROOT_PATH}/media/icons/massiveMultiplayer.png"), margin: 4, tip: "Drive Team Rotation Generator", image_width: 1.0 do
           page(TAC::Pages::DriveTeamRotationGenerator)
+        end
+
+        button get_image("#{TAC::ROOT_PATH}/media/icons/trophy.png"), margin: 4, tip: "Practice Game Clock", image_width: 1.0 do
+          page(TAC::Pages::GameClock)
         end
       end
 
