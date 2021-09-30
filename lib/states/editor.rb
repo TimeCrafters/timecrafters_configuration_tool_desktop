@@ -3,6 +3,8 @@ class Editor < CyberarmEngine::GuiState
   attr_reader :header_bar, :header_bar_label, :navigation, :content, :menu_bar, :status_bar, :body
 
   def setup
+    window.show_cursor = true
+
     @window_width = 0
     @window_height = 0
 

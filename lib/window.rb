@@ -29,10 +29,6 @@ module TAC
       @notification_manager.update
     end
 
-    def needs_cursor?
-      true
-    end
-
     def toast(title, message = nil)
       @notification_manager.create_notification(
         priority: GosuNotifications::Notification::PRIORITY_HIGH,

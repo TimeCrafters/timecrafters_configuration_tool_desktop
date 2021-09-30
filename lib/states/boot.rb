@@ -2,6 +2,8 @@ module TAC
   class States
     class Boot < CyberarmEngine::GuiState
       def setup
+        window.show_cursor = true
+
         stack width: 1.0, height: 1.0 do
           background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY, TAC::Palette::TIMECRAFTERS_TERTIARY, TAC::Palette::TIMECRAFTERS_PRIMARY]
         end
