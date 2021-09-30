@@ -7,9 +7,8 @@ module TAC
 
         color = @dangerous ? Palette::DANGEROUS : Palette::ALERT
 
-
-        @dialog_root.style.border_color = [ color, darken(color, 50) ]
-        @titlebar.style.background = [ color, darken(color, 50) ]
+        @dialog_root.style.default[:border_color] = [ color, darken(color, 50) ]
+        @titlebar.style.default[:background] = [ color, darken(color, 50) ]
 
         background Gosu::Color::GRAY
         label @options[:message]

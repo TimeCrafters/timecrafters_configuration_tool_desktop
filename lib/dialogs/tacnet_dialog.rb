@@ -2,8 +2,8 @@ module TAC
   class Dialog
     class TACNETDialog < Dialog
       def build
-        @dialog_root.style.border_color = [ Palette::TACNET_PRIMARY, Palette::TACNET_SECONDARY ]
-        @titlebar.style.background = [ Palette::TACNET_PRIMARY, Palette::TACNET_SECONDARY ]
+        @dialog_root.style.default[:border_color] = [ Palette::TACNET_PRIMARY, Palette::TACNET_SECONDARY ]
+        @titlebar.style.default[:background] = [ Palette::TACNET_PRIMARY, Palette::TACNET_SECONDARY ]
 
         background Gosu::Color::GRAY
         label @options[:message], width: 1.0
