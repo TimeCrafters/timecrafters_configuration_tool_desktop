@@ -178,7 +178,7 @@ module TAC
 
                   button get_image("#{ROOT_PATH}/media/icons/plus.png") do
                     @jukebox_volume += 0.1
-                    @jukebox_volume = 0.1 if @jukebox_volume < 0.1
+                    @jukebox_volume = 1.0 if @jukebox_volume > 1.0
                     RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_set_volume(@jukebox_volume))
                   end
 
@@ -211,9 +211,7 @@ module TAC
               stack width: 0.9, margin_left: 50, margin_top: 20 do
                 flow width: 1.0 do
                   title "Clock: "
-                  @clock_label = title "0:123456789"
-                  @clock_label.width
-                  @clock_label.value = "0:00"
+                  @clock_label = title "0:00"
                 end
 
                 flow width: 1.0 do
@@ -234,6 +232,10 @@ module TAC
         def update
           super
 
+          while (o = RemoteControl.connection.proxy_object.queue.shift)
+            o.call
+          end
+
           return if RemoteControl.connection.connected?
 
           # We've lost connection, unset window's connection object
@@ -252,7 +254,7 @@ module TAC
         end
 
         def volume_changed(float)
-          @volume.value = "#{float.round(1) * 100.0}%"
+          @volume.value = "#{(float.round(1) * 100.0).round}%"
         end
 
         def clock_changed(string)
@@ -260,7 +262,6 @@ module TAC
         end
 
         def randomizer_changed(boolean)
-          puts "Randomizer is visable? #{boolean}"
           @randomizer_label.value = "Visible" if boolean
           @randomizer_label.value = "Not Visible" unless boolean
         end

@@ -5,12 +5,13 @@ module TAC
       attr_reader :clock
 
       def setup
-        window.show_cursor = true
-
         @remote_control_mode = @options[:remote_control_mode]
+        window.show_cursor = !@remote_control_mode
         @escape_counter = 0
 
         @background_image = get_image("#{ROOT_PATH}/media/background.png")
+        # Preload duck image since Gosu and windows threads don't get along with OpenGL (image is blank if loaded in a threaded context)
+        get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
         @menu_background = 0xaa004000
         @mouse = Mouse.new(window)
         @clock = Clock.new
@@ -61,6 +62,7 @@ module TAC
               else
                 @server&.close
 
+                @jukebox.stop
                 window.fullscreen = false
                 window.pop_state
               end
@@ -172,8 +174,7 @@ module TAC
         super
         @clock.update
         @mouse.update
-        @jukebox.update
-        @particle_emitters.each(&:update)
+        update_non_gui
 
         if @last_clock_state != @clock.active?
           @particle_emitters.each { |emitter| @clock.active? ? emitter.clock_active! : emitter.clock_inactive! }
@@ -213,6 +214,12 @@ module TAC
       end
 
       def update_non_gui
+        if @remote_control_mode
+          while (o = RemoteControl.server.proxy_object.queue.shift)
+            o.call
+          end
+        end
+
         @particle_emitters.each(&:update)
         @jukebox.update
       end
@@ -251,7 +258,7 @@ module TAC
 
       def randomizer_changed(boolean)
         if boolean
-          push_state(Randomizer)
+          push_state(Randomizer) unless @clock.active?
         else
           pop_state if current_state.is_a?(Randomizer)
         end

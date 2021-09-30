@@ -1,11 +1,18 @@
 module TAC
   class PracticeGameClock
     class ClockProxy
+      attr_reader :queue, :clock
+
       def initialize(clock, jukebox)
         @clock = clock
         @jukebox = jukebox
 
+        @queue = []
         @callbacks = {}
+      end
+
+      def enqueue(&block)
+        @queue << block
       end
 
       def register(callback, method)

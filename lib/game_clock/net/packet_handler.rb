@@ -83,127 +83,143 @@ module TAC
     end
 
     def handle_start_clock(packet)
-      unless @host_is_a_connection
+      return if @host_is_a_connection
+
+      @proxy_object.enqueue do
         @proxy_object.start_clock(packet.body.to_sym)
       end
     end
 
     def handle_abort_clock(packet)
-      unless @host_is_a_connection
-        @proxy_object.abort_clock
-      end
+      return if @host_is_a_connection
+
+      @proxy_object.abort_clock
     end
 
     def handle_set_clock_title(packet)
-      unless @host_is_a_connection
-        title = packet.body
+      return if @host_is_a_connection
+
+      title = packet.body
+
+      @proxy_object.enqueue do
         @proxy_object.set_clock_title(title)
       end
     end
 
     def handle_get_clock_title(packet)
-      unless @host_is_a_connection
-        RemoteControl.server.active_client.puts(Packet.clock_title(@proxy_object.clock.title))
-      end
+      return if @host_is_a_connection
+
+      RemoteControl.server.active_client.puts(Packet.clock_title(@proxy_object.clock.title))
     end
 
     def handle_jukebox_previous_track(packet)
-      unless @host_is_a_connection
-        @proxy_object.jukebox_previous_track
+      return if @host_is_a_connection
 
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
-      end
+      @proxy_object.jukebox_previous_track
+
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
     end
 
     def handle_jukebox_next_track(packet)
-      unless @host_is_a_connection
-        @proxy_object.jukebox_next_track
+      return if @host_is_a_connection
 
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
-      end
+      @proxy_object.jukebox_next_track
+
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
     end
 
     def handle_jukebox_play(packet)
-      unless @host_is_a_connection
-        @proxy_object.jukebox_play
+      return if @host_is_a_connection
 
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
-      end
+      @proxy_object.jukebox_play
+
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
     end
 
     def handle_jukebox_pause(packet)
-      unless @host_is_a_connection
-        @proxy_object.jukebox_pause
+      return if @host_is_a_connection
 
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
-      end
+      @proxy_object.jukebox_pause
+
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
     end
 
     def handle_jukebox_stop(packet)
-      unless @host_is_a_connection
-        @proxy_object.jukebox_stop
+      return if @host_is_a_connection
 
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
-      end
+      @proxy_object.jukebox_stop
+
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_current_track(@proxy_object.jukebox_current_track))
     end
 
     def handle_jukebox_set_volume(packet)
-      unless @host_is_a_connection
-        float = packet.body.to_f
-        float = float.clamp(0.0, 1.0)
+      return if @host_is_a_connection
 
-        @proxy_object.jukebox_set_volume(float)
+      float = packet.body.to_f
+      float = float.clamp(0.0, 1.0)
 
-        float = @proxy_object.jukebox_volume
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
-      end
+      @proxy_object.jukebox_set_volume(float)
+
+      float = @proxy_object.jukebox_volume
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
     end
 
     def handle_jukebox_get_volume(packet)
-      unless @host_is_a_connection
-        float = @proxy_object.jukebox_volume
+      return if @host_is_a_connection
 
-        RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
-      end
+      float = @proxy_object.jukebox_volume
+
+      RemoteControl.server.active_client.puts(PacketHandler.packet_jukebox_volume(float))
     end
 
     def handle_jukebox_volume(packet)
-      if @host_is_a_connection
-        float = packet.body.to_f
+      return unless @host_is_a_connection
 
+      float = packet.body.to_f
+
+      @proxy_object.enqueue do
         @proxy_object.volume_changed(float)
       end
     end
 
     def handle_jukebox_set_sound_effects(packet)
-      unless @host_is_a_connection
-        boolean = packet.body == "true"
+      return if @host_is_a_connection
 
+      boolean = packet.body == "true"
+
+      @proxy_object.enqueue do
         @proxy_object.jukebox_set_sound_effects(boolean)
       end
     end
 
     def handle_jukebox_current_track(packet)
-      if @host_is_a_connection
+      return unless @host_is_a_connection
+
+      @proxy_object.enqueue do
         @proxy_object.track_changed(packet.body)
       end
     end
 
     def handle_clock_time(packet)
-      if @host_is_a_connection
+      return unless @host_is_a_connection
+
+      @proxy_object.enqueue do
         @proxy_object.clock_changed(packet.body)
       end
     end
 
     def handle_randomizer_visible(packet)
       boolean = packet.body == "true"
+      boolean = false if @proxy_object.is_a?(ClockProxy) && @proxy_object.clock.active?
 
-      @proxy_object.randomizer_changed(boolean)
-
-      unless @host_is_a_connection
-        # Send confirmation to client
-        RemoteControl.server.active_client.puts(PacketHandler.packet_randomizer_visible(boolean))
+      @proxy_object.enqueue do
+        @proxy_object.randomizer_changed(boolean)
       end
+
+      return if @host_is_a_connection
+
+      # Send confirmation to client
+      RemoteControl.server.active_client.puts(PacketHandler.packet_randomizer_visible(boolean))
     end
 
     def handle_shutdown(packet)

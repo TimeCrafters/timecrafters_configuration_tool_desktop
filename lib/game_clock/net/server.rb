@@ -5,7 +5,8 @@ module TAC
     TAG = "ClockNet|Server"
     attr_reader :active_client,
                 :packets_sent, :packets_received, :data_sent, :data_received,
-                :client_last_packets_sent, :client_last_packets_received, :client_last_data_sent, :client_last_data_received
+                :client_last_packets_sent, :client_last_packets_received, :client_last_data_sent, :client_last_data_received,
+                :proxy_object
     def initialize(hostname: "localhost", port: 4567, proxy_object: )
       $server = self
 

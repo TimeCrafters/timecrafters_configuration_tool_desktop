@@ -7,4 +7,5 @@ gem "clipboard"
 
 group :packaging do
   gem "ocra"
+  gem "releasy"
 end

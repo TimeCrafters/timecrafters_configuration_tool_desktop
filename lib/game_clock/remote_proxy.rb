@@ -1,10 +1,17 @@
 module TAC
   class PracticeGameClock
     class RemoteProxy
+      attr_reader :queue
+
       def initialize(window)
         @window = window
 
+        @queue = []
         @callbacks = {}
+      end
+
+      def enqueue(&block)
+        @queue << block
       end
 
       def register(callback, method)

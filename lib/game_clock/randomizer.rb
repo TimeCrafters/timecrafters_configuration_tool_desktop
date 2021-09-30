@@ -18,19 +18,19 @@ module TAC
           # Blue: Right
           # Red: Left
 
-          @ducks << Ducky.new(alliance: :blue, slot: 3, speed: 512, die_size: @size)
-          @ducks << Ducky.new(alliance: :red, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 512, die_size: @size)
         when 2, 5
           #Blue and Red: Center
 
-          @ducks << Ducky.new(alliance: :blue, slot: 2, speed: 512, die_size: @size)
-          @ducks << Ducky.new(alliance: :red, slot: 2, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 2, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 2, speed: 512, die_size: @size)
         when 3, 6
           # Blue: Left
           # Red: Right
 
-          @ducks << Ducky.new(alliance: :blue, slot: 1, speed: 512, die_size: @size)
-          @ducks << Ducky.new(alliance: :red, slot: 3, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 3, speed: 512, die_size: @size)
         end
       end
 
@@ -58,7 +58,7 @@ module TAC
       def update
         window.previous_state&.update_non_gui
 
-        @ducks.each { |o| o.update(window, @size) }
+        @ducks.each { |o| o.update(@size) }
 
         @size = [window.width, window.height].min / 2.0
       end
@@ -113,15 +113,17 @@ module TAC
         SIZE = 0.20
         HALF_SIZE = SIZE * 0.5
 
-        def initialize(alliance:, slot:, speed:, die_size:)
+        def initialize(window:, alliance:, slot:, speed:, die_size:)
+          @window = window
           @alliance = alliance
           @slot = slot
           @speed = speed
 
-          @image = $window.get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
+          @image = @window.get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
+          @debug_text = Gosu::Font.new(28)
 
           if @alliance == :blue
-            @position = CyberarmEngine::Vector.new($window.width, die_size)
+            @position = CyberarmEngine::Vector.new(@window.width, die_size)
           else
             @position = CyberarmEngine::Vector.new(-die_size, die_size + die_size * 0.40)
           end
@@ -139,14 +141,14 @@ module TAC
           end
         end
 
-        def update(window, size)
-          center = window.width * 0.5 - size * 0.5
+        def update(size)
+          center = @window.width * 0.5 - size * 0.5
 
           if @position.x > center
-            @position.x -= @speed * window.dt
+            @position.x -= @speed * @window.dt
             @position.x = center if @position.x < center
           elsif @position.x < center
-            @position.x += @speed * window.dt
+            @position.x += @speed * @window.dt
             @position.x = center if @position.x > center
           end
         end
