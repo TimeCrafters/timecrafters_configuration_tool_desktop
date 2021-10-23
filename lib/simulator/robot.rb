@@ -87,6 +87,10 @@ module TAC
         @queue << Turn.new(robot: self, relative_angle: relative_angle, power: power)
       end
 
+      def delay(time_in_seconds)
+        @queue << Delay.new(robot: self, time_in_seconds: time_in_seconds)
+      end
+
       def speed
         @ticks_per_revolution / @gear_ratio
       end
@@ -95,7 +99,7 @@ module TAC
         @queue
       end
 
-class State
+      class State
         def start
         end
 
@@ -257,6 +261,39 @@ class State
           end
 
           @last_angle = @robot.angle
+        end
+      end
+
+      class Delay < State
+        def initialize(robot:, time_in_seconds:)
+          @robot = robot
+          @time_in_seconds = time_in_seconds
+
+          @accumulator = 0.0
+        end
+
+        def start
+          @complete = false
+        end
+
+        def draw
+          fraction = @accumulator / @time_in_seconds.to_f
+
+          Gosu.draw_arc(
+            @robot.position.x + @robot.width / 2,
+            @robot.position.y + @robot.depth / 2,
+            @robot.width > @robot.depth ? @robot.width : @robot.depth,
+            1 - fraction,
+            360,
+            1,
+            TAC::Palette::TIMECRAFTERS_TERTIARY
+          )
+
+          @complete = fraction >= 1
+        end
+
+        def update(dt)
+          @accumulator += dt
         end
       end
     end
