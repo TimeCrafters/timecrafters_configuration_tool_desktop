@@ -1,7 +1,9 @@
 module TAC
   class Simulator
     class Robot
-      attr_accessor :position, :angle
+      FONT = Gosu::Font.new(11)
+
+      attr_accessor :position, :angle, :comment
       attr_reader :alliance, :width, :depth
       def initialize(alliance:, width:, depth:)
         @alliance = alliance
@@ -15,6 +17,8 @@ module TAC
         @unit = :ticks
         @ticks_per_revolution = 240
         @gear_ratio = 1
+
+        @comment = ""
       end
 
       def draw
@@ -32,6 +36,9 @@ module TAC
             end
             Gosu.draw_circle(@position.x, @position.y - @depth * 0.25, 2, 3, TAC::Palette::TIMECRAFTERS_TERTIARY)
           end
+
+          FONT.draw_text(@comment, 2.2, 2.2, 0, 1, 1, Gosu::Color::BLACK)
+          FONT.draw_text(@comment, 2, 2, 0)
         end
       end
 
@@ -89,6 +96,10 @@ module TAC
 
       def delay(time_in_seconds)
         @queue << Delay.new(robot: self, time_in_seconds: time_in_seconds)
+      end
+
+      def comment(comment)
+        @queue << Comment.new(robot: self, comment: comment)
       end
 
       def speed
@@ -294,6 +305,24 @@ module TAC
 
         def update(dt)
           @accumulator += dt
+        end
+      end
+
+      class Comment < State
+        def initialize(robot:, comment:)
+          @robot = robot
+          @comment = comment
+        end
+
+        def start
+          @robot.comment = @comment
+          @complete = true
+        end
+
+        def draw
+        end
+
+        def update(dt)
         end
       end
     end
