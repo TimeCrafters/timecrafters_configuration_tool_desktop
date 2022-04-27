@@ -32,7 +32,7 @@ module TAC
           flow(width: 1.0, height: 1.0) do
             stack width: 0.33333, height: 1.0, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
               @groups_menu = flow(width: 1.0) do
-                label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE
+                label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
                   push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", list: window.backend.config.groups, callback_method: method(:create_group))
@@ -90,7 +90,7 @@ module TAC
 
             stack width: 0.33333, height: 1.0, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
               @actions_menu = flow(width: 1.0) do
-                label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE
+                label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
                   if @active_group
@@ -157,7 +157,7 @@ module TAC
 
             stack width: 0.331, height: 1.0 do
               @variables_menu = flow(width: 1.0) do
-                label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE
+                label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
                     push_state(TAC::Dialog::VariableDialog, title: "Create Variable", callback_method: method(:create_variable))
@@ -323,7 +323,7 @@ module TAC
             flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button group.name, width: 0.8 do
+              button group.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
                 @active_group = group
                 @active_group_label.value = group.name
                 @active_action = nil
@@ -357,7 +357,7 @@ module TAC
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
               flow width: 1.0 do
-                button action.name, width: 0.72 do
+                button action.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
                   @active_action = action
                   @active_action_label.value = action.name
 
@@ -398,7 +398,7 @@ module TAC
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
               flow(width: 1.0) do
-                button "#{variable.name}", width: 0.89, tip: "Edit variable" do
+                button "#{variable.name}", fill: true, text_size: THEME_ICON_SIZE - 3, tip: "Edit variable" do
                   push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
                 end
 

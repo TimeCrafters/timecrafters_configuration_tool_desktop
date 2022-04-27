@@ -39,7 +39,7 @@ module TAC
 
               name = File.basename(config_file, ".json")
 
-              button "#{name}", width: 0.94 do
+              button "#{name}", fill: true, text_size: THEME_ICON_SIZE - 3 do
                 change_config(name)
 
                 if window.backend.tacnet.connected?
