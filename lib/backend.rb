@@ -101,7 +101,7 @@ module TAC
     end
 
     def refresh_tacnet_status
-      $window.current_state.refresh_tacnet_status
+      CyberarmEngine::Window.instance.current_state.refresh_tacnet_status
     end
 
 

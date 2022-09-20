@@ -18,7 +18,7 @@ module TAC
       end
 
       def update
-        @particles.each { |part| part.update($window.dt) }
+        @particles.each { |part| part.update(CyberarmEngine::Window.instance.dt) }
         @particles.delete_if { |part| part.die? }
 
         spawn_particles
@@ -27,28 +27,28 @@ module TAC
       def spawn_particles
         # !clock_active? &&
         if @particles.count < @max_particles && Gosu.milliseconds - @last_spawned >= @interval
-          screen_midpoint = CyberarmEngine::Vector.new($window.width / 2, $window.height / 2)
+          screen_midpoint = CyberarmEngine::Vector.new(CyberarmEngine::Window.instance.width / 2, CyberarmEngine::Window.instance.height / 2)
           scale = rand(0.25..1.0)
           image_name = @image_options.sample
 
           return unless image_name
 
-          image = $window.current_state.get_image(image_name)
+          image = CyberarmEngine::Window.instance.current_state.get_image(image_name)
           position = CyberarmEngine::Vector.new(0, 0)
 
           r = rand
           if r < 0.25 # LEFT
             position.x = -image.width * scale
-            position.y = rand(0..($window.height - image.height * scale))
+            position.y = rand(0..(CyberarmEngine::Window.instance.height - image.height * scale))
           elsif r < 0.5 # RIGHT
-            position.x = $window.width + (image.width * scale)
-            position.y = rand(0..($window.height - image.height * scale))
+            position.x = CyberarmEngine::Window.instance.width + (image.width * scale)
+            position.y = rand(0..(CyberarmEngine::Window.instance.height - image.height * scale))
           elsif r < 0.75 # TOP
-            position.x = rand(0..($window.width - image.width * scale))
+            position.x = rand(0..(CyberarmEngine::Window.instance.width - image.width * scale))
             position.y = -image.height * scale
           else #BOTTOM
-            position.x = rand(0..($window.width - image.width * scale))
-            position.y = $window.height + image.height * scale
+            position.x = rand(0..(CyberarmEngine::Window.instance.width - image.width * scale))
+            position.y = CyberarmEngine::Window.instance.height + image.height * scale
           end
 
           position.x ||= 0

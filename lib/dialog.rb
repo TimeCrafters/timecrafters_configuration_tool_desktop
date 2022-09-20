@@ -6,7 +6,7 @@ module TAC
 
       @title = @options[:title] ? @options[:title] : "#{self.class}"
       @window_width, @window_height = window.width, window.height
-      @previous_state = window.previous_state
+      @previous_state = previous_state
 
       @dialog_root = stack width: 0.25, border_thickness: 2, border_color: [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY] do
         # Title bar
@@ -122,7 +122,7 @@ module TAC
     end
 
     def close
-      $window.pop_state
+      CyberarmEngine::Window.instance.pop_state
     end
   end
 end

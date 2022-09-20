@@ -35,7 +35,7 @@ module TAC
       end
 
       def draw
-        window.previous_state.draw
+        previous_state.draw
 
         Gosu.flush
 
@@ -56,7 +56,7 @@ module TAC
       end
 
       def update
-        window.previous_state&.update_non_gui
+        previous_state&.update_non_gui
 
         @ducks.each { |o| o.update(@size) }
 

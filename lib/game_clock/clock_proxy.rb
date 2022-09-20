@@ -20,7 +20,7 @@ module TAC
       end
 
       def start_clock(mode)
-        return if @clock.active? || $window.current_state.is_a?(Randomizer)
+        return if @clock.active? || CyberarmEngine::Window.instance.current_state.is_a?(Randomizer)
 
         @clock.controller = case mode
         when :full_match
@@ -45,7 +45,7 @@ module TAC
 
       def set_clock_title(string)
         @clock.title.text = string.to_s
-        @clock.title.x = $window.width / 2 - @clock.title.width / 2
+        @clock.title.x = CyberarmEngine::Window.instance.width / 2 - @clock.title.width / 2
       end
 
       def get_clock_title(string)

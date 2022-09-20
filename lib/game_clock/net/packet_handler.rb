@@ -225,7 +225,7 @@ module TAC
     def handle_shutdown(packet)
       unless @host_is_a_connection
         # RemoteControl.server.close
-        # $window.close
+        # CyberarmEngine::Window.instance.close
         Gosu::Song.current_song&.stop
         exit
       end

@@ -47,7 +47,7 @@ module TAC
 
       def handle_handshake(packet)
         if @host_is_a_connection
-          $window.backend.tacnet.client.uuid = packet.body
+          CyberarmEngine::Window.instance.backend.tacnet.client.uuid = packet.body
         end
       end
 
@@ -59,7 +59,7 @@ module TAC
       def handle_error(packet)
         if @host_is_a_connection
           title, message = packet.body.split(Packet::PROTOCOL_SEPERATOR, 2)
-          $window.push_state(TAC::Dialog::TACNETDialog, title: title, message: message)
+          CyberarmEngine::Window.instance.push_state(TAC::Dialog::TACNETDialog, title: title, message: message)
         else
           log.e(TAG, "Remote error: #{title}: #{message}")
         end
@@ -73,11 +73,11 @@ module TAC
           if data.is_a?(Hash) && data.dig(:config, :spec_version) == TAC::CONFIG_SPEC_VERSION
             File.open("#{TAC::CONFIGS_PATH}/#{config_name}.json", "w") { |f| f.write json }
 
-            if $window.backend.config&.name == config_name
-              $window.backend.load_config(config_name)
+            if CyberarmEngine::Window.instance.backend.config&.name == config_name
+              CyberarmEngine::Window.instance.backend.load_config(config_name)
             end
           else
-            $window.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Supported config spec: v#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
+            CyberarmEngine::Window.instance.push_state(TAC::Dialog::AlertDialog, title: "Invalid Config", message: "Supported config spec: v#{TAC::CONFIG_SPEC_VERSION} got v#{data.dig(:config, :spec_version)}")
           end
 
         rescue JSON::ParserError => e
@@ -97,7 +97,7 @@ module TAC
         end
 
         if @host_is_a_connection
-          $window.backend.tacnet.puts(pkt)
+          CyberarmEngine::Window.instance.backend.tacnet.puts(pkt)
         else
           $server.active_client.puts(pkt)
         end
@@ -119,20 +119,20 @@ module TAC
               config = Config.new(name)
 
               if config.configuration.revision < revision
-                $window.backend.tacnet.puts( PacketHandler.packet_download_config(name) )
+                CyberarmEngine::Window.instance.backend.tacnet.puts( PacketHandler.packet_download_config(name) )
               elsif config.configuration.revision > revision
-                $window.backend.tacnet.puts( PacketHandler.packet_upload_config(name, JSON.dump( config )) )
+                CyberarmEngine::Window.instance.backend.tacnet.puts( PacketHandler.packet_upload_config(name, JSON.dump( config )) )
               end
 
             else
-              $window.backend.tacnet.puts( PacketHandler.packet_download_config(name) )
+              CyberarmEngine::Window.instance.backend.tacnet.puts( PacketHandler.packet_download_config(name) )
             end
           end
 
           _diff.each do |name|
             config = Config.new(name)
 
-            $window.backend.tacnet.puts( PacketHandler.packet_upload_config(name, JSON.dump( config )) )
+            CyberarmEngine::Window.instance.backend.tacnet.puts( PacketHandler.packet_upload_config(name, JSON.dump( config )) )
           end
         else
           if $server.active_client && $server.active_client.connected?
@@ -144,43 +144,43 @@ module TAC
       def handle_select_config(packet)
         config_name = packet.body
 
-        $window.backend.settings.config = config_name
-        $window.backend.save_settings
-        $window.backend.load_config(config_name)
+        CyberarmEngine::Window.instance.backend.settings.config = config_name
+        CyberarmEngine::Window.instance.backend.save_settings
+        CyberarmEngine::Window.instance.backend.load_config(config_name)
       end
 
       def handle_add_config(packet)
         config_name = packet.body
 
-        if $window.backend.configs_list.include?(config_name)
+        if CyberarmEngine::Window.instance.backend.configs_list.include?(config_name)
           unless @host_is_a_connection
             if $server.active_client&.connected?
               $server.active_client.puts(PacketHandler.packet_error("Config already exists!", "A config with the name #{config_name} already exists over here."))
             end
           end
         else
-          $window.backend.write_new_config(config_name)
+          CyberarmEngine::Window.instance.backend.write_new_config(config_name)
         end
       end
 
       def handle_update_config(packet)
         old_config_name, new_config_name  = packet.body.split(PROTOCOL_SEPERATOR, 2)
 
-        if $window.backend.configs_list.include?(config_name)
+        if CyberarmEngine::Window.instance.backend.configs_list.include?(config_name)
           unless @host_is_a_connection
             if $server.active_client&.connected?
               $server.active_client.puts(PacketHandler.packet_error("Config already exists!", "A config with the name #{config_name} already exists over here."))
             end
           end
         else
-          $window.backend.move_config(old_config_name, new_config_name)
+          CyberarmEngine::Window.instance.backend.move_config(old_config_name, new_config_name)
         end
       end
 
       def handle_delete_config(packet)
         config_name = packet.body
 
-        $window.backend.delete_config(config_name)
+        CyberarmEngine::Window.instance.backend.delete_config(config_name)
       end
 
       def self.packet_handshake(client_uuid)

@@ -8,7 +8,7 @@ module TAC
 
       def initialize
         @title = CyberarmEngine::Text.new("FIRST TECH CHALLENGE", size: TITLE_SIZE, text_shadow: true, y: 10, color: Gosu::Color::GRAY)
-        @title.x = $window.width / 2 - @title.width / 2
+        @title.x = CyberarmEngine::Window.instance.width / 2 - @title.width / 2
 
         @text = CyberarmEngine::Text.new(":1234567890", size: CLOCK_SIZE, text_border: true, border_size: 2, border_color: Gosu::Color::GRAY)
         @text.width # trigger font-eager loading
@@ -28,7 +28,7 @@ module TAC
       end
 
       def update
-        @title.x = $window.width / 2 - @title.width / 2
+        @title.x = CyberarmEngine::Window.instance.width / 2 - @title.width / 2
 
         if @controller
           @text.color = @controller.display_color
@@ -38,8 +38,8 @@ module TAC
           @text.text = "0:00"
         end
 
-        @text.x = $window.width / 2 - @text.textobject.text_width("0:00") / 2
-        @text.y = $window.height / 2 - @text.height / 2
+        @text.x = CyberarmEngine::Window.instance.width / 2 - @text.textobject.text_width("0:00") / 2
+        @text.y = CyberarmEngine::Window.instance.height / 2 - @text.height / 2
 
         @controller&.update
       end
