@@ -418,6 +418,51 @@ module TAC
           end
         end
       end
+
+      def button_down(id)
+        super
+
+        return if control_down? || shift_down? || !alt_down?
+
+        case id
+        when Gosu::KB_G
+          push_state(
+            TAC::Dialog::NamePromptDialog,
+            title: "Create Group",
+            list: window.backend.config.groups,
+            callback_method: method(:create_group)
+          )
+        when Gosu::KB_A
+          if @active_group
+            push_state(
+              TAC::Dialog::ActionDialog,
+              title: "Create Action",
+              list: @active_group.actions,
+              callback_method: method(:create_action)
+            )
+          else
+            push_state(
+              TAC::Dialog::AlertDialog,
+              title: "Error",
+              message: "Unable to create action, no group selected."
+            )
+          end
+        when Gosu::KB_V
+          if @active_action
+            push_state(
+              TAC::Dialog::VariableDialog,
+              title: "Create Variable",
+              callback_method: method(:create_variable)
+            )
+          else
+            push_state(
+              TAC::Dialog::AlertDialog,
+              title: "Error",
+              message: "Unable to create variable, no action selected."
+            )
+          end
+        end
+      end
     end
   end
 end
