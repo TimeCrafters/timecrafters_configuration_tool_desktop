@@ -8,7 +8,7 @@ module TAC
         label "Name", width: 1.0, text_align: :center
         @name_error = label "", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
-        @name = edit_line @options[:renaming] ? @options[:renaming].name : "", filter: method(:name_filter), width: 1.0, autofocus: true
+        @name = edit_line @options[:renaming] ? @options[:renaming].name : "", filter: method(:name_filter), width: 1.0, autofocus: true, focus: true
 
         @name.subscribe(:changed) do |sender, value|
           valid?

@@ -12,7 +12,7 @@ module TAC
             begin
               @simulation = TAC::Simulator::Simulation.new(source_code: @source_code.value, field_container: @field_container)
               @simulation.start
-            rescue SyntaxError, NameError, NoMethodError, TypeError, ArgumentError => e
+            rescue SyntaxError, NameError, NoMethodError, TypeError, ArgumentError, StandardError => e
               puts e.backtrace.reverse.join("\n")
               puts e
               push_state(Dialog::AlertDialog, title: "#{e.class}", message: e)

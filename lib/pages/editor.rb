@@ -30,8 +30,8 @@ module TAC
 
         body.clear do
           flow(width: 1.0, height: 1.0) do
-            stack width: 0.33333, height: 1.0, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
-              @groups_menu = flow(width: 1.0) do
+            stack fill: true, height: 1.0, padding_left: 2, padding_right: 2, border_thickness_right: 1, border_color: Gosu::Color::BLACK do
+              @groups_menu = flow(width: 1.0, height: 36) do
                 label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
@@ -84,12 +84,12 @@ module TAC
                 end
               end
 
-              @groups_list = stack width: 1.0, scroll: true do
+              @groups_list = stack width: 1.0, fill: true, scroll: true do
               end
             end
 
-            stack width: 0.33333, height: 1.0, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0] do
-              @actions_menu = flow(width: 1.0) do
+            stack fill: true, height: 1.0, padding_left: 2, padding_right: 2, border_thickness_right: 1, border_color: Gosu::Color::BLACK do
+              @actions_menu = flow(width: 1.0, height: 36) do
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
@@ -151,12 +151,12 @@ module TAC
                 end
               end
 
-              @actions_list = stack width: 1.0, scroll: true do
+              @actions_list = stack width: 1.0, fill: true, scroll: true do
               end
             end
 
-            stack width: 0.331, height: 1.0 do
-              @variables_menu = flow(width: 1.0) do
+            stack fill: true, height: 1.0, padding_left: 2, padding_right: 2 do
+              @variables_menu = flow(width: 1.0, height: 36) do
                 label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
@@ -167,7 +167,7 @@ module TAC
                 end
               end
 
-              @variables_list = stack width: 1.0, scroll: true do
+              @variables_list = stack width: 1.0, fill: true, scroll: true do
               end
             end
           end
@@ -210,16 +210,6 @@ module TAC
             end
           end
         end
-
-        body.root.subscribe(:window_size_changed) do
-          set_list_heights
-        end
-      end
-
-      def set_list_heights
-        @groups_list.style.height = body.height - @groups_menu.height
-        @actions_list.style.height = body.height - @actions_menu.height
-        @variables_list.style.height = body.height - @variables_menu.height
       end
 
       def create_group(name)
@@ -244,8 +234,10 @@ module TAC
         window.backend.config_changed!
 
         @active_group = nil
+        @active_group_container = nil
         @active_group_label.value = ""
         @active_action = nil
+        @active_active_container = nil
         @active_action_label.value = ""
         @actions_list.clear
         @variables_list.clear
@@ -320,13 +312,20 @@ module TAC
 
         @groups_list.clear do
           groups.each_with_index do |group, i|
-            flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
+            flow width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING do |container|
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
               button group.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
+                if (old_i = groups.index(@active_group))
+                  @active_group_container.style.default[:background] = old_i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+                end
+
                 @active_group = group
+                @active_group_container = container
+                @active_group_container.style.default[:background] = THEME_HIGHLIGHTED_COLOR
                 @active_group_label.value = group.name
                 @active_action = nil
+                @active_action_container = nil
                 @active_action_label.value = ""
 
                 populate_actions_list(group)
@@ -342,8 +341,6 @@ module TAC
             end
           end
         end
-
-        set_list_heights
       end
 
       def populate_actions_list(group)
@@ -353,12 +350,18 @@ module TAC
 
         @actions_list.clear do
           actions.each_with_index do |action, i|
-            stack width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
+            stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING do |container|
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              flow width: 1.0 do
+              flow width: 1.0, height: 36 do
                 button action.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
+                  if (old_i = actions.index(@active_action))
+                    @active_action_container.style.default[:background] = old_i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+                  end
+
                   @active_action = action
+                  @active_action_container = container
+                  @active_action_container.style.default[:background] = THEME_HIGHLIGHTED_COLOR
                   @active_action_label.value = action.name
 
                   populate_variables_list(action)
@@ -379,12 +382,14 @@ module TAC
                 end
               end
 
-              caption "#{action.comment}", width: 1.0, text_wrap: :word_wrap unless action.comment.empty?
+              unless action.comment.empty?
+                stack(width: 1.0, fill: true, scroll: true) do
+                  caption action.comment.to_s, width: 1.0, text_wrap: :word_wrap, text_border: true, text_border_size: 1, text_border_color: 0xaa_000000
+                end
+              end
             end
           end
         end
-
-        set_list_heights
       end
 
       def populate_variables_list(action)
@@ -394,10 +399,10 @@ module TAC
 
         @variables_list.clear do
           variables.each_with_index do |variable, i|
-            stack width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
+            stack width: 1.0, height: 96, **THEME_ITEM_CONTAINER_PADDING do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              flow(width: 1.0) do
+              flow(width: 1.0, fill: true) do
                 button "#{variable.name}", fill: true, text_size: THEME_ICON_SIZE - 3, tip: "Edit variable" do
                   push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
                 end
@@ -412,8 +417,6 @@ module TAC
             end
           end
         end
-
-        set_list_heights
       end
     end
   end

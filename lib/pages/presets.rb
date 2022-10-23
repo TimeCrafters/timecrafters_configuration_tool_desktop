@@ -11,10 +11,10 @@ module TAC
 
         body.clear do
           flow(width: 1.0, height: 1.0) do
-            @group_presets = stack(width: 0.49995, height: 1.0, scroll: true, border_thickness_right: 1, border_color: [0, Gosu::Color::BLACK, 0, 0]) do
+            @group_presets = stack(fill: true, height: 1.0, scroll: true, padding_left: 2, padding_top: 2, padding_right: 2, border_thickness_right: 1, border_color: Gosu::Color::BLACK) do
             end
 
-            @action_presets = stack(width: 0.49995, height: 1.0, scroll: true) do
+            @action_presets = stack(fill: true, height: 1.0, scroll: true, padding_left: 2, padding_top: 2, padding_right: 2) do
             end
           end
         end
@@ -26,11 +26,11 @@ module TAC
       def populate_group_presets
         @group_presets.clear do
           window.backend.config.presets.groups.each_with_index do |group, i|
-            flow(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
+            flow(width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING) do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button group.name, width: 0.895 do
-                page(TAC::Pages::Editor,{ group: group, group_is_preset: true })
+              button group.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
+                page(TAC::Pages::Editor, { group: group, group_is_preset: true })
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group preset" do
@@ -59,11 +59,11 @@ module TAC
       def populate_action_presets
         @action_presets.clear do
           window.backend.config.presets.actions.each_with_index do |action, i|
-            flow(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
+            flow(width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING) do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button action.name, width: 0.895 do
-                page(TAC::Pages::Editor,{ action: action, action_is_preset: true })
+              button action.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
+                page(TAC::Pages::Editor, { action: action, action_is_preset: true })
               end
 
               button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action preset" do

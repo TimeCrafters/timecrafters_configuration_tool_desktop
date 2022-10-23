@@ -8,7 +8,7 @@ module TAC
         @field_container = field_container
 
         @robots = []
-        @field = Field.new(simulation: self, season: :freight_frenzy, container: @field_container)
+        @field = Field.new(simulation: self, season: :power_play, container: @field_container)
         @show_paths = false
 
         @last_milliseconds = Gosu.milliseconds
@@ -29,7 +29,7 @@ module TAC
       def update
         @accumulator += (Gosu.milliseconds - @last_milliseconds) / 1000.0
 
-        while(@accumulator > @simulation_step)
+        while @accumulator > @simulation_step
           @field.update
           @robots.each { |robot| robot.update(@simulation_step) }
 
@@ -41,7 +41,7 @@ module TAC
       end
 
       def create_robot(alliance:, width:, depth:)
-        robot = Simulator::Robot.new(alliance: alliance, width: width, depth: depth)
+        robot = Simulator::Robot.new(alliance: alliance, width: width, depth: depth, container: @field_container)
         @robots << robot
 
         return robot

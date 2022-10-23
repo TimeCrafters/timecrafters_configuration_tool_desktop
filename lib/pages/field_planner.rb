@@ -35,6 +35,11 @@ module TAC
               @nodes.clear
               refresh_panel
             end
+
+            list_box items: ["Power Play", "Freight Frenzy", "Ultimate Goal", "Skystone"], width: 200, height: 1.0 do |item|
+              season = item.downcase.gsub(" ", "_").to_sym
+              @field = TAC::Simulator::Field.new(container: @field_container, season: season, simulation: nil)
+            end
           end
         end
 
@@ -61,7 +66,7 @@ module TAC
           end
         end
 
-        @field = TAC::Simulator::Field.new(container: @field_container, season: :freight_frenzy, simulation: nil)
+        @field = TAC::Simulator::Field.new(container: @field_container, season: :power_play, simulation: nil)
         @nodes ||= []
         @unit = :inches
         @total_distance = 0
@@ -77,16 +82,12 @@ module TAC
       end
 
       def draw
-        super
-
         @field.draw
 
         display_path
       end
 
       def update
-        super
-
         @field.update
 
         measure_path
@@ -133,7 +134,7 @@ module TAC
           Gosu.draw_circle(
             current_node.x * @field.scale + @field_container.x,
             current_node.y * @field.scale + @field_container.y,
-            @node_radius, 7, mouse_near ? @node_hover_color : @node_color, 10
+            @node_radius, 7, mouse_near ? @node_hover_color : @node_color, @field_container.z + 1
           )
 
           next if i.zero?
@@ -153,7 +154,8 @@ module TAC
               (@field_container.y + last_node.y * @field.scale) - distance,
               @segment_thickness,
               distance,
-              @segment_color
+              @segment_color,
+              @field_container.z + 1
             )
           end
 

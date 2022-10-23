@@ -4,13 +4,16 @@ module TAC
       FONT = Gosu::Font.new(11)
 
       attr_accessor :position, :angle, :comment
-      attr_reader :alliance, :width, :depth
-      def initialize(alliance:, width:, depth:)
+      attr_reader :alliance, :width, :depth, :z
+      def initialize(alliance:, width:, depth:, container:)
         @alliance = alliance
-        @width, @depth = width, depth
+        @width = width
+        @depth = depth
+        @container = container
 
         @position = CyberarmEngine::Vector.new
         @angle = 0
+        @z = @container.z + 1
 
         @queue = []
 
@@ -24,28 +27,28 @@ module TAC
       def draw
         Gosu.translate(@width / 2, @depth / 2) do
           Gosu.rotate(@angle, @position.x, @position.y) do
-            Gosu.draw_rect(@position.x - @width / 2, @position.y - @depth / 2, @width, @depth, Gosu::Color::BLACK)
-            Gosu.draw_rect(@position.x - @width / 2 + 1, @position.y - @depth / 2 + 1, @width - 2, @depth - 2, Gosu::Color.new(0xff_808022))
+            Gosu.draw_rect(@position.x - @width / 2, @position.y - @depth / 2, @width, @depth, Gosu::Color::BLACK, @z)
+            Gosu.draw_rect(@position.x - @width / 2 + 1, @position.y - @depth / 2 + 1, @width - 2, @depth - 2, Gosu::Color.new(0xff_808022), @z)
 
             if @alliance == :blue
-              Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, TAC::Palette::BLUE_ALLIANCE)
+              Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, TAC::Palette::BLUE_ALLIANCE, @z)
             elsif @alliance == :red
-              Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, TAC::Palette::RED_ALLIANCE)
+              Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, TAC::Palette::RED_ALLIANCE, @z)
             else
-              Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, @alliance)
+              Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, @alliance, @z)
             end
-            Gosu.draw_circle(@position.x, @position.y - @depth * 0.25, 2, 3, TAC::Palette::TIMECRAFTERS_TERTIARY)
+            Gosu.draw_circle(@position.x, @position.y - @depth * 0.25, 2, 3, TAC::Palette::TIMECRAFTERS_TERTIARY, @z)
           end
 
-          FONT.draw_text(@comment, 2.2, 2.2, 0, 1, 1, Gosu::Color::BLACK)
-          FONT.draw_text(@comment, 2, 2, 0)
+          FONT.draw_text(@comment, 2.2, 2.2, @z, 1, 1, Gosu::Color::BLACK)
+          FONT.draw_text(@comment, 2, 2, @z)
         end
       end
 
       def update(dt)
         @angle %= 360.0
 
-        if state = @queue.first
+        if (state = @queue.first)
           state.update(dt)
 
           if state.complete?
@@ -145,9 +148,10 @@ module TAC
         def draw
           Gosu.draw_line(
             @robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY,
-            @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY
+            @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY,
+            @robot.z
           )
-          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 1), @goal.y + (@robot.depth / 2 - 1), 2, 2, Gosu::Color::RED)
+          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 1), @goal.y + (@robot.depth / 2 - 1), 2, 2, Gosu::Color::RED, @robot.z)
         end
 
         def update(dt)
@@ -191,9 +195,10 @@ module TAC
         def draw
           Gosu.draw_line(
             @robot.position.x + @robot.width / 2, @robot.position.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY,
-            @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY
+            @goal.x + @robot.width / 2, @goal.y + @robot.depth / 2, TAC::Palette::TIMECRAFTERS_TERTIARY,
+            @robot.z
           )
-          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 1), @goal.y + (@robot.depth / 2 - 1), 2, 2, Gosu::Color::RED)
+          Gosu.draw_rect(@goal.x + (@robot.width / 2 - 1), @goal.y + (@robot.depth / 2 - 1), 2, 2, Gosu::Color::RED, @robot.z)
         end
 
         def update(dt)
@@ -245,7 +250,8 @@ module TAC
               fraction,
               360,
               1,
-              TAC::Palette::TIMECRAFTERS_TERTIARY
+              TAC::Palette::TIMECRAFTERS_TERTIARY,
+              @robot.z
             )
           end
 
@@ -254,7 +260,8 @@ module TAC
             @robot.position.y + @robot.depth / 2 + Gosu.offset_y(@target_angle, @robot.width > @robot.depth ? @robot.width : @robot.depth),
             1,
             9,
-            Gosu::Color::RED
+            Gosu::Color::RED,
+            @robot.z
           )
           # Gosu.draw_arc(@position.x, @position.y, 6, 1.0, 32, 2, @alliance)
         end
@@ -297,7 +304,8 @@ module TAC
             1 - fraction,
             360,
             1,
-            TAC::Palette::TIMECRAFTERS_TERTIARY
+            TAC::Palette::TIMECRAFTERS_TERTIARY,
+            @robot.z
           )
 
           @complete = fraction >= 1

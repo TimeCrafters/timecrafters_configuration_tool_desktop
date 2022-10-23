@@ -16,12 +16,14 @@ module TAC
         end
 
         status_bar.clear do
-          label "Current Configuration: "
-          @config_label = label window.backend.settings.config
+          flow(width: 1.0, max_width: 720, h_align: :center) do
+            label "Current Configuration: "
+            @config_label = label window.backend.settings.config
+          end
         end
 
         body.clear do
-          @configs_list = stack width: 1.0, height: 1.0, scroll: true do
+          @configs_list = stack width: 1.0, height: 1.0, margin_top: 36, max_width: 720, h_align: :center, scroll: true do
           end
         end
 
@@ -34,10 +36,11 @@ module TAC
 
         @configs_list.clear do
           @config_files.each_with_index do |config_file, i|
-            flow width: 1.0, **THEME_ITEM_CONTAINER_PADDING do
-              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-
+            flow width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING do
               name = File.basename(config_file, ".json")
+
+              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR unless name == window.backend.settings.config
+              background THEME_HIGHLIGHTED_COLOR if name == window.backend.settings.config
 
               button "#{name}", fill: true, text_size: THEME_ICON_SIZE - 3 do
                 change_config(name)
@@ -92,6 +95,8 @@ module TAC
         window.backend.load_config(name)
 
         @config_label.value = name.to_s
+
+        populate_configs
       end
     end
   end

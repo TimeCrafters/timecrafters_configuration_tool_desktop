@@ -5,49 +5,30 @@ module TAC
       background Gosu::Color.new(0xaa_000000)
 
       @title = @options[:title] ? @options[:title] : "#{self.class}"
-      @window_width, @window_height = window.width, window.height
-      @previous_state = previous_state
 
-      @dialog_root = stack width: 0.25, border_thickness: 2, border_color: [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY] do
+      @dialog_root = stack(width: 0.25, h_align: :center, v_align: :center, border_thickness: 2, border_color: [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]) do
         # Title bar
-        @titlebar = flow width: 1.0 do
+        @titlebar = flow(width: 1.0, height: 36) do
           background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
 
-          # title
-          flow width: 0.9 do
-            label @title, text_size: THEME_SUBHEADING_TEXT_SIZE, width: 1.0, text_align: :center, text_border: true, text_border_color: 0xff_222222, text_border_size: 1
-          end
+          label @title, text_size: THEME_SUBHEADING_TEXT_SIZE, font: TAC::THEME_BOLD_FONT, fill: true, text_align: :center, text_border: true, text_border_color: 0xaa_222222, text_border_size: 1
 
-          # Buttons
-          flow width: 0.0999 do
-            button get_image("#{TAC::ROOT_PATH}/media/icons/cross.png"), image_width: 1.0, **THEME_DANGER_BUTTON do
-              close
-            end
+          button get_image("#{TAC::ROOT_PATH}/media/icons/cross.png"), image_height: 1.0, **THEME_DANGER_BUTTON do
+            close
           end
         end
 
         # Dialog body
-        @dialog_content = stack width: 1.0 do
+        @dialog_content = stack(width: 1.0, scroll: true) do
         end
       end
 
       @dialog_content.clear do
         build
       end
-
-      @root_container.recalculate
-      @root_container.recalculate
-      @root_container.recalculate
-
-      center_dialog
     end
 
     def build
-    end
-
-    def center_dialog
-      @dialog_root.style.x = window.width / 2 - @dialog_root.width / 2
-      @dialog_root.style.y = window.height / 2 - @dialog_root.height / 2
     end
 
     def name_filter(text)
@@ -90,22 +71,10 @@ module TAC
     end
 
     def draw
-      @previous_state.draw
+      previous_state&.draw
       Gosu.flush
 
       super
-    end
-
-    def update
-      super
-
-      if window.width != @window_width or window.height != @window_height
-        request_recalculate
-
-        @window_width, @window_height = window.width, window.height
-      end
-
-      center_dialog
     end
 
     def button_down(id)
@@ -122,7 +91,7 @@ module TAC
     end
 
     def close
-      CyberarmEngine::Window.instance.pop_state
+      pop_state
     end
   end
 end

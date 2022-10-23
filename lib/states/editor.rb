@@ -34,7 +34,7 @@ class Editor < CyberarmEngine::GuiState
     @header_bar = flow(width: 1.0, height: 36) do
       background 0xff_006000
 
-      @header_bar_label = label TAC::NAME, width: 1.0, text_align: :center, text_size: 32
+      @header_bar_label = label TAC::NAME, width: 1.0, text_align: :center, text_size: 32, font: TAC::THEME_BOLD_FONT
 
       @window_controls = flow(x: window.width - 36 * 2, y: 0, height: 1.0) do
         button get_image("#{TAC::ROOT_PATH}/media/icons/minus.png"), tip: "Minimize", image_height: 1.0 do
@@ -128,9 +128,9 @@ class Editor < CyberarmEngine::GuiState
   end
 
   def draw
-    super
+    @page&.draw
 
-    @page.draw if @page
+    super
   end
 
   def update

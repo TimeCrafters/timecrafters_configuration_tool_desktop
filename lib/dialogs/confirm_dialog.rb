@@ -22,17 +22,17 @@ module TAC
             try_commit(true)
           end
         end
+      end
 
-        def try_commit(force = false)
-          if !@dangerous
-            close
+      def try_commit(force = false)
+        if !@dangerous
+          close
 
-            @options[:callback_method].call
-          elsif @dangerous && force
-            close
+          @options[:callback_method].call
+        elsif @dangerous && force
+          close
 
-            @options[:callback_method].call
-          end
+          @options[:callback_method].call
         end
       end
     end

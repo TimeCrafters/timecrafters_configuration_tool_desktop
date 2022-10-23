@@ -8,7 +8,7 @@ module TAC
           search = edit_line "", fill: true, height: 1.0
           button get_image("#{TAC::ROOT_PATH}/media/icons/zoom.png"), image_height: 1.0 do
             unless search.value.strip.empty?
-              search_results = search_config(search.value.downcase.strip)
+              search_results = search_config(search.value.strip)
 
               status_bar.clear do
                 if search_results.results.size.zero?
@@ -89,7 +89,6 @@ module TAC
                       end
                     end
 
-
                     if search_results.action_presets.size.positive?
                       title "Action Presets"
 
@@ -152,7 +151,7 @@ module TAC
 
       def search_groups(query, search_results)
         window.backend.config.groups.each do |group|
-          if group.name.downcase.include?(query)
+          if group.name.downcase.include?(query.downcase)
             result = SearchResult.new(group: group, query: query, is_group: true, is_from_name: true)
             search_results.results << result
           end
@@ -162,12 +161,12 @@ module TAC
       def search_actions(query, search_results)
         window.backend.config.groups.each do |group|
           group.actions.each do |action|
-            if action.name.downcase.include?(query)
+            if action.name.downcase.include?(query.downcase)
               result = SearchResult.new(group: group, action: action, query: query, is_action: true, is_from_name: true)
               search_results.results << result
             end
 
-            if action.comment.downcase.include?(query)
+            if action.comment.downcase.include?(query.downcase)
               result = SearchResult.new(group: group, action: action, query: query, is_action: true, is_from_comment: true)
               search_results.results << result
             end
@@ -179,12 +178,12 @@ module TAC
         window.backend.config.groups.each do |group|
           group.actions.each do |action|
             action.variables.each do |variable|
-              if variable.name.downcase.include?(query)
+              if variable.name.downcase.include?(query.downcase)
                 result = SearchResult.new(group: group, action: action, variable: variable, is_variable: true, query: query, is_from_name: true)
                 search_results.results << result
               end
 
-              if variable.value.downcase.include?(query)
+              if variable.value.downcase.include?(query.downcase)
                 result = SearchResult.new(group: group, action: action, variable: variable, is_variable: true, query: query, is_from_value: true)
                 search_results.results << result
               end
@@ -195,29 +194,29 @@ module TAC
 
       def search_presets(query, search_results)
         window.backend.config.presets.groups.each do |group|
-          if group.name.downcase.include?(query)
+          if group.name.downcase.include?(query.downcase)
             result = SearchResult.new(group: group, query: query, is_group: true, is_from_name: true, is_preset: true)
             search_results.results << result
           end
 
           group.actions.each do |action|
-            if action.name.downcase.include?(query)
+            if action.name.downcase.include?(query.downcase)
               result = SearchResult.new(group: group, action: action, query: query, is_action: true, is_from_name: true, is_preset: true)
               search_results.results << result
             end
 
-            if action.comment.downcase.include?(query)
+            if action.comment.downcase.include?(query.downcase)
               result = SearchResult.new(group: group, action: action, query: query, is_action: true, is_from_comment: true, is_preset: true)
               search_results.results << result
             end
 
             action.variables.each do |variable|
-              if variable.name.downcase.include?(query)
+              if variable.name.downcase.include?(query.downcase)
                 result = SearchResult.new(group: group, action: action, variable: variable, is_variable: true, query: query, is_from_name: true, is_preset: true)
                 search_results.results << result
               end
 
-              if variable.value.downcase.include?(query)
+              if variable.value.downcase.include?(query.downcase)
                 result = SearchResult.new(group: group, action: action, variable: variable, is_variable: true, query: query, is_from_value: true, is_preset: true)
                 search_results.results << result
               end
@@ -226,27 +225,27 @@ module TAC
         end
 
         window.backend.config.presets.actions.each do |action|
-            if action.name.downcase.include?(query)
-              result = SearchResult.new(group: nil, action: action, query: query, is_action: true, is_from_name: true, is_preset: true)
+          if action.name.downcase.include?(query.downcase)
+            result = SearchResult.new(group: nil, action: action, query: query, is_action: true, is_from_name: true, is_preset: true)
+            search_results.results << result
+          end
+
+          if action.comment.downcase.include?(query.downcase)
+            result = SearchResult.new(group: nil, action: action, query: query, is_action: true, is_from_comment: true, is_preset: true)
+            search_results.results << result
+          end
+
+          action.variables.each do |variable|
+            if variable.name.downcase.include?(query.downcase)
+              result = SearchResult.new(group: nil, action: action, variable: variable, is_variable: true, query: query, is_from_name: true, is_preset: true)
               search_results.results << result
             end
 
-            if action.comment.downcase.include?(query)
-              result = SearchResult.new(group: nil, action: action, query: query, is_action: true, is_from_comment: true, is_preset: true)
+            if variable.value.downcase.include?(query.downcase)
+              result = SearchResult.new(group: nil, action: action, variable: variable, is_variable: true, query: query, is_from_value: true, is_preset: true)
               search_results.results << result
             end
-
-            action.variables.each do |variable|
-              if variable.name.downcase.include?(query)
-                result = SearchResult.new(group: nil, action: action, variable: variable, is_variable: true, query: query, is_from_name: true, is_preset: true)
-                search_results.results << result
-              end
-
-              if variable.value.downcase.include?(query)
-                result = SearchResult.new(group: nil, action: action, variable: variable, is_variable: true, query: query, is_from_value: true, is_preset: true)
-                search_results.results << result
-              end
-            end
+          end
         end
       end
 
@@ -332,7 +331,8 @@ module TAC
         end
 
         def highlight(string)
-          string.gsub(/#{@query}/i, "<b><c=ff00ff>#{@query}</c></b>")
+          match = string.match(/#{@query}/i)
+          string.gsub(/#{@query}/i, "<b><c=ff00ff>#{match}</c></b>")
         end
       end
     end

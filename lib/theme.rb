@@ -1,12 +1,15 @@
 module TAC
-  THEME_FONT = "#{TAC::ROOT_PATH}/media/fonts/DejaVuSansCondensed.ttf"
+  THEME_FONT = "#{TAC::ROOT_PATH}/media/fonts/NotoSans-Bold.ttf"
+  THEME_BOLD_FONT = "#{TAC::ROOT_PATH}/media/fonts/NotoSans-Black.ttf"
   THEME = {
-    Label: {
+    TextBlock: {
+      text_static: true,
       font: THEME_FONT,
       text_size: 22,
       color: Gosu::Color.new(0xee_ffffff),
     },
     Button: {
+      font: THEME_BOLD_FONT,
       text_size: 22,
       background: TAC::Palette::TIMECRAFTERS_PRIMARY,
       border_thickness: 1,
@@ -20,6 +23,7 @@ module TAC
     },
     EditLine: {
       caret_color: Gosu::Color.new(0xff_88ef90),
+      font: THEME_FONT
     },
     ToggleButton: {
       width: 18,
@@ -31,10 +35,10 @@ module TAC
     color: Gosu::Color.new(0xff_ffffff),
     background: Gosu::Color.new(0xff_800000),
     hover: {
-      background: Gosu::Color.new(0xff_600000),
+      background: Gosu::Color.new(0xff_c00000),
     },
     active: {
-      background: Gosu::Color.new(0xff_c00000),
+      background: Gosu::Color.new(0xff_600000),
     }
   }
 
@@ -49,6 +53,7 @@ module TAC
     padding_top: THEME_ITEM_PADDING,
     padding_bottom: THEME_ITEM_PADDING
   }
+  THEME_HIGHLIGHTED_COLOR = Gosu::Color.rgb(255, 175, 0) # Gosu::Color.new(0xff_f080f0)
   THEME_EVEN_COLOR = Gosu::Color.new(0xff_202020)
   THEME_ODD_COLOR = Gosu::Color.new(0xff_606060)
   THEME_CONTENT_BACKGROUND = Gosu::Color.new(0x88_007f3f)
