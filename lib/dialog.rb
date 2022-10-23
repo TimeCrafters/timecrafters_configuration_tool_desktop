@@ -57,11 +57,12 @@ module TAC
 
     def _deep_dive_interactive_elements(element, list)
       element.children.each do |child|
-        if child.visible? && child.is_a?(CyberarmEngine::Element::EditLine) ||
-          child.is_a?(CyberarmEngine::Element::EditBox) ||
-          child.is_a?(CyberarmEngine::Element::CheckBox) ||
-          child.is_a?(CyberarmEngine::Element::ToggleButton) ||
-          child.is_a?(CyberarmEngine::Element::ListBox)
+        if child.visible? && child.enabled? &&
+           child.is_a?(CyberarmEngine::Element::EditLine) ||
+           child.is_a?(CyberarmEngine::Element::EditBox) ||
+           child.is_a?(CyberarmEngine::Element::CheckBox) ||
+           child.is_a?(CyberarmEngine::Element::ToggleButton) ||
+           child.is_a?(CyberarmEngine::Element::ListBox)
 
           list << child
         elsif child.visible? && child.is_a?(CyberarmEngine::Element::Container)
