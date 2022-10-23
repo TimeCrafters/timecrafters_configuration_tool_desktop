@@ -256,6 +256,7 @@ module TAC
       def update_action(action, name, comment)
         action.name = name
         action.comment = comment
+        @active_group.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
         populate_actions_list(@active_group)
