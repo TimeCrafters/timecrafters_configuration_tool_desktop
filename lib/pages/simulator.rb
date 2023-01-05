@@ -77,6 +77,7 @@ robot.forward 100"
         @simulation.update
 
         unless @simulation.robots.all? { |robot| robot.queue.empty? } # Only update clock if simulation is running
+          current_state.request_repaint
           @simulation_status.value = "Time: #{(@simulation.simulation_time).round(1)} seconds"
         end
       end

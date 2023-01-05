@@ -11,6 +11,8 @@ module TAC
 
       if ARGV.join.include?("--game-clock-remote-display")
         push_state(PracticeGameClock::View, remote_control_mode: true)
+      elsif ARGV.join.include?("--intro")
+        push_state(CyberarmEngine::IntroState, forward: TAC::States::Boot)
       else
         push_state(TAC::States::Boot)
       end
@@ -27,6 +29,14 @@ module TAC
       super
 
       @notification_manager.update
+    end
+
+    def needs_redraw?
+      if current_state.is_a?(Editor)
+        current_state.needs_repaint? || @notification_manager.instance_variable_get(:@drivers).size.positive?
+      else
+        true
+      end
     end
 
     def toast(title, message = nil)

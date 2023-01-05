@@ -8,6 +8,8 @@ class Editor < CyberarmEngine::GuiState
     @window_width = 0
     @window_height = 0
 
+    @last_tacnet_status = nil
+
     @pages = {}
     @page = nil
 
@@ -34,9 +36,9 @@ class Editor < CyberarmEngine::GuiState
     @header_bar = flow(width: 1.0, height: 36) do
       background 0xff_006000
 
-      @header_bar_label = label TAC::NAME, width: 1.0, text_align: :center, text_size: 32, font: TAC::THEME_BOLD_FONT
+      @header_bar_label = label TAC::NAME, fill: true, text_align: :center, text_size: 32, font: TAC::THEME_BOLD_FONT, margin_left: BORDERLESS ? 36 * 3 : 0
 
-      @window_controls = flow(x: window.width - 36 * 2, y: 0, height: 1.0) do
+      @window_controls = flow(width: 36 * 3, height: 1.0) do
         button get_image("#{TAC::ROOT_PATH}/media/icons/minus.png"), tip: "Minimize", image_height: 1.0 do
           window.minimize if window.respond_to?(:minimize)
         end
@@ -138,15 +140,32 @@ class Editor < CyberarmEngine::GuiState
 
     @page.update if @page
 
-    case window.backend.tacnet.status
-    when :not_connected
-      @tacnet_button.style.color = Gosu::Color::WHITE
-    when :connecting
-      @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTING
-    when :connected
-      @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTED
-    when :connection_error
-      @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTION_ERROR
+    if @last_tacnet_status != window.backend.tacnet.status
+      @last_tacnet_status = window.backend.tacnet.status
+
+      case window.backend.tacnet.status
+      when :not_connected, :connected
+        @tacnet_button.style.color = Gosu::Color::WHITE
+        @header_bar.style.background = 0xff_006000
+      when :connecting
+        @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTING
+        @header_bar.style.background = TAC::Palette::TACNET_CONNECTING
+      when :connection_error
+        @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTION_ERROR
+        @header_bar.style.background = TAC::Palette::TACNET_CONNECTION_ERROR
+
+        unless @page.is_a?(TAC::Pages::TACNET)
+          push_state(TAC::Dialog::TACNETDialog, title: "TACNET Connection Error", message: window.backend.tacnet.full_status)
+        end
+      end
+
+      @tacnet_button.style.default[:color] = @tacnet_button.style.color
+      @header_bar.style.default[:background] = @header_bar.style.background
+
+      @tacnet_button.recalculate
+      @header_bar.recalculate
+
+      request_repaint
     end
 
     window.width = Gosu.available_width / 2 if window.width < Gosu.available_width / 2
