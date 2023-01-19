@@ -49,7 +49,7 @@ robot.forward 100
 robot.turn -90
 robot.forward 100"
 
-              source_code = File.read(SOURCE_FILE_PATH) if File.exists?(SOURCE_FILE_PATH)
+              source_code = File.read(SOURCE_FILE_PATH) if File.exist?(SOURCE_FILE_PATH)
 
               @source_code = edit_box source_code, width: 1.0, height: 1.0
             end

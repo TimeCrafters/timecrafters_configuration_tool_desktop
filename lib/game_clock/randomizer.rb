@@ -23,14 +23,22 @@ module TAC
         when 2, 5
           #Blue and Red: Center
 
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 2, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 2, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 512, die_size: @size)
+
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 3, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 512, die_size: @size)
         when 3, 6
           # Blue: Left
           # Red: Right
 
           @ducks << Ducky.new(window: window, alliance: :blue, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 2, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 512, die_size: @size)
+
           @ducks << Ducky.new(window: window, alliance: :red, slot: 3, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 2, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 512, die_size: @size)
         end
       end
 

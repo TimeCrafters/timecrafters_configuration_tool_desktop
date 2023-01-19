@@ -42,13 +42,13 @@ module TAC
     end
 
     def move_config(old_name, new_name)
-      if not File.exists?("#{TAC::CONFIGS_PATH}/#{old_name}.json") or
+      if not File.exist?("#{TAC::CONFIGS_PATH}/#{old_name}.json") or
         File.directory?("#{TAC::CONFIGS_PATH}/#{old_name}.json")
         # move_config: Can not move config file "#{old_name}" does not exist!
         return false
       end
 
-      if File.exists?("#{TAC::CONFIGS_PATH}/#{new_name}.json") &&
+      if File.exist?("#{TAC::CONFIGS_PATH}/#{new_name}.json") &&
         !File.directory?("#{TAC::CONFIGS_PATH}/#{old_name}.json")
         # move_config: Config file "#{new_name}" already exist!
         return false
@@ -61,7 +61,7 @@ module TAC
     end
 
     def delete_config(config_name)
-      FileUtils.rm("#{TAC::CONFIGS_PATH}/#{config_name}.json") if File.exists?("#{TAC::CONFIGS_PATH}/#{config_name}.json")
+      FileUtils.rm("#{TAC::CONFIGS_PATH}/#{config_name}.json") if File.exist?("#{TAC::CONFIGS_PATH}/#{config_name}.json")
     end
 
 
