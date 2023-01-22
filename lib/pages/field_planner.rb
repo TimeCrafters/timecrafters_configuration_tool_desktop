@@ -33,6 +33,8 @@ module TAC
 
             button "Reset", text_size: THEME_HEADING_TEXT_SIZE, **THEME_DANGER_BUTTON do
               @nodes.clear
+              measure_path
+
               refresh_panel
             end
 
@@ -48,7 +50,7 @@ module TAC
             tagline "Nodes:"
             @nodes_count_label = tagline "0"
 
-            tagline "Total Distance:"
+            tagline "Total Distance:", margin_left: 20
             @total_distance_label = tagline "0"
 
             @units_label = tagline "Inches"
@@ -77,6 +79,8 @@ module TAC
         @node_radius = 6
         @segment_thickness = 2
 
+        @font = CyberarmEngine::Text.new(font: THEME_BOLD_FONT, size: 18, border: true, static: true)
+
         measure_path
         refresh_panel
       end
@@ -85,6 +89,28 @@ module TAC
         @field.draw
 
         display_path
+
+        if @field_container.hit?(window.mouse_x, window.mouse_y)
+          x = (window.mouse_x - @field_container.x) / @field.scale - 72
+          y = (window.mouse_y - @field_container.y) / @field.scale - 72
+
+          @font.text = "X: #{inches_to_unit(x).round(2)} Y: #{inches_to_unit(y).round(2)} (#{@unit.to_s})"
+          @font.x = window.mouse_x + 6
+          @font.y = window.mouse_y - (@font.height / 2.0 + 24)
+          @font.z = 100_001
+
+          Gosu.draw_rect(
+            window.mouse_x,
+            @font.y - 6,
+            @font.width + 12,
+            @font.height + 12,
+            0xaa_000000,
+            100_000)
+
+            @font.draw
+
+        end
+
       end
 
       def update
@@ -186,6 +212,10 @@ module TAC
         @total_distance_label.value = "#{inches_to_unit(@total_distance).round(2)}"
         @units_label.value = @unit.to_s.capitalize
 
+        status_bar.recalculate
+        status_bar.recalculate
+        status_bar.recalculate
+
         # @points_container.clear do
           # v1 = @nodes.first
           # break unless v1
@@ -216,11 +246,11 @@ module TAC
         when :feet
           inches / 12.0
         when :millimeters
-          inches / 0.254
+          inches * 25.4
         when :centimeters
-          inches / 2.54
+          inches * 2.54
         when :meters
-          inches / 25.4
+          inches * 0.0254
         end
       end
     end
