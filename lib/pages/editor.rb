@@ -173,11 +173,15 @@ module TAC
           end
         end
 
-        populate_groups_list
+        populated_groups_list = false
 
         if @options[:group_is_preset]
+          populated_groups_list
+
           @active_group = @options[:group]
           @active_group_label.value = @active_group.name
+
+          populate_groups_list
           populate_actions_list(@active_group)
 
           @groups_menu.hide
@@ -193,14 +197,19 @@ module TAC
 
         else
           if @options[:group]
+            populated_groups_list = true
+
             @active_group = @options[:group]
             @active_group_label.value = @active_group.name
 
-            populate_actions_list(@active_group)
+            populate_groups_list
+            populate_actions_list(@active_group) unless @options[:action]
 
             if @options[:action]
               @active_action = @options[:action]
               @active_action_label.value = @active_action.name
+
+              populate_actions_list(@active_group)
 
               populate_variables_list(@active_action)
 
@@ -210,6 +219,8 @@ module TAC
             end
           end
         end
+
+        populate_groups_list unless populated_groups_list
       end
 
       def create_group(name)
@@ -314,7 +325,8 @@ module TAC
         @groups_list.clear do
           groups.each_with_index do |group, i|
             flow width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING do |container|
-              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+              background group == @active_group ? THEME_HIGHLIGHTED_COLOR : (i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
+              @active_group_container = container if group == @active_group
 
               button group.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
                 if (old_i = groups.index(@active_group))
@@ -352,7 +364,8 @@ module TAC
         @actions_list.clear do
           actions.each_with_index do |action, i|
             stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING do |container|
-              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+              background action == @active_action ? THEME_HIGHLIGHTED_COLOR : (i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
+              @active_action_container = container if action == @active_action
 
               flow width: 1.0, height: 36 do
                 button action.name, fill: true, text_size: THEME_ICON_SIZE - 3 do

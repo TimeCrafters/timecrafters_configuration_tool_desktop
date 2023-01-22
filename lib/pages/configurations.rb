@@ -13,6 +13,16 @@ module TAC
               populate_configs
             })
           end
+
+          button "Open Folder", tip: "Open folder containing configurations", height: 1.0 do
+            if RUBY_PLATFORM =~ /mingw/
+              system("start \"#{TAC::CONFIGS_PATH}\"")
+            elsif RUBY_PLATFORM =~ /darwin/
+              system("open \"#{TAC::CONFIGS_PATH}\"")
+            else
+              system("xdg-open \"#{TAC::CONFIGS_PATH}\"")
+            end
+          end
         end
 
         status_bar.clear do

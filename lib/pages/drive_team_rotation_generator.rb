@@ -30,7 +30,7 @@ module TAC
             end
           end
 
-          button get_image("#{TAC::ROOT_PATH}/media/icons/target.png"), margin_right: 10, image_height: 1.0, tip: "Generate rotation" do
+          button "Generate", margin_right: 10, height: 1.0, tip: "Generate rotation" do
             populate_rotation
           end
         end
