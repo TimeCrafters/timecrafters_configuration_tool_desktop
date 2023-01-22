@@ -160,7 +160,7 @@ module TAC
                 label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
                 button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
-                    push_state(TAC::Dialog::VariableDialog, title: "Create Variable", callback_method: method(:create_variable))
+                    push_state(TAC::Dialog::VariableDialog, title: "Create Variable", list: @active_action.variables, callback_method: method(:create_variable))
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to create variable, no action selected.")
                   end
@@ -418,7 +418,7 @@ module TAC
 
               flow(width: 1.0, fill: true) do
                 button "#{variable.name}", fill: true, text_size: THEME_ICON_SIZE - 3, tip: "Edit variable" do
-                  push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, callback_method: method(:update_variable))
+                  push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, list: @active_action.variables, callback_method: method(:update_variable))
                 end
 
                 button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do
@@ -466,6 +466,7 @@ module TAC
             push_state(
               TAC::Dialog::VariableDialog,
               title: "Create Variable",
+              list: @active_action.variables,
               callback_method: method(:create_variable)
             )
           else

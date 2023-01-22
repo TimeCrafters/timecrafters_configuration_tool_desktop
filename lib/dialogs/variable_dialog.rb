@@ -79,9 +79,20 @@ module TAC
 
       def valid?
         valid = true
+        name = @name.value.strip
 
-        if @name.value.strip.empty?
+        if name.empty?
           @name_error.value = "Error: Name cannot be blank or only whitespace."
+          @name_error.show
+          valid = false
+
+        ### Don't error if renaming variable to itself
+        elsif @options[:variable] && @options[:variable].name == name
+          @name_error.value = ""
+          @name_error.hide
+
+        elsif @options[:list].find { |variable| variable.name == name }
+          @name_error.value = "Error: Name is not unique!"
           @name_error.show
           valid = false
         end
