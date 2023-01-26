@@ -110,23 +110,24 @@ module TAC
         rescue => error
           @last_socket_error = error
           @socket_error = true
+
           log.e(TAG, error.message)
+
           close
         end
       end
 
       def read
         begin
-          message = @socket.gets
+          message = @socket.gets.strip
         rescue => error
           @last_socket_error = error
           @socket_error = true
 
+          log.e(TAG, error.message)
+
           message = ""
         end
-
-
-        return message.strip
       end
 
       def puts(message)

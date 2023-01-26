@@ -144,9 +144,12 @@ class Editor < CyberarmEngine::GuiState
       @last_tacnet_status = window.backend.tacnet.status
 
       case window.backend.tacnet.status
-      when :not_connected, :connected
+      when :not_connected
         @tacnet_button.style.color = Gosu::Color::WHITE
         @header_bar.style.background = 0xff_006000
+      when :connected
+        @tacnet_button.style.color = Gosu::Color::WHITE
+        @header_bar.style.background = TAC::Palette::TACNET_PRIMARY
       when :connecting
         @tacnet_button.style.color = TAC::Palette::TACNET_CONNECTING
         @header_bar.style.background = TAC::Palette::TACNET_CONNECTING
