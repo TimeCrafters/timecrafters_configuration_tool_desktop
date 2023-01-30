@@ -119,14 +119,15 @@ module TAC
 
       def read
         begin
-          message = @socket.gets.strip
+          @socket.gets&.strip
+
         rescue => error
           @last_socket_error = error
           @socket_error = true
 
           log.e(TAG, error.message)
 
-          message = ""
+          ""
         end
       end
 

@@ -52,7 +52,7 @@ module TAC
         return minutes + seconds
       end
 
-    def play_sound(sound)
+      def play_sound(sound)
         path = nil
         case sound
         when :autonomous_countdown
