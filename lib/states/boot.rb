@@ -30,15 +30,20 @@ module TAC
       def update
         super
 
+        request_repaint
+
         @title_font.x = window.width / 2 - @title_font.width / 2
         @title_font.y = (window.height / 2 - (@logo.height / 2 + @title_font.height)) * @title_animator.transition
 
         @transition_color.alpha = @transition_animator.transition
 
-        push_state(@next_state) if @transition_color.alpha >= 255
+        if @transition_color.alpha >= 255
+          pop_state
+          push_state(@next_state)
+        end
       end
 
-      def button_up(id)
+      def button_down(id)
         super
 
         push_state(@next_state)
