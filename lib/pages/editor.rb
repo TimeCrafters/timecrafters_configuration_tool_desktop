@@ -42,7 +42,8 @@ module TAC
                   if @active_group
                     push_state(Dialog::NamePromptDialog, title: "Clone Group", renaming: @active_group, accept_label: "Clone", list: window.backend.config.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
-                      clone.name = "#{name}"
+                      clone.name = name.to_s
+
                       window.backend.config.groups << clone
                       window.backend.config_changed!
 
@@ -57,7 +58,8 @@ module TAC
                   if @active_group
                     push_state(Dialog::NamePromptDialog, title: "Save Group Preset", renaming: @active_group, accept_label: "Save", list: window.backend.config.presets.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
-                      clone.name = "#{name}"
+                      clone.name = name.to_s
+
                       window.backend.config.presets.groups << clone
                       window.backend.config.presets.groups.sort_by! { |g| g.name.downcase }
                       window.backend.config_changed!
@@ -73,7 +75,8 @@ module TAC
                   push_state(Dialog::PickPresetDialog, title: "Pick Group Preset", limit: :groups, callback_method: proc { |preset|
                     push_state(Dialog::NamePromptDialog, title: "Name Group", renaming: preset, accept_label: "Add", list: window.backend.config.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( group.to_json, symbolize_names: true ))
-                      clone.name = "#{name}"
+                      clone.name = name.to_s
+
                       window.backend.config.groups << clone
                       window.backend.config.groups.sort_by! { |g| g.name.downcase }
                       window.backend.config_changed!
@@ -106,6 +109,7 @@ module TAC
                       clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
                       clone.name    = name
                       clone.comment = comment
+
                       @active_group.actions << clone
                       window.backend.config_changed!
 
@@ -121,6 +125,7 @@ module TAC
                     push_state(Dialog::NamePromptDialog, title: "Save Action Preset", renaming: @active_action, accept_label: "Save", list: window.backend.config.presets.actions, callback_method: proc { |action, name|
                       clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
                       clone.name = "#{name}"
+
                       window.backend.config.presets.actions << clone
                       window.backend.config.presets.actions.sort_by! { |a| a.name.downcase }
                       window.backend.config_changed!
@@ -135,9 +140,12 @@ module TAC
                 button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import action from preset" do
                   if @active_group
                     push_state(Dialog::PickPresetDialog, title: "Pick Action Preset", limit: :actions, callback_method: proc { |preset|
-                      push_state(Dialog::ActionDialog, title: "Name Action", action: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name|
+                      push_state(Dialog::ActionDialog, title: "Name Action", action: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name, comment|
                         clone = TAC::Config::Action.from_json( JSON.parse( action.to_json, symbolize_names: true ))
-                        clone.name = "#{name}"
+                        clone.name = name.to_s
+                        clone.comment = comment.to_s
+                        clone.enabled = true
+
                         @active_group.actions << clone
                         @active_group.actions.sort_by! { |a| a.name.downcase }
                         window.backend.config_changed!
@@ -176,7 +184,7 @@ module TAC
         populated_groups_list = false
 
         if @options[:group_is_preset]
-          populated_groups_list
+          populated_groups_list = true
 
           @active_group = @options[:group]
           @active_group_label.value = @active_group.name
