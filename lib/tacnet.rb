@@ -1,6 +1,6 @@
 module TAC
   class TACNET
-    DEFAULT_HOSTNAME = "192.168.49.1"
+    DEFAULT_HOSTNAME = "192.168.49.1".freeze
     DEFAULT_PORT = 8962
 
     SYNC_INTERVAL = 250 # ms
@@ -30,7 +30,7 @@ module TAC
     end
 
     def full_status
-      _status = status.to_s.split("_").map { |c| c.capitalize }.join(" ")
+      _status = status.to_s.split("_").map(&:capitalize).join(" ")
 
       if connected?
         net_stats = ""
@@ -42,7 +42,7 @@ module TAC
 
         "<b>Status:</b> #{_status}\n\n#{net_stats}"
       elsif @connection&.client && @connection.client.socket_error?
-        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error.to_s}"
+        "<b>Status:</b> #{_status}\n\n#{@connection.client.last_socket_error}"
       else
         "<b>Status:</b> #{_status}"
       end
@@ -53,10 +53,10 @@ module TAC
     end
 
     def close
-      if connected?
-        @connection.close
-        @connection = nil
-      end
+      return unless connected?
+
+      @connection.close
+      @connection = nil
     end
 
     def client
