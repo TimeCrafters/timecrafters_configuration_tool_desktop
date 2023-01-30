@@ -17,6 +17,7 @@ module TAC
         @clock = Clock.new
         @clock.controller = nil
         @last_clock_display_value = @clock.value
+        @last_clock_title_value = @clock.title.text
 
         @particle_emitters = [
           PracticeGameClock::ParticleEmitter.new
@@ -72,17 +73,17 @@ module TAC
           stack width: 0.4, padding_left: 50 do
             background @menu_background
 
-            flow do
+            flow(width: 1.0) do
               label "♫ Now playing:"
               @current_song_label = label "♫ ♫ ♫"
             end
 
-            flow do
+            flow(width: 1.0) do
               label "Volume:"
               @current_volume_label = label "100%"
             end
 
-            flow do
+            flow(width: 1.0) do
               button get_image("#{ROOT_PATH}/media/icons/previous.png") do
                 @jukebox.previous_track
               end
@@ -137,7 +138,7 @@ module TAC
               end
             end
 
-            stack width: 1.0 do
+            stack(width: 1.0) do
               button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do
                 unless @clock.active?
                   push_state(Randomizer)
@@ -195,9 +196,17 @@ module TAC
         if @clock.value != @last_clock_display_value
           @last_clock_display_value = @clock.value
 
+          request_repaint
+
           if @remote_control_mode && @server.active_client
             @server.active_client.puts(ClockNet::PacketHandler.packet_clock_time(@last_clock_display_value))
           end
+        end
+
+        if @clock.title.text != @last_clock_title_value
+          @last_clock_title_value = @clock.title.text
+
+          request_repaint
         end
 
         if @last_track_name != @jukebox.current_track
@@ -211,6 +220,14 @@ module TAC
         @last_track_name = @jukebox.current_track
         @last_volume = @jukebox.volume
         @last_clock_state = @clock.active?
+      end
+
+      def request_repaint
+        if @particle_emitters && @particle_emitters.map(&:particle_count).sum.positive?
+          true
+        else
+          super
+        end
       end
 
       def update_non_gui

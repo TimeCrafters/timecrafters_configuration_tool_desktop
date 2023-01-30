@@ -71,6 +71,10 @@ module TAC
         end
       end
 
+      def particle_count
+        @particles.size
+      end
+
       def clock_active!
         @clock_active = true
         @particles.each(&:clock_active!)

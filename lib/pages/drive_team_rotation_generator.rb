@@ -7,18 +7,20 @@ module TAC
         header_bar("Drive Team Rotation Generator")
 
         @roster ||= [
-          "Alexander",
           "Aubrey",
           "Cayden",
+          "Dan",
           "Gabe",
           "Spencer",
-          "Olivia"
+          "Sodi",
+          "Trent"
         ]
 
         @roles ||= [
           "Coach",
           "Driver A",
-          "Driver B"
+          "Driver B",
+          "Human"
         ]
 
         menu_bar.clear do
@@ -37,12 +39,12 @@ module TAC
 
         body.clear do
           flow(margin_left: 20, width: 1.0, height: 1.0) do
-            stack(width: 0.25) do
+            stack(width: 0.25, height: 1.0) do
               title "Roles", width: 1.0, margin_bottom: 4, text_align: :center
 
-              flow(width: 1.0, margin_bottom: 20) do
-                @role_name = edit_line "", placeholder: "Add role", width: 0.9
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 0.1, tip: "Add role" do
+              flow(width: 1.0, height: 32, margin_bottom: 20) do
+                @role_name = edit_line "", placeholder: "Add role", fill: true, height: 1.0
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_height: 1.0, tip: "Add role" do
                   if @role_name.value.strip.length.positive?
                     @roles.push(@role_name.value.strip)
                     @role_name.value = ""
@@ -52,16 +54,16 @@ module TAC
                 end
               end
 
-              @roles_container = stack(width: 1.0, height: 0.835, scroll: true) do
+              @roles_container = stack(width: 1.0, fill: true, scroll: true) do
               end
             end
 
             stack(margin_left: 20, width: 0.25, height: 1.0) do
               title "Roster", width: 1.0, margin_bottom: 4, text_align: :center
 
-              flow(width: 1.0, margin_bottom: 20) do
-                @roster_name = edit_line "", placeholder: "Add name", width: 0.9
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: 0.1, tip: "Add name" do
+              flow(width: 1.0, height: 32, margin_bottom: 20) do
+                @roster_name = edit_line "", placeholder: "Add name", height: 1.0, fill: true
+                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_height: 1.0, tip: "Add name" do
                   if @roster_name.value.strip.length.positive?
                     @roster.push(@roster_name.value.strip)
                     @roster_name.value = ""
@@ -71,14 +73,14 @@ module TAC
                 end
               end
 
-              @roster_container = stack(width: 1.0, height: 0.835, scroll: true) do
+              @roster_container = stack(width: 1.0, fill: true, scroll: true) do
               end
             end
 
-            stack(margin_left: 20, margin_right: 20, width: 0.5, height: 1.0) do
+            stack(margin_left: 20, margin_right: 20, fill: true, height: 1.0) do
               title "Rotation", width: 1.0, margin_bottom: 4, text_align: :center
 
-              @rotation_container = stack(width: 1.0, height: 0.835, scroll: true) do
+              @rotation_container = stack(width: 1.0, fill: true, scroll: true) do
               end
             end
           end
@@ -92,11 +94,11 @@ module TAC
       def populate_roles
         @roles_container.clear do
           @roles.each_with_index do |name, i|
-            flow(width: 1.0, padding: 2) do
+            flow(width: 1.0, height: 32, padding: 2) do
               background i.even? ? 0xff_007000 : 0xff_006000
 
-              tagline name, width: 0.9
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 0.1, tip: "Remove role", **THEME_DANGER_BUTTON do
+              tagline name, fill: true
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_height: 1.0, tip: "Remove role", **THEME_DANGER_BUTTON do
                 @roles.delete(name)
                 populate_roles
               end
@@ -108,11 +110,11 @@ module TAC
       def populate_roster
         @roster_container.clear do
           @roster.each_with_index do |name, i|
-            flow(width: 1.0, padding: 2) do
+            flow(width: 1.0, height: 32, padding: 2) do
               background i.even? ? 0xff_007000 : 0xff_006000
 
-              tagline name, width: 0.9
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: 0.1, tip: "Remove name", **THEME_DANGER_BUTTON do
+              tagline name, fill: true
+              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_height: 1.0, tip: "Remove name", **THEME_DANGER_BUTTON do
                 @roster.delete(name)
                 populate_roster
               end
@@ -125,13 +127,11 @@ module TAC
         @rotation = Generator.new(roster: @roster, team_size: @roles.count)
 
         @rotation_container.clear do
-          fraction = (1.0 / @rotation.team_size) - 0.02
-
-          flow(width: 1.0, padding: 2) do
+          flow(width: 1.0, height: 32, padding: 2) do
             background Gosu::Color::BLACK
 
             @roles.each do |role|
-            tagline "<b>#{role}</b>", width: fraction
+            tagline "<b>#{role}</b>", fill: true
             end
           end
 
@@ -139,11 +139,11 @@ module TAC
           teams = @rotation.teams.shuffle if @shuffle_teams&.value
 
           teams.each_with_index do |team, i|
-            flow(width: 1.0, padding: 2) do
+            flow(width: 1.0, height: 32, padding: 2) do
               background i.even? ? 0xff_007000 : 0xff_006000
 
               team.each do |player|
-                tagline player, width: fraction
+                tagline player, fill: true
               end
             end
           end
