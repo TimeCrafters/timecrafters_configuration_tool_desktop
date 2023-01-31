@@ -47,7 +47,13 @@ module TAC
                       window.backend.config.groups << clone
                       window.backend.config_changed!
 
-                      populate_groups_list
+                      @groups_list.append do
+                        add_group_container(clone)
+                      end
+
+                      update_list_children(@groups_list)
+
+                      scroll_into_view(clone)
                     })
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to clone group, no group selected.")
@@ -81,7 +87,13 @@ module TAC
                       window.backend.config.groups.sort_by! { |g| g.name.downcase }
                       window.backend.config_changed!
 
-                      populate_groups_list
+                      @groups_list.append do
+                        add_group_container(clone)
+                      end
+
+                      update_list_children(@groups_list)
+
+                      scroll_into_view(clone)
                     })
                   })
                 end
@@ -113,7 +125,13 @@ module TAC
                       @active_group.actions << clone
                       window.backend.config_changed!
 
-                      populate_actions_list(@active_group)
+                      @actions_list.append do
+                        add_action_container(clone)
+                      end
+
+                      update_list_children(@actions_list)
+
+                      scroll_into_view(clone)
                     })
                   else
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to clone action, no action selected.")
@@ -150,7 +168,13 @@ module TAC
                         @active_group.actions.sort_by! { |a| a.name.downcase }
                         window.backend.config_changed!
 
-                        populate_actions_list(@active_group)
+                        @actions_list.append do
+                          add_action_container(clone)
+                        end
+
+                        update_list_children(@actions_list)
+
+                        scroll_into_view(clone)
                       })
                     })
                   else
@@ -238,17 +262,30 @@ module TAC
         window.backend.config.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
-        populate_groups_list
+        @groups_list.append do
+          add_group_container(group)
+        end
+
+        update_list_children(@groups_list)
 
         scroll_into_view(group)
       end
 
       def update_group(group, name)
+        old_name = group.name
+
         group.name = name
         window.backend.config.groups.sort_by! { |g| g.name.downcase }
         window.backend.config_changed!
 
-        populate_groups_list
+        group_container = find_element_by_tag(@groups_list, old_name)
+        label = find_element_by_tag(group_container, "label")
+
+        label.value = name
+
+        group_container.style.tag = name
+
+        update_list_children(@groups_list)
 
         scroll_into_view(group)
       end
@@ -267,7 +304,11 @@ module TAC
         @actions_list.clear
         @variables_list.clear
 
-        populate_groups_list
+        # Remove deleted action from list
+        container = find_element_by_tag(@groups_list, action.name)
+        @groups_list.remove(container)
+
+        update_list_children(@groups_list)
       end
 
       def create_action(name, comment)
@@ -294,7 +335,7 @@ module TAC
         @active_group.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
-        action_container = find_element_by_tag(@actions_list, old_name.downcase)
+        action_container = find_element_by_tag(@actions_list, old_name)
         label = find_element_by_tag(action_container, "label")
         comment_container = find_element_by_tag(action_container, "comment_container")
         comment_label = find_element_by_tag(action_container, "comment")
@@ -309,6 +350,8 @@ module TAC
           comment_container.show
           comment_label.value = comment.to_s
         end
+
+        action_container.style.tag = name
 
         update_list_children(@actions_list)
 
@@ -325,7 +368,7 @@ module TAC
         @variables_list.clear
 
         # Remove deleted action from list
-        container = find_element_by_tag(@actions_list, action.name.downcase)
+        container = find_element_by_tag(@actions_list, action.name)
         @actions_list.remove(container)
 
         update_list_children(@actions_list)
@@ -338,12 +381,18 @@ module TAC
         @active_action.variables.sort_by! { |v| v.name.downcase }
         window.backend.config_changed!
 
-        populate_variables_list(@active_action)
+        @variables_list.append do
+          add_variable_container(variable)
+        end
+
+        update_list_children(@variables_list)
 
         scroll_into_view(variable)
       end
 
       def update_variable(variable, name, type, value)
+        old_name = variable.name
+
         variable.name = name
         variable.type = type
         variable.value = value
@@ -352,7 +401,18 @@ module TAC
 
         window.backend.config_changed!
 
-        populate_variables_list(@active_action)
+        variable_container = find_element_by_tag(@variables_list, old_name)
+        label = find_element_by_tag(variable_container, "label")
+        type  = find_element_by_tag(variable_container, "type")
+        value = find_element_by_tag(variable_container, "value")
+
+        label.value = name
+        type.value = "Type: #{variable.type}"
+        value.value = "Value: #{variable.value}"
+
+        variable_container.style.tag = name
+
+        update_list_children(@variables_list)
 
         scroll_into_view(variable)
       end
@@ -362,7 +422,11 @@ module TAC
         @active_action.variables.sort_by! { |v| v.name.downcase }
         window.backend.config_changed!
 
-        populate_variables_list(@active_action)
+        # Remove deleted variable from list
+        container = find_element_by_tag(@variables_list, variable.name)
+        @variables_list.remove(container)
+
+        update_list_children(@variables_list)
       end
 
       def update_list_children(list)
