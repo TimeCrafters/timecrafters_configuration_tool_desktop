@@ -272,11 +272,16 @@ module TAC
 
       def create_action(name, comment)
         action = TAC::Config::Action.new(name: name, comment: comment, enabled: true, variables: [])
+
         @active_group.actions << action
         @active_group.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
-        populate_actions_list(@active_group)
+        @actions_list.append do
+          add_action_container(action)
+        end
+
+        update_list_children(@actions_list)
 
         scroll_into_view(action)
       end
@@ -289,10 +294,21 @@ module TAC
         @active_group.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
-        a = @actions_list.children.find { |a| a.style.tag == old_name.downcase }
-        label = a.children.find { |a| a.style.tag == "label" }
-        # comment = a.children.find { |a| a.style.tag == "comment" }
+        action_container = find_element_by_tag(@actions_list, old_name.downcase)
+        label = find_element_by_tag(action_container, "label")
+        comment_container = find_element_by_tag(action_container, "comment_container")
+        comment_label = find_element_by_tag(action_container, "comment")
+
         label.value = name
+        if comment.empty?
+          action_container.style.height = 36
+          comment_container.hide
+          comment_label.value = ""
+        else
+          action_container.style.height = 72
+          comment_container.show
+          comment_label.value = comment.to_s
+        end
 
         update_list_children(@actions_list)
 
@@ -309,7 +325,7 @@ module TAC
         @variables_list.clear
 
         # Remove deleted action from list
-        container = @actions_list.children.find { |a| a.style.tag == action.name.downcase }
+        container = find_element_by_tag(@actions_list, action.name.downcase)
         @actions_list.remove(container)
 
         update_list_children(@actions_list)
@@ -354,12 +370,12 @@ module TAC
         is_action = list == @actions_list
         is_variable = list == @variables_list
 
-        list.children.sort_by! { |i| i.style.tag }
+        list.children.sort_by! { |i| i.style.tag.downcase }
 
         list.children.each_with_index do |child, i|
           bg_color = i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-          bg_color = THEME_HIGHLIGHTED_COLOR if is_group && @active_group&.name&.downcase == child.style.tag
-          bg_color = THEME_HIGHLIGHTED_COLOR if is_action && @active_action&.name&.downcase == child.style.tag
+          bg_color = THEME_HIGHLIGHTED_COLOR if is_group && @active_group&.name == child.style.tag
+          bg_color = THEME_HIGHLIGHTED_COLOR if is_action && @active_action&.name == child.style.tag
 
           child.style.default[:background] = bg_color
 
@@ -386,35 +402,8 @@ module TAC
         end
 
         @groups_list.clear do
-          groups.each_with_index do |group, i|
-            flow width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING, tag: group.name.downcase do |container|
-              background group == @active_group ? THEME_HIGHLIGHTED_COLOR : (i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
-              @active_group_container = container if group == @active_group
-
-              button group.name, fill: true, text_size: THEME_ICON_SIZE - 3, tag: "label" do
-                if (old_i = groups.index(@active_group))
-                  @active_group_container.style.default[:background] = old_i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                end
-
-                @active_group = group
-                @active_group_container = container
-                @active_group_container.style.default[:background] = THEME_HIGHLIGHTED_COLOR
-                @active_group_label.value = group.name
-                @active_action = nil
-                @active_action_container = nil
-                @active_action_label.value = ""
-
-                populate_actions_list(group)
-                @variables_list.clear
-              end
-
-              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
-                push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
-              end
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
-                push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete group and all of its actions and variables?", callback_method: proc { delete_group(group) })
-              end
-            end
+          groups.each do |group|
+            add_group_container(group)
           end
         end
       end
@@ -425,46 +414,8 @@ module TAC
         actions = group.actions
 
         @actions_list.clear do
-          actions.each_with_index do |action, i|
-            stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING, tag: action.name.downcase do |container|
-              background action == @active_action ? THEME_HIGHLIGHTED_COLOR : (i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
-              @active_action_container = container if action == @active_action
-
-              flow width: 1.0, height: 36 do
-                button action.name, fill: true, text_size: THEME_ICON_SIZE - 3, tag: "label" do
-                  if (old_i = actions.index(@active_action))
-                    @active_action_container.style.default[:background] = old_i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                  end
-
-                  @active_action = action
-                  @active_action_container = container
-                  @active_action_container.style.default[:background] = THEME_HIGHLIGHTED_COLOR
-                  @active_action_label.value = action.name
-
-                  populate_variables_list(action)
-                end
-
-                action_enabled_toggle = toggle_button tip: "Enable action", checked: action.enabled
-                action_enabled_toggle.subscribe(:changed) do |sender, value|
-                  action.enabled = value
-                  window.backend.config_changed!
-                end
-
-                button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
-                  push_state(Dialog::ActionDialog, title: "Edit Action", action: action, list: @active_group.actions, callback_method: method(:update_action))
-                end
-
-                button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
-                  push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete action and all of its variables?", callback_method: proc { delete_action(action) })
-                end
-              end
-
-              unless action.comment.empty?
-                stack(width: 1.0, fill: true, scroll: true) do
-                  caption action.comment.to_s, width: 1.0, text_wrap: :word_wrap, text_border: true, text_border_size: 1, text_border_color: 0xaa_000000, tag: "comment"
-                end
-              end
-            end
+          actions.each do |action|
+            add_action_container(action)
           end
         end
       end
@@ -475,24 +426,99 @@ module TAC
         variables = action.variables
 
         @variables_list.clear do
-          variables.each_with_index do |variable, i|
-            stack width: 1.0, height: 96, **THEME_ITEM_CONTAINER_PADDING, tag: variable.name.downcase do
-              background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+          variables.each do |variable|
+            add_variable_container(variable)
+          end
+        end
+      end
 
-              flow(width: 1.0, fill: true) do
-                button "#{variable.name}", fill: true, text_size: THEME_ICON_SIZE - 3, tip: "Edit variable", tag: "label" do
-                  push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, list: @active_action.variables, callback_method: method(:update_variable))
-                end
+      def add_group_container(group)
+        index = window.backend.config.groups.index(group)
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do
-                  push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
-                end
-              end
+        flow width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING, tag: group.name do |container|
+          background group == @active_group ? THEME_HIGHLIGHTED_COLOR : (index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
+          @active_group_container = container if group == @active_group
 
-              caption "Type: #{variable.type}", tag: "type", fill: true
-              caption "Value: #{variable.value}", tag: "value", fill: true
+          button group.name, fill: true, text_size: THEME_ICON_SIZE - 3, tag: "label" do
+            @active_group = group
+            @active_group_container = container
+            @active_group_label.value = group.name
+            @active_action = nil
+            @active_action_container = nil
+            @active_action_label.value = ""
+
+            update_list_children(@groups_list)
+
+            populate_actions_list(group)
+            @variables_list.clear
+          end
+
+          button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
+            push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
+          end
+          button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
+            push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete group and all of its actions and variables?", callback_method: proc { delete_group(group) })
+          end
+        end
+      end
+
+      def add_action_container(action)
+        index = @active_group.actions.index(action)
+
+        stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING, tag: action.name do |container|
+          background action == @active_action ? THEME_HIGHLIGHTED_COLOR : (index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
+          @active_action_container = container if action == @active_action
+
+          flow width: 1.0, height: 36 do
+            button action.name, fill: true, text_size: THEME_ICON_SIZE - 3, tag: "label" do
+              @active_action = action
+              @active_action_container = container
+              @active_action_label.value = action.name
+
+              update_list_children(@actions_list)
+
+              populate_variables_list(action)
+            end
+
+            action_enabled_toggle = toggle_button tip: "Enable action", checked: action.enabled
+            action_enabled_toggle.subscribe(:changed) do |sender, value|
+              action.enabled = value
+              window.backend.config_changed!
+            end
+
+            button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
+              push_state(Dialog::ActionDialog, title: "Edit Action", action: action, list: @active_group.actions, callback_method: method(:update_action))
+            end
+
+            button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
+              push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete action and all of its variables?", callback_method: proc { delete_action(action) })
             end
           end
+
+          stack(width: 1.0, fill: true, scroll: true, visible: !action.comment.empty?, tag: "comment_container") do
+            caption action.comment.to_s, width: 1.0, text_wrap: :word_wrap, text_border: true, text_border_size: 1, text_border_color: 0xaa_000000, tag: "comment"
+          end
+        end
+      end
+
+      def add_variable_container(variable)
+        index = @active_action.variables.index(variable)
+
+        stack width: 1.0, height: 96, **THEME_ITEM_CONTAINER_PADDING, tag: variable.name do
+          background index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+
+          flow(width: 1.0, fill: true) do
+            button variable.name, fill: true, text_size: THEME_ICON_SIZE - 3, tip: "Edit variable", tag: "label" do
+              push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, list: @active_action.variables, callback_method: method(:update_variable))
+            end
+
+            button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do
+              push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
+            end
+          end
+
+          caption "Type: #{variable.type}", tag: "type", fill: true
+          caption "Value: #{variable.value}", tag: "value", fill: true
         end
       end
 
