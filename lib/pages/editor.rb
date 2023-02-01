@@ -6,6 +6,18 @@ module TAC
         @active_group = nil
         @active_action = nil
 
+        @scroll_into_view_list = []
+        @highlight_item_container = nil
+        @highlight_from_color = Gosu::Color.rgba(0, 0, 0, 0)
+        @highlight_to_color = Gosu::Color.rgba(THEME_HIGHLIGHTED_COLOR.red, THEME_HIGHLIGHTED_COLOR.green, THEME_HIGHLIGHTED_COLOR.blue, 200)
+
+        @highlight_animator = CyberarmEngine::Animator.new(
+          start_time: Gosu.milliseconds - 1,
+          duration: 0,
+          from: Gosu::Color.rgba(0, 0, 0, 0),
+          to: THEME_HIGHLIGHTED_COLOR
+        )
+
         menu_bar.clear do
           if @options[:group_is_preset]
             title "Editing group preset: #{@options[:group].name}"
@@ -213,19 +225,32 @@ module TAC
           @active_group = @options[:group]
           @active_group_label.value = @active_group.name
 
+          if @options[:action]
+            @active_action = @options[:action]
+            @active_action_label.value = @active_action.name
+          end
+
           populate_groups_list
           populate_actions_list(@active_group)
+          populate_variables_list(@active_action) if @active_action
 
           @groups_menu.hide
+
+          scroll_into_view(@active_group)
+          scroll_into_view(@active_action) if @active_action
+          scroll_into_view(@options[:variable]) if @options[:variable]
 
         elsif @options[:action_is_preset]
           @active_action = @options[:action]
           @active_action_label.value = @active_action.name
 
-          populate_variables_list(@options[:action])
+          populate_variables_list(@active_action)
 
           @groups_menu.hide
           @actions_menu.hide
+
+          scroll_into_view(@active_action)
+          scroll_into_view(@options[:variable]) if @options[:variable]
 
         else
           if @options[:group]
@@ -237,6 +262,8 @@ module TAC
             populate_groups_list
             populate_actions_list(@active_group) unless @options[:action]
 
+            scroll_into_view(@active_group)
+
             if @options[:action]
               @active_action = @options[:action]
               @active_action_label.value = @active_action.name
@@ -245,9 +272,8 @@ module TAC
 
               populate_variables_list(@active_action)
 
-              if @options[:variable]
-                # Scroll into view?
-              end
+              scroll_into_view(@active_action)
+              scroll_into_view(@options[:variable]) if @options[:variable]
             end
           end
         end
@@ -463,8 +489,7 @@ module TAC
 
         item_container = find_element_by_tag(list_container, item.name)
 
-        @scroll_into_view_list_container = list_container
-        @scroll_into_view_item_container = item_container
+        @scroll_into_view_list << { list: list_container, item: item_container }
       end
 
       def populate_groups_list
@@ -597,25 +622,47 @@ module TAC
         end
       end
 
+      def draw
+        super
+
+        unless @highlight_animator.complete?
+          item = @highlight_item_container
+
+          Gosu.draw_rect(
+            item.x, item.y,
+            item.width, item.height,
+            @highlight_animator.color_transition,
+            item.z + 1
+          )
+        end
+      end
+
       def update
         super
 
-        list_container = @scroll_into_view_list_container
-        item_container = @scroll_into_view_item_container
+        while (hash = @scroll_into_view_list.shift)
+          list_container = hash[:list]
+          item_container = hash[:item]
 
-        return unless list_container
-        return unless item_container
+          return unless list_container
+          return unless item_container
 
-        unless item_container.x.between?(list_container.x, list_container.x + list_container.width) &&
-          item_container.y.between?(list_container.y, list_container.y + list_container.height)
+          unless (item_container.y + item_container.height).between?(list_container.y, list_container.y + list_container.height)
 
-          list_container.scroll_top = (item_container.y + item_container.height) - item_container.height
+            list_container.scroll_top = (item_container.y + item_container.height) - (list_container.y + list_container.height)
 
-          list_container.recalculate
+            list_container.recalculate
+          end
+
+          @highlight_item_container = item_container
+          @highlight_animator = CyberarmEngine::Animator.new(
+            start_time: Gosu.milliseconds,
+            duration: 750,
+            from: @highlight_from_color,
+            to: @highlight_to_color,
+            tween: :ease_in_out_back
+          )
         end
-
-        @scroll_into_view_list_container = nil
-        @scroll_into_view_item_container = nil
       end
 
       def button_down(id)

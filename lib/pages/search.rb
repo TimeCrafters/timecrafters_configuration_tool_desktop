@@ -22,7 +22,7 @@ module TAC
                 shared_index = 0
 
                 flow(width: 1.0, height: 1.0) do
-                  stack(width: 0.495, height: 1.0, scroll: true) do
+                  stack(fill: true, height: 1.0, scroll: true, padding: 20, padding_right: 10) do
                     if search_results.groups.size.positive?
                       title "Groups"
 
@@ -44,7 +44,9 @@ module TAC
                       search_results.actions.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button result.highlight(result.action.name), width: 1.0 do
+                          tip = "Group: #{result.group.name}"
+
+                          button result.highlight(result.action.name), width: 1.0, tip: tip do
                             page(TAC::Pages::Editor, { group: result.group, action: result.action, is_search: true })
                           end
 
@@ -63,7 +65,9 @@ module TAC
                       search_results.variables.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button "#{result.highlight(result.variable.name)} [#{result.highlight(result.variable.value)}]", width: 1.0 do
+                          tip = "Group: #{result.group.name}, Action: #{result.action.name}"
+
+                          button "#{result.highlight(result.variable.name)} [#{result.variable.type}: #{result.highlight(result.variable.value)}]", width: 1.0, tip: tip do
                             page(TAC::Pages::Editor, { group: result.group, action: result.action, variable: result.variable, is_search: true })
                           end
                         end
@@ -73,13 +77,14 @@ module TAC
                     end
                   end
 
-                  stack(width: 0.495, height: 1.0, scroll: true) do
+                  stack(fill: true, height: 1.0, scroll: true, padding: 20, padding_left: 10) do
                     if search_results.group_presets.size.positive?
                       title "Group Presets"
 
                       search_results.group_presets.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
+
                           button result.highlight(result.group.name), width: 1.0 do
                             page(TAC::Pages::Editor, { group: result.group, group_is_preset: true, is_search: true })
                           end
@@ -95,7 +100,9 @@ module TAC
                       search_results.action_presets.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button result.highlight(result.action.name), width: 1.0 do
+                          tip = result.group ? "Group: #{result.group.name}" : nil
+
+                          button result.highlight(result.action.name), width: 1.0, tip: tip do
                             if result.group.nil?
                               page(TAC::Pages::Editor, { action: result.action, action_is_preset: true, is_search: true })
                             else
@@ -118,7 +125,9 @@ module TAC
                       search_results.variables_from_presets.each do |result|
                         stack(width: 1.0, **THEME_ITEM_CONTAINER_PADDING) do
                           background shared_index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
-                          button "#{result.highlight(result.variable.name)} [#{result.highlight(result.variable.value)}]", width: 1.0 do
+                          tip = result.group ? "Group: #{result.group.name}, Action: #{result.action.name}" : "Action: #{result.action.name}"
+
+                          button "#{result.highlight(result.variable.name)} [#{result.variable.type}: #{result.highlight(result.variable.value)}]", width: 1.0, tip: tip do
                             if result.group.nil?
                               page(TAC::Pages::Editor, { action: result.action, variable: result.variable, action_is_preset: true, is_search: true })
                             else
