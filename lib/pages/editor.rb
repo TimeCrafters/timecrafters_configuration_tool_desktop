@@ -305,7 +305,7 @@ module TAC
         @variables_list.clear
 
         # Remove deleted action from list
-        container = find_element_by_tag(@groups_list, action.name)
+        container = find_element_by_tag(@groups_list, group.name)
         @groups_list.remove(container)
 
         update_list_children(@groups_list)
@@ -448,12 +448,23 @@ module TAC
       end
 
       def scroll_into_view(item)
+        list_container = nil
+        item_container = nil
+
         if item.is_a?(TAC::Config::Group)
+          list_container = @groups_list
         elsif item.is_a?(TAC::Config::Action)
+          list_container = @actions_list
         elsif item.is_a?(TAC::Config::Variable)
+          list_container = @variables_list
         else
           raise "Unsupported item type: #{item.class}"
         end
+
+        item_container = find_element_by_tag(list_container, item.name)
+
+        @scroll_into_view_list_container = list_container
+        @scroll_into_view_item_container = item_container
       end
 
       def populate_groups_list
@@ -584,6 +595,27 @@ module TAC
           caption "Type: #{variable.type}", tag: "type", fill: true
           caption "Value: #{variable.value}", tag: "value", fill: true
         end
+      end
+
+      def update
+        super
+
+        list_container = @scroll_into_view_list_container
+        item_container = @scroll_into_view_item_container
+
+        return unless list_container
+        return unless item_container
+
+        unless item_container.x.between?(list_container.x, list_container.x + list_container.width) &&
+          item_container.y.between?(list_container.y, list_container.y + list_container.height)
+
+          list_container.scroll_top = (item_container.y + item_container.height) - item_container.height
+
+          list_container.recalculate
+        end
+
+        @scroll_into_view_list_container = nil
+        @scroll_into_view_item_container = nil
       end
 
       def button_down(id)
