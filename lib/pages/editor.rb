@@ -626,6 +626,8 @@ module TAC
         super
 
         unless @highlight_animator.complete?
+          current_state.request_repaint
+
           item = @highlight_item_container
 
           Gosu.draw_rect(
