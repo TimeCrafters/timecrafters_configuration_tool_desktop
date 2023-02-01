@@ -18,12 +18,12 @@ Releasy::Project.new do
     "media/music/.gitkeep",
     "media/particles/.gitkeep"
   ]
-  exclude_encoding # Applications that don't use advanced encoding (e.g. Japanese characters) can save build size with this.
+  # exclude_encoding # Applications that don't use advanced encoding (e.g. Japanese characters) can save build size with this.
   verbose
 
   add_build :windows_folder do
     icon "media/icon.ico"
-    executable_type :console # Assuming you don't want it to run with a console window.
+    executable_type :windows # Assuming you don't want it to run with a console window.
     add_package :exe # Windows self-extracting archive.
   end
 end
