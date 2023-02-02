@@ -626,8 +626,6 @@ module TAC
         super
 
         unless @highlight_animator.complete?
-          current_state.request_repaint
-
           item = @highlight_item_container
 
           Gosu.draw_rect(
@@ -641,6 +639,8 @@ module TAC
 
       def update
         super
+
+        current_state.request_repaint unless @highlight_animator.complete?
 
         while (hash = @scroll_into_view_list.shift)
           list_container = hash[:list]
