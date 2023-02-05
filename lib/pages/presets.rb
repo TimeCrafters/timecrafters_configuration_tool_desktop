@@ -59,30 +59,36 @@ module TAC
       def populate_action_presets
         @action_presets.clear do
           window.backend.config.presets.actions.each_with_index do |action, i|
-            flow(width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING) do
+            stack(width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING) do
               background i.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR
 
-              button action.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
-                page(TAC::Pages::Editor, { action: action, action_is_preset: true })
+              flow(width: 1.0, height: 36) do
+                button action.name, fill: true, text_size: THEME_ICON_SIZE - 3 do
+                  page(TAC::Pages::Editor, { action: action, action_is_preset: true })
+                end
+
+                button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action preset" do
+                  push_state(
+                    Dialog::ActionDialog,
+                    title: "Edit Action Preset",
+                    action: action,
+                    list: window.backend.config.presets.actions,
+                    callback_method: method(:update_action_preset)
+                  )
+                end
+
+                button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action preset", **THEME_DANGER_BUTTON do
+                  push_state(
+                    Dialog::ConfirmDialog,
+                    title: "Are you sure?",
+                    message: "Delete action preset and all of its actions and variables?",
+                    callback_method: proc { delete_action_preset(action) }
+                  )
+                end
               end
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action preset" do
-                push_state(
-                  Dialog::NamePromptDialog,
-                  title: "Rename Action Preset",
-                  renaming: action,
-                  list: window.backend.config.presets.actions,
-                  callback_method: method(:update_action_preset)
-                )
-              end
-
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action preset", **THEME_DANGER_BUTTON do
-                push_state(
-                  Dialog::ConfirmDialog,
-                  title: "Are you sure?",
-                  message: "Delete action preset and all of its actions and variables?",
-                  callback_method: proc { delete_action_preset(action) }
-                )
+              stack(width: 1.0, fill: true, scroll: true, visible: !action.comment.empty?, tag: "comment_container") do
+                caption action.comment.to_s, width: 1.0, text_wrap: :word_wrap, text_border: true, text_border_size: 1, text_border_color: 0xaa_000000, tag: "comment"
               end
             end
           end
@@ -105,8 +111,9 @@ module TAC
         populate_group_presets
       end
 
-      def update_action_preset(action, name)
+      def update_action_preset(action, name, comment)
         action.name = name
+        action.comment = comment
         window.backend.config.presets.actions.sort_by! { |a| a.name.downcase }
         window.backend.config_changed!
 
