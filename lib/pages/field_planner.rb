@@ -80,12 +80,15 @@ module TAC
         @segment_thickness = 2
 
         @font = CyberarmEngine::Text.new(font: THEME_BOLD_FONT, size: 18, border: true, static: true)
+        @last_mouse_position = CyberarmEngine::Vector.new(window.mouse_x, window.mouse_y)
 
         measure_path
         refresh_panel
       end
 
       def draw
+        super
+
         @field.draw
 
         display_path
@@ -105,15 +108,19 @@ module TAC
             @font.width + 12,
             @font.height + 12,
             0xaa_000000,
-            100_000)
+            100_000
+          )
 
-            @font.draw
-
+          @font.draw
         end
-
       end
 
       def update
+        super
+
+        current_state.request_repaint if window.mouse_x != @last_mouse_position.x || window.mouse_y != @last_mouse_position.y
+        @last_mouse_position = CyberarmEngine::Vector.new(window.mouse_x, window.mouse_y)
+
         @field.update
 
         measure_path
