@@ -80,7 +80,10 @@ module TAC
 
           @jukebox_volume = 1.0
           @jukebox_sound_effects = true
+          @locked_buttons_randomizer_visible = []
+          @locked_buttons_clock_active  = []
           @randomizer_visible = false
+          @clock_updated_at = -1000
 
           RemoteControl.connection.proxy_object.register(:track_changed, method(:track_changed))
           RemoteControl.connection.proxy_object.register(:volume_changed, method(:volume_changed))
@@ -94,25 +97,25 @@ module TAC
           flow width: 1.0, height: 1.0 do
             stack width: 0.5 do
               title "Match", width: 1.0, text_align: :center
-              button "Start Match", width: 1.0, text_size: 48, margin_bottom: 50 do
+              @start_match_btn = button "Start Match", width: 1.0, text_size: 48, margin_bottom: 50 do
                 start_clock(:full_match)
               end
 
               title "Practice", width: 1.0, text_align: :center
-              button "Autonomous", width: 1.0 do
+              @autonomous_btn = button "Autonomous", width: 1.0 do
                 start_clock(:autonomous)
               end
-              button "TeleOp with Countdown", width: 1.0 do
+              @teleop_with_countdown_btn = button "TeleOp with Countdown", width: 1.0 do
                 start_clock(:full_teleop)
               end
-              button "TeleOp", width: 1.0 do
+              @teleop_btn = button "TeleOp", width: 1.0 do
                 start_clock(:teleop_only)
               end
-              button "TeleOp Endgame", width: 1.0, margin_bottom: 50 do
+              @teleop_endgame_btn = button "TeleOp Endgame", width: 1.0, margin_bottom: 50 do
                 start_clock(:endgame_only)
               end
 
-              button "Abort Match", width: 1.0 do
+              @abort_match_btn = button "Abort Match", width: 1.0 do
                 RemoteControl.connection.puts(ClockNet::PacketHandler.packet_abort_clock)
               end
 
@@ -219,7 +222,7 @@ module TAC
                   @randomizer_label = title "Not Visible"
                 end
 
-                button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do
+                @randomizer_btn = button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do
                   @randomizer_visible = !@randomizer_visible
 
                   RemoteControl.connection.puts(ClockNet::PacketHandler.packet_randomizer_visible(@randomizer_visible))
@@ -227,6 +230,24 @@ module TAC
               end
             end
           end
+
+          @locked_buttons_clock_active.push(
+            @start_match_btn,
+            @autonomous_btn,
+            @teleop_with_countdown_btn,
+            @teleop_btn,
+            @teleop_endgame_btn,
+            @randomizer_btn
+          )
+
+          @locked_buttons_randomizer_visible.push(
+            @start_match_btn,
+            @autonomous_btn,
+            @teleop_with_countdown_btn,
+            @teleop_btn,
+            @teleop_endgame_btn,
+            @abort_match_btn
+          )
         end
 
         def update
@@ -235,6 +256,8 @@ module TAC
           while (o = RemoteControl.connection.proxy_object.queue.shift)
             o.call
           end
+
+          manage_button_enablement
 
           return if RemoteControl.connection.connected?
 
@@ -258,12 +281,30 @@ module TAC
         end
 
         def clock_changed(string)
+          @clock_updated_at = Gosu.milliseconds if @clock_label.value != string
+
           @clock_label.value = string
         end
 
         def randomizer_changed(boolean)
           @randomizer_label.value = "Visible" if boolean
           @randomizer_label.value = "Not Visible" unless boolean
+        end
+
+        def manage_button_enablement
+          if @randomizer_visible
+            @locked_buttons_randomizer_visible.each do |btn|
+              btn.enabled = false
+            end
+          elsif Gosu.milliseconds - @clock_updated_at <= 1_250
+            @locked_buttons_clock_active.each do |btn|
+              btn.enabled = false
+            end
+          else
+            (@locked_buttons_clock_active + @locked_buttons_randomizer_visible).uniq.each do |btn|
+              btn.enabled = true
+            end
+          end
         end
       end
     end
