@@ -336,6 +336,10 @@ module TAC
         end
       end
 
+      def draw_field_centerstage
+
+      end
+
       def draw_tile_box(color)
         Gosu.draw_rect(0,  0, 24, 2, color, @z)
         Gosu.draw_rect(22, 2, 2, 22, color, @z)

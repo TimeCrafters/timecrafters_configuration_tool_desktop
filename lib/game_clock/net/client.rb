@@ -129,7 +129,7 @@ module TAC
           end
 
 
-          return message.strip
+          return message.to_s.strip
         end
 
         def puts(message)

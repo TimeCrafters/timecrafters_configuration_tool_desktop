@@ -10,7 +10,7 @@ module TAC
         @escape_counter = 0
 
         @background_image = get_image("#{ROOT_PATH}/media/background.png")
-        # Preload duck image since Gosu and windows threads don't get along with OpenGL (image is blank if loaded in a threaded context)
+        # Preload duck image since Gosu and Windows threads don't get along with OpenGL (image is blank if loaded in a threaded context)
         get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
         @menu_background = 0xaa004000
         @mouse = Mouse.new(window)
@@ -25,6 +25,10 @@ module TAC
 
         @last_clock_state = @clock.active?
 
+        @locked_buttons_randomizer_visible = []
+        @locked_buttons_clock_active  = []
+        @randomizer_visible = false
+
         theme(THEME)
 
         @menu_container = flow width: 1.0 do
@@ -32,28 +36,45 @@ module TAC
             background @menu_background
 
             title "Match", width: 1.0, text_align: :center
-            button "Start Match", width: 1.0, margin_bottom: 50 do
+            @start_match_btn = button "Start Match", width: 1.0, margin_bottom: 50 do |btn|
+              @locked_buttons_clock_active << btn
+              @locked_buttons_randomizer_visible << btn
+
               @clock_proxy.start_clock(:full_match)
             end
 
             title "Practice", width: 1.0, text_align: :center
-            button "Autonomous", width: 1.0 do
+            @autonomous_btn = button "Autonomous", width: 1.0 do |btn|
+              @locked_buttons_clock_active << btn
+              @locked_buttons_randomizer_visible << btn
+
               @clock_proxy.start_clock(:autonomous)
             end
 
-            button "TeleOp with Countdown", width: 1.0 do
+            @teleop_with_countdown_btn = button "TeleOp with Countdown", width: 1.0 do |btn|
+              @locked_buttons_clock_active << btn
+              @locked_buttons_randomizer_visible << btn
+
               @clock_proxy.start_clock(:full_teleop)
             end
 
-            button "TeleOp", width: 1.0 do
+            @teleop_btn = button "TeleOp", width: 1.0 do |btn|
+              @locked_buttons_clock_active << btn
+              @locked_buttons_randomizer_visible << btn
+
               @clock_proxy.start_clock(:teleop_only)
             end
 
-            button "TeleOp Endgame", width: 1.0 do
+            @teleop_endgame_btn = button "TeleOp Endgame", width: 1.0 do |btn|
+              @locked_buttons_clock_active << btn
+              @locked_buttons_randomizer_visible << btn
+
               @clock_proxy.start_clock(:endgame_only)
             end
 
-            button "Abort Match", width: 1.0, margin_top: 50 do
+            @abort_match_btn = button "Abort Match", width: 1.0, margin_top: 50 do |btn|
+              @locked_buttons_randomizer_visible << btn
+
               @clock_proxy.abort_clock
             end
 
@@ -139,7 +160,7 @@ module TAC
             end
 
             stack(width: 1.0) do
-              button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do
+              @randomizer_btn = button "Randomizer", width: 1.0, **TAC::THEME_DANGER_BUTTON do |btn|
                 unless @clock.active?
                   push_state(Randomizer)
                 end
@@ -147,6 +168,24 @@ module TAC
             end
           end
         end
+
+        @locked_buttons_clock_active.push(
+          @start_match_btn,
+          @autonomous_btn,
+          @teleop_with_countdown_btn,
+          @teleop_btn,
+          @teleop_endgame_btn,
+          @randomizer_btn
+        )
+
+        @locked_buttons_randomizer_visible.push(
+          @start_match_btn,
+          @autonomous_btn,
+          @teleop_with_countdown_btn,
+          @teleop_btn,
+          @teleop_endgame_btn,
+          @abort_match_btn
+        )
 
         @jukebox = Jukebox.new(@clock)
 
@@ -191,6 +230,8 @@ module TAC
             @menu_container.hide if @menu_container.visible?
             window.show_cursor = false
           end
+
+          manage_button_enablement
         end
 
         if @clock.value != @last_clock_display_value
@@ -222,9 +263,9 @@ module TAC
         @last_clock_state = @clock.active?
       end
 
-      def request_repaint
+      def needs_repaint?
         if @particle_emitters && @particle_emitters.map(&:particle_count).sum.positive?
-          true
+          @needs_repaint = true
         else
           super
         end
@@ -239,6 +280,22 @@ module TAC
 
         @particle_emitters.each(&:update)
         @jukebox.update
+      end
+
+      def manage_button_enablement
+        if @randomizer_visible
+          @locked_buttons_randomizer_visible.each do |btn|
+            btn.enabled = false
+          end
+        elsif @clock.active?
+          @locked_buttons_clock_active.each do |btn|
+            btn.enabled = false
+          end
+        else
+          (@locked_buttons_clock_active + @locked_buttons_randomizer_visible).uniq.each do |btn|
+            btn.enabled = true
+          end
+        end
       end
 
       def button_down(id)
@@ -274,6 +331,8 @@ module TAC
       end
 
       def randomizer_changed(boolean)
+        @randomizer_visible = boolean
+
         if boolean
           push_state(Randomizer) unless @clock.active?
         else
