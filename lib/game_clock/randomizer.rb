@@ -15,30 +15,20 @@ module TAC
 
         case @roll
         when 1, 4
-          # Blue: Right
-          # Red: Left
+          #Blue and Red: Left
 
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 1, speed: 1010, die_size: @size, label: "Left")
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 1010, die_size: @size, label: "Left")
         when 2, 5
           #Blue and Red: Center
 
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 1, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 512, die_size: @size)
-
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 3, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 2, speed: 1010, die_size: @size, label: "Center")
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 2, speed: 1010, die_size: @size, label: "Center")
         when 3, 6
-          # Blue: Left
-          # Red: Right
+          #Blue and Red: Right
 
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 1, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 2, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 512, die_size: @size)
-
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 3, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 2, speed: 512, die_size: @size)
-          @ducks << Ducky.new(window: window, alliance: :red, slot: 1, speed: 512, die_size: @size)
+          @ducks << Ducky.new(window: window, alliance: :blue, slot: 3, speed: 1010, die_size: @size, label: "Right")
+          @ducks << Ducky.new(window: window, alliance: :red, slot: 3, speed: 1010, die_size: @size, label: "Right")
         end
       end
 
@@ -121,14 +111,17 @@ module TAC
         SIZE = 0.20
         HALF_SIZE = SIZE * 0.5
 
-        def initialize(window:, alliance:, slot:, speed:, die_size:)
+        def initialize(window:, alliance:, slot:, speed:, die_size:, label:)
           @window = window
           @alliance = alliance
           @slot = slot
           @speed = speed
+          @die_size = die_size
+          @label = label
 
           @image = @window.get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
           @debug_text = Gosu::Font.new(28)
+          @label_text = CyberarmEngine::Text.new(@label, static: true, size: 28, alignment: :center)
 
           if @alliance == :blue
             @position = CyberarmEngine::Vector.new(@window.width, die_size)
@@ -146,6 +139,10 @@ module TAC
             duck_scale = (size * (SIZE + HALF_SIZE)) / @image.width
             duck_scale_x = @alliance == :blue ? -duck_scale : duck_scale
             @image.draw_rot(slot_position(size), size * SIZE + float_y(size), 1, 0, 0.5, 0.5, duck_scale_x, duck_scale)
+
+            @label_text.x = slot_position(size) + (@alliance == :blue ? -170 : 110)
+            @label_text.y = float_y(size) + 52
+            @label_text.draw
           end
         end
 
