@@ -7,7 +7,7 @@ module TAC
 
       self.caption = "#{TAC::NAME} v#{TAC::VERSION} (#{TAC::RELEASE_NAME})"
       @backend = Backend.new
-      @notification_manager = GosuNotifications::NotificationManager.new(window: self, edge: :bottom)
+      @notification_manager = CyberarmEngine::NotificationManager.new(window: self, edge: :bottom)
 
       if ARGV.join.include?("--game-clock-remote-display")
         push_state(PracticeGameClock::View, remote_control_mode: true)
@@ -26,9 +26,9 @@ module TAC
     end
 
     def update
-      super
-
       @notification_manager.update
+
+      super
     end
 
     def needs_redraw?
@@ -37,7 +37,7 @@ module TAC
 
     def toast(title, message = nil)
       @notification_manager.create_notification(
-        priority: GosuNotifications::Notification::PRIORITY_HIGH,
+        priority: CyberarmEngine::Notification::PRIORITY_HIGH,
         title: title,
 
         tagline: message ? message : "",

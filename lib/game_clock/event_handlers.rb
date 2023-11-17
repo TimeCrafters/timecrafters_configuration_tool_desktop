@@ -41,6 +41,12 @@ module TAC
           Gosu::Color.rgb(150, 0, 0)
         end
 
+        ### --- ###
+        # OVERRIDE: offical CenterStage game clock no longer has colors
+        ### --- ###
+
+        out = Gosu::Color::WHITE
+
         @display_color = out
       end
 

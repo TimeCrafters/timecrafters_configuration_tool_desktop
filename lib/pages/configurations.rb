@@ -16,7 +16,7 @@ module TAC
 
           button "Open Folder", tip: "Open folder containing configurations", height: 1.0 do
             if RUBY_PLATFORM =~ /mingw/
-              system("start \"#{TAC::CONFIGS_PATH}\"")
+              system("explorer \"#{TAC::CONFIGS_PATH.gsub("/", "\\")}\"")
             elsif RUBY_PLATFORM =~ /darwin/
               system("open \"#{TAC::CONFIGS_PATH}\"")
             else

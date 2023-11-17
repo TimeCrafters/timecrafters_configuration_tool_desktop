@@ -4,7 +4,6 @@ begin
 rescue LoadError
   require "cyberarm_engine"
 end
-require "gosu_notifications"
 require "socket"
 require "securerandom"
 require "json"

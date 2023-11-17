@@ -33,8 +33,8 @@ module TAC
         create_event(:change_countdown, 33.0, "0:08"),
         create_event(:change_display, 33.0, :countdown),
         create_event(:start_countdown, 33.0),
-        create_event(:play_sound, 34.5, :teleop_pickup_controllers),
-        create_event(:change_color, 37.0, :red),
+        create_event(:play_sound, 35.0, :teleop_pickup_controllers),
+        create_event(:change_color, 38.0, :red),
         create_event(:play_sound, 38.0, :teleop_countdown),
         create_event(:stop_countdown, 41.0),
       ].freeze
@@ -44,7 +44,7 @@ module TAC
         create_event(:change_clock, 131.0, "0:30"),
         create_event(:start_clock, 131.0),
         create_event(:play_sound, 131.0, :end_game),
-        create_event(:play_sound, 158.0, :autonomous_countdown),
+        # create_event(:play_sound, 158.0, :autonomous_countdown), # Not played here anymore
         create_event(:play_sound, 161.0, :end_match),
         create_event(:stop_clock, 161.0),
       ].freeze
@@ -128,7 +128,7 @@ module TAC
         elsif @countdown_running
           return @countdown_time
         else
-          return 60 * 2 + 30
+          return 0 # Clock defaults to showing "0:00" if there is no clock or countdown
         end
       end
     end

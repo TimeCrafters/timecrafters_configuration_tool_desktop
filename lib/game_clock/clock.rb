@@ -57,10 +57,9 @@ module TAC
       end
 
       def clock_time(time_left)
-        minutes = ((time_left + 0.5) / 60.0).floor
+        minutes = ((time_left + 1.0) / 60.0).floor
 
-        seconds = time_left.round % 60
-        seconds = "0#{seconds}" if seconds < 10
+        seconds = format("%02d", time_left.ceil % 60)
 
         return "#{minutes}:#{seconds}" if time_left.round.even?
         return "#{minutes}<c=999999>:</c>#{seconds}" if time_left.round.odd?

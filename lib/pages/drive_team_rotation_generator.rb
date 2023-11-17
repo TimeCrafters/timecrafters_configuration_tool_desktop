@@ -9,11 +9,12 @@ module TAC
         @roster ||= [
           "Aubrey",
           "Cayden",
+          "Connor",
+          "Ben",
           "Dan",
           "Gabe",
           "Spencer",
-          "Sodi",
-          "Trent"
+          "Sodi"
         ]
 
         @roles ||= [

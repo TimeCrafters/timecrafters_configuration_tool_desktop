@@ -46,6 +46,7 @@ module TAC
       def button_down(id)
         super
 
+        pop_state
         push_state(@next_state)
       end
     end
