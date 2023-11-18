@@ -336,7 +336,108 @@ module TAC
         end
       end
 
+      ###########################
+      ### --- CENTERSTAGE --- ###
+      ###########################
       def draw_field_centerstage
+        # Corner TAPE
+        2.times do |i|
+          Gosu.rotate((i + 2) * 90.0, 72, 72) do
+            Gosu.draw_quad(
+              24 - 2, 0,      i.odd? ? @red : @blue,
+              24,     0,      i.odd? ? @red : @blue,
+              0,      24 - 2, i.odd? ? @red : @blue,
+              0,      24,     i.odd? ? @red : @blue,
+              @z
+            )
+          end
+        end
+
+        # Backstage TAPE
+        # BLUE
+        Gosu.draw_rect(0, 22, 58.5, 2, @blue, @z)
+        Gosu.draw_quad(
+          72 - 2, 0,      @blue,
+          72,     0,      @blue,
+          58.5 - 2,  24,  @blue,
+          58.5,      24,  @blue,
+          @z
+        )
+        # RED
+        Gosu.draw_rect(@field_size, 22, -58.5, 2, @red, @z)
+        Gosu.draw_quad(
+          @field_size - (72 - 2), 0,      @red,
+          @field_size - 72,     0,      @red,
+          @field_size - (58.5 - 2),  24,  @red,
+          @field_size - 58.5,      24,  @red,
+          @z
+        )
+
+        # Backstage BACKDROP
+        Gosu.draw_rect(24, 0, 24, 11.25, 0xff_252525, @z)
+        Gosu.draw_rect(@field_size - 48, 0, 24, 11.25, 0xff_252525, @z)
+
+        # Pixel TAPE
+        7.times do |i|
+          next if i == 3 # skip 4th iteration; empty slot
+
+          # TAPE
+          Gosu.draw_rect(24 + 11.5 + (12 * i), @field_size - 6, 1, 6, 0xff_dddddd, @z)
+          # Pixel
+          Gosu.rotate(30, 24 + 12 + (12 * i), @field_size - 1.75) do
+            Gosu.draw_circle(24 + 12 + (12 * i), @field_size - 1.75, 2.25, 6, 0xff_ffffff, @z)
+          end
+        end
+
+        # Spike marks TAPE
+        # BLUE
+        2.times do |r|
+          2.times do |i|
+            Gosu.rotate(r * 180, @field_size / 2, @field_size / 2 + 12) do
+              c = r.even? ? @blue : @red
+              Gosu.translate(0, i * 48) do
+                Gosu.draw_rect(35.5, @field_size / 2 - 1.5, 12, 1, c, @z)
+                Gosu.draw_rect(47.5 - 1, @field_size / 2 - 18, 1, 12, c, @z)
+                Gosu.draw_rect(35.5, @field_size / 2 - 23.5, 12, 1, c, @z)
+                # --- mark
+                Gosu.draw_rect(35.5 + 6, @field_size / 2 - 1.5, 0.125, 1, 0xff_000000, @z)
+                Gosu.draw_rect(47.5 - 1, @field_size / 2 - 18 + 6, 1, 0.125, 0xff_000000, @z)
+                Gosu.draw_rect(35.5 + 6, @field_size / 2 - 23.5, 0.125, 1, 0xff_000000, @z)
+              end
+            end
+          end
+        end
+
+        # Trusses
+        Gosu.draw_rect(0, @field_size / 2 - 2, 2, 28, 0xff_656565, @z)
+        Gosu.draw_rect(23, @field_size / 2 - 2, 2, 28, 0xff_656565, @z)
+        Gosu.draw_rect(47, @field_size / 2 - 2, 2, 28, 0xff_656565, @z)
+        Gosu.draw_rect(@field_size / 2 + 24 + -1, @field_size / 2 - 2, 2, 28, 0xff_656565, @z)
+        Gosu.draw_rect(@field_size / 2 + 24 + 23, @field_size / 2 - 2, 2, 28, 0xff_656565, @z)
+        Gosu.draw_rect(@field_size / 2 + 24 + 46, @field_size / 2 - 2, 2, 28, 0xff_656565, @z)
+
+        # Crossbeams
+        # BLUE
+        Gosu.draw_rect(0, @field_size / 2 + 12 + 2, 26, 2, @blue, @z)
+        Gosu.draw_rect(24, @field_size / 2 + 12 - 1, 24, 2, @blue, @z)
+        # YELLOW
+        # --- Blue
+        Gosu.draw_rect(0, @field_size / 2 + 2, 25, 1, @soft_orange, @z)
+        Gosu.draw_rect(23, @field_size / 2 + 21, 26, 1, @soft_orange, @z)
+        # --- Middle
+        Gosu.draw_rect(24 + 24, @field_size / 2 + 2, 48, 1, @soft_orange, @z)
+        Gosu.draw_rect(24 + 24, @field_size / 2 + 12 - 0.5, 48, 1, @soft_orange, @z)
+        Gosu.draw_rect(24 + 24, @field_size / 2 + 12 - 0.5, 48, 1, @soft_orange, @z)
+        # --- --- parallel beams
+        Gosu.draw_rect(24 + 28, @field_size / 2 + 2, 1, 10, @soft_orange, @z)
+        Gosu.draw_rect(@field_size / 2, @field_size / 2 + 2, 1, 10, @soft_orange, @z)
+        Gosu.draw_rect(24 + 72 - 4, @field_size / 2 + 2, 1, 10, @soft_orange, @z)
+        # --- Red
+        Gosu.draw_rect(47 + 72, @field_size / 2 + 2, 25, 1, @soft_orange, @z)
+        Gosu.draw_rect(23 + 72, @field_size / 2 + 21, 26, 1, @soft_orange, @z)
+        # RED
+        Gosu.draw_rect(24 + 72, @field_size / 2 + 12 - 1, 24, 2, @red, @z)
+        Gosu.draw_rect(46 + 72, @field_size / 2 + 12 + 2, 26, 2, @red, @z)
 
       end
 
