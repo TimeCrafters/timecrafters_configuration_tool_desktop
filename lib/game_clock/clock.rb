@@ -61,8 +61,8 @@ module TAC
 
         seconds = format("%02d", time_left.ceil % 60)
 
-        return "#{minutes}:#{seconds}" if time_left.round.even?
-        return "#{minutes}<c=999999>:</c>#{seconds}" if time_left.round.odd?
+        return "#{minutes}:#{seconds}" if time_left.ceil.even?
+        return "#{minutes}<c=999999>:</c>#{seconds}" if time_left.ceil.odd?
       end
     end
   end
