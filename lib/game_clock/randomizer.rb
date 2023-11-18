@@ -119,7 +119,7 @@ module TAC
           @die_size = die_size
           @label = label
 
-          @image = @window.get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
+          @image = @window.get_image("#{MEDIA_PATH}/openclipart_ducky.png")
           @debug_text = Gosu::Font.new(28)
           @label_text = CyberarmEngine::Text.new(@label, static: true, size: 28, alignment: :center)
 

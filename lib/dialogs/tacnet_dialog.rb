@@ -8,7 +8,7 @@ module TAC
         background Gosu::Color::GRAY
         label @options[:message], width: 1.0
 
-        @sound = Gosu::Sample.new("#{TAC::ROOT_PATH}/media/error_alarm.ogg").play(1, 1, true)
+        @sound = Gosu::Sample.new("#{TAC::MEDIA_PATH}/error_alarm.ogg").play(1, 1, true)
 
         button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           try_commit

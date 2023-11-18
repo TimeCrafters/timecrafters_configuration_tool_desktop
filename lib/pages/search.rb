@@ -6,7 +6,7 @@ module TAC
 
         menu_bar.clear do
           search = edit_line "", fill: true, height: 1.0
-          button get_image("#{TAC::ROOT_PATH}/media/icons/zoom.png"), image_height: 1.0 do
+          button get_image("#{TAC::MEDIA_PATH}/icons/zoom.png"), image_height: 1.0 do
             unless search.value.strip.empty?
               search_results = search_config(search.value.strip)
 

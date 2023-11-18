@@ -9,7 +9,7 @@ module TAC
         end
 
         @title_font = CyberarmEngine::Text.new(TAC::NAME, z: 100, size: 72, border: true, border_size: 2, border_color: 0xff_000000, font: THEME[:TextBlock][:font], static:  true)
-        @logo = Gosu::Image.new("#{TAC::ROOT_PATH}/media/logo.png")
+        @logo = Gosu::Image.new("#{TAC::MEDIA_PATH}/logo.png")
 
         @title_animator = CyberarmEngine::Animator.new(start_time: Gosu.milliseconds + 0, duration: 750, from: 0.0, to: 1.0, tween: :swing_from_to)
         @logo_animator = CyberarmEngine::Animator.new(start_time: Gosu.milliseconds + 750, duration: 1_000, from: 0.0, to: 1.0, tween: :swing_to)

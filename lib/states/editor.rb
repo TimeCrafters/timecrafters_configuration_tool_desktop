@@ -39,15 +39,15 @@ class Editor < CyberarmEngine::GuiState
       @header_bar_label = label TAC::NAME, fill: true, text_align: :center, text_size: 32, font: TAC::THEME_BOLD_FONT, margin_left: BORDERLESS ? 36 * 3 : 0
 
       @window_controls = flow(width: 36 * 3, height: 1.0) do
-        button get_image("#{TAC::ROOT_PATH}/media/icons/minus.png"), tip: "Minimize", image_height: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/minus.png"), tip: "Minimize", image_height: 1.0 do
           window.minimize if window.respond_to?(:minimize)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/larger.png"), tip: "Maximize", image_height: 1.0 do |btn|
+        button get_image("#{TAC::MEDIA_PATH}/icons/larger.png"), tip: "Maximize", image_height: 1.0 do |btn|
           window.maximize if window.respond_to?(:maximize)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/cross.png"), tip: "Exit", image_height: 1.0, **TAC::THEME_DANGER_BUTTON do
+        button get_image("#{TAC::MEDIA_PATH}/icons/cross.png"), tip: "Exit", image_height: 1.0, **TAC::THEME_DANGER_BUTTON do
           window.close
         end
       end
@@ -57,27 +57,27 @@ class Editor < CyberarmEngine::GuiState
       @navigation = stack(width: 64, height: 1.0, scroll: true) do
         background 0xff_333333
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/home.png"), margin: 4, tip: "Home", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/home.png"), margin: 4, tip: "Home", image_width: 1.0 do
           page(TAC::Pages::Home)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/menuList.png"), margin: 4, tip: "Editor", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/menuList.png"), margin: 4, tip: "Editor", image_width: 1.0 do
           page(TAC::Pages::Editor)
         end
 
-        @tacnet_button = button get_image("#{TAC::ROOT_PATH}/media/icons/signal3.png"), margin: 4, tip: "TACNET", image_width: 1.0 do
+        @tacnet_button = button get_image("#{TAC::MEDIA_PATH}/icons/signal3.png"), margin: 4, tip: "TACNET", image_width: 1.0 do
           page(TAC::Pages::TACNET)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), margin: 4, tip: "Configurations", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/gear.png"), margin: 4, tip: "Configurations", image_width: 1.0 do
           page(TAC::Pages::Configurations)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/menuGrid.png"), margin: 4, tip: "Presets", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/menuGrid.png"), margin: 4, tip: "Presets", image_width: 1.0 do
           page(TAC::Pages::Presets)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/zoom.png"), margin: 4, tip: "Search", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/zoom.png"), margin: 4, tip: "Search", image_width: 1.0 do
           page(TAC::Pages::Search)
         end
 
@@ -86,23 +86,23 @@ class Editor < CyberarmEngine::GuiState
           para "Tools", width: 1.0, text_align: :center
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), margin: 4, tip: "Simulator", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/right.png"), margin: 4, tip: "Simulator", image_width: 1.0 do
           page(TAC::Pages::Simulator)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/joystickLeft.png"), margin: 4, tip: "Field Planner", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/joystickLeft.png"), margin: 4, tip: "Field Planner", image_width: 1.0 do
           page(TAC::Pages::FieldPlanner)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/massiveMultiplayer.png"), margin: 4, tip: "Drive Team Rotation Generator", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/massiveMultiplayer.png"), margin: 4, tip: "Drive Team Rotation Generator", image_width: 1.0 do
           page(TAC::Pages::DriveTeamRotationGenerator)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/custom_stopWatch.png"), margin: 4, tip: "Game Clock", image_width: 1.0 do
+        button get_image("#{TAC::MEDIA_PATH}/icons/custom_stopWatch.png"), margin: 4, tip: "Game Clock", image_width: 1.0 do
           page(TAC::Pages::GameClock)
         end
 
-        button get_image("#{TAC::ROOT_PATH}/media/icons/power.png"), margin: 4, tip: "Exit", image_width: 1.0, **TAC::THEME_DANGER_BUTTON do
+        button get_image("#{TAC::MEDIA_PATH}/icons/power.png"), margin: 4, tip: "Exit", image_width: 1.0, **TAC::THEME_DANGER_BUTTON do
           window.close
         end
       end

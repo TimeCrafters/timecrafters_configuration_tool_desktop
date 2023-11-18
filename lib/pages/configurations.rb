@@ -5,7 +5,7 @@ module TAC
         header_bar("Manage Configurations")
 
         menu_bar.clear do
-          button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_height: 1.0, tip: "Add configuration" do
+          button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_height: 1.0, tip: "Add configuration" do
             push_state(Dialog::NamePromptDialog, title: "Config Name", callback_method: proc { |name|
               window.backend.write_new_config(name)
 
@@ -60,7 +60,7 @@ module TAC
                 end
               end
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Rename configuration" do
+              button get_image("#{TAC::MEDIA_PATH}/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Rename configuration" do
                 push_state(Dialog::NamePromptDialog, title: "Rename Config", renaming: @config_files_list.find { |c| c.name == name }, list: @config_files_list, accept_label: "Update", callback_method: proc { |old_name, new_name|
                   if not File.exist?("#{TAC::CONFIGS_PATH}/#{new_name}.json")
                     FileUtils.mv(
@@ -79,7 +79,7 @@ module TAC
                 })
               end
 
-              button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, **THEME_DANGER_BUTTON, tip: "Delete configuration" do
+              button get_image("#{TAC::MEDIA_PATH}/icons/trashcan.png"), image_width: THEME_ICON_SIZE, **THEME_DANGER_BUTTON, tip: "Delete configuration" do
                 push_state(Dialog::ConfirmDialog, title: "Delete Config?", dangerous: true, callback_method: proc {
                   File.delete("#{TAC::CONFIGS_PATH}/#{name}.json")
 

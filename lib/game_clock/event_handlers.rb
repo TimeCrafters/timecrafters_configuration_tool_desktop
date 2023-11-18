@@ -62,26 +62,26 @@ module TAC
         path = nil
         case sound
         when :autonomous_countdown
-          path = "media/sounds/3-2-1.wav"
+          path = "sounds/3-2-1.wav"
         when :autonomous_start
-          path = "media/sounds/charge.wav"
+          path = "sounds/charge.wav"
         when :autonomous_ended
-          path = "media/sounds/endauto.wav"
+          path = "sounds/endauto.wav"
         when :teleop_pickup_controllers
-          path = "media/sounds/Pick_Up_Controllers.wav"
+          path = "sounds/Pick_Up_Controllers.wav"
         when :abort_match
-          path = "media/sounds/fogblast.wav"
+          path = "sounds/fogblast.wav"
         when :teleop_countdown
-          path = "media/sounds/3-2-1.wav"
+          path = "sounds/3-2-1.wav"
         when :teleop_started
-          path = "media/sounds/firebell.wav"
+          path = "sounds/firebell.wav"
         when :end_game
-          path = "media/sounds/factwhistle.wav"
+          path = "sounds/factwhistle.wav"
         when :end_match
-          path = "media/sounds/endmatch.wav"
+          path = "sounds/endmatch.wav"
         end
 
-        path = "#{ROOT_PATH}/#{path}"
+        path = "#{MEDIA_PATH}/#{path}"
 
         if path && File.exist?(path) && !File.directory?(path)
           Jukebox::SAMPLES[path] = Gosu::Sample.new(path) unless Jukebox::SAMPLES[path].is_a?(Gosu::Sample)

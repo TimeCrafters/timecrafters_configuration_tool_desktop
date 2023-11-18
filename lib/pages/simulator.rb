@@ -6,7 +6,7 @@ module TAC
         header_bar("Simulator")
 
         menu_bar.clear do
-          button get_image("#{TAC::ROOT_PATH}/media/icons/right.png"), tip: "Run Simulation", image_height: 1.0 do
+          button get_image("#{TAC::MEDIA_PATH}/icons/right.png"), tip: "Run Simulation", image_height: 1.0 do
             save_source
 
             begin
@@ -19,11 +19,11 @@ module TAC
             end
           end
 
-          button get_image("#{TAC::ROOT_PATH}/media/icons/stop.png"), tip: "Stop Simulation", image_height: 1.0 do
+          button get_image("#{TAC::MEDIA_PATH}/icons/stop.png"), tip: "Stop Simulation", image_height: 1.0 do
             @simulation.robots.each { |robot| robot.queue.clear } if @simulation
           end
 
-          button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), tip: "Save", image_height: 1.0 do
+          button get_image("#{TAC::MEDIA_PATH}/icons/save.png"), tip: "Save", image_height: 1.0 do
             save_source
           end
         end

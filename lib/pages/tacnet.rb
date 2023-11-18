@@ -30,7 +30,7 @@ module TAC
         end
 
         status_bar.clear do
-          @tacnet_icon = image "#{TAC::ROOT_PATH}/media/icons/signal3.png", height: 26
+          @tacnet_icon = image "#{TAC::MEDIA_PATH}/icons/signal3.png", height: 26
           @status_label = label "TACNET: Not Connected", text_size: 26
         end
 

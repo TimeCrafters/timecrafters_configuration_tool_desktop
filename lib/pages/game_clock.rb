@@ -24,7 +24,7 @@ module TAC
                   # Spawn game clock window
                   $clock_pid = Process.spawn(
                     RbConfig.ruby,
-                    "#{ROOT_PATH}/timecrafters_configuration_tool.rb",
+                    "#{MEDIA_PATH}/../timecrafters_configuration_tool.rb",
                     "--game-clock-remote-display"
                   )
 

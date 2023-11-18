@@ -1,11 +1,11 @@
 module TAC
   class PracticeGameClock
     class Jukebox
-      MUSIC = Dir.glob(ROOT_PATH + "/media/music/*.*").freeze
+      MUSIC = Dir.glob(MEDIA_PATH + "/music/*.*").freeze
       SAMPLES = {}
 
-      if File.exist?(ROOT_PATH + "/media/sounds/skystone")
-        BEEPS_AND_BOOPS = Dir.glob(ROOT_PATH + "/media/sounds/skystone/*.*").freeze
+      if File.exist?(MEDIA_PATH + "/sounds/skystone")
+        BEEPS_AND_BOOPS = Dir.glob(MEDIA_PATH + "/sounds/skystone/*.*").freeze
       end
 
       attr_reader :volume, :now_playing

@@ -9,9 +9,9 @@ module TAC
         window.show_cursor = !@remote_control_mode
         @escape_counter = 0
 
-        @background_image = get_image("#{ROOT_PATH}/media/background.png")
+        @background_image = get_image("#{MEDIA_PATH}/background.png")
         # Preload duck image since Gosu and Windows threads don't get along with OpenGL (image is blank if loaded in a threaded context)
-        get_image("#{ROOT_PATH}/media/openclipart_ducky.png")
+        get_image("#{MEDIA_PATH}/openclipart_ducky.png")
         @menu_background = 0xaa004000
         @mouse = Mouse.new(window)
         @clock = Clock.new
@@ -105,56 +105,56 @@ module TAC
             end
 
             flow(width: 1.0) do
-              button get_image("#{ROOT_PATH}/media/icons/previous.png") do
+              button get_image("#{MEDIA_PATH}/icons/previous.png") do
                 @jukebox.previous_track
               end
 
-              button get_image("#{ROOT_PATH}/media/icons/pause.png") do |button|
+              button get_image("#{MEDIA_PATH}/icons/pause.png") do |button|
                 if @jukebox.song && @jukebox.song.paused?
-                  button.value = get_image("#{ROOT_PATH}/media/icons/right.png")
+                  button.value = get_image("#{MEDIA_PATH}/icons/right.png")
                   @jukebox.play
                 elsif !@jukebox.song
-                  button.value = get_image("#{ROOT_PATH}/media/icons/right.png")
+                  button.value = get_image("#{MEDIA_PATH}/icons/right.png")
                   @jukebox.play
                 else
-                  button.value = get_image("#{ROOT_PATH}/media/icons/pause.png")
+                  button.value = get_image("#{MEDIA_PATH}/icons/pause.png")
                   @jukebox.pause
                 end
               end
 
-              button get_image("#{ROOT_PATH}/media/icons/stop.png") do
+              button get_image("#{MEDIA_PATH}/icons/stop.png") do
                 @jukebox.stop
               end
 
-              button get_image("#{ROOT_PATH}/media/icons/next.png") do
+              button get_image("#{MEDIA_PATH}/icons/next.png") do
                 @jukebox.next_track
               end
 
-              button get_image("#{ROOT_PATH}/media/icons/minus.png"), margin_left: 20 do
+              button get_image("#{MEDIA_PATH}/icons/minus.png"), margin_left: 20 do
                 @jukebox.set_volume(@jukebox.volume - 0.1)
               end
 
-              button get_image("#{ROOT_PATH}/media/icons/plus.png") do
+              button get_image("#{MEDIA_PATH}/icons/plus.png") do
                 @jukebox.set_volume(@jukebox.volume + 0.1)
               end
 
               button "Open Music Library", margin_left: 50 do
                 if RUBY_PLATFORM.match(/ming|msys|cygwin/)
-                  system("explorer #{ROOT_PATH}/media/music")
+                  system("explorer #{MEDIA_PATH}/music")
                 elsif RUBY_PLATFORM.match(/linux/)
-                  system("xdg-open #{ROOT_PATH}/media/music")
+                  system("xdg-open #{MEDIA_PATH}/music")
                 else
                   # TODO.
                 end
               end
 
-              button get_image("#{ROOT_PATH}/media/icons/musicOn.png"), margin_left: 50, tip: "Toggle Sound Effects" do |button|
+              button get_image("#{MEDIA_PATH}/icons/musicOn.png"), margin_left: 50, tip: "Toggle Sound Effects" do |button|
                 boolean = @jukebox.set_sfx(!@jukebox.play_sfx?)
 
                 if boolean
-                  button.value = get_image("#{ROOT_PATH}/media/icons/musicOn.png")
+                  button.value = get_image("#{MEDIA_PATH}/icons/musicOn.png")
                 else
-                  button.value = get_image("#{ROOT_PATH}/media/icons/musicOff.png")
+                  button.value = get_image("#{MEDIA_PATH}/icons/musicOff.png")
                 end
               end
             end

@@ -2,7 +2,7 @@ module TAC
   class PracticeGameClock
     THEME = {
       TextBlock: {
-        font: "Canterell",
+        font: "NotoSans-Bold",
         color: Gosu::Color.new(0xee_ffffff)
       },
       Button: {
@@ -23,7 +23,7 @@ module TAC
       },
       ToggleButton: {
         width: 18,
-        checkmark_image: "#{File.expand_path("..", __dir__)}/media/icons/checkmark.png",
+        checkmark_image: "#{MEDIA_PATH}/icons/checkmark.png",
       }
     }
   end

@@ -46,11 +46,11 @@ module TAC
               @groups_menu = flow(width: 1.0, height: 36) do
                 label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
                   push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", list: window.backend.config.groups, callback_method: method(:create_group))
                 end
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected group" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected group" do
                   if @active_group
                     push_state(Dialog::NamePromptDialog, title: "Clone Group", renaming: @active_group, accept_label: "Clone", list: window.backend.config.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
@@ -72,7 +72,7 @@ module TAC
                   end
                 end
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save group as preset" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save group as preset" do
                   if @active_group
                     push_state(Dialog::NamePromptDialog, title: "Save Group Preset", renaming: @active_group, accept_label: "Save", list: window.backend.config.presets.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( @active_group.to_json, symbolize_names: true ))
@@ -89,7 +89,7 @@ module TAC
                   end
                 end
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import group from preset" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import group from preset" do
                   push_state(Dialog::PickPresetDialog, title: "Pick Group Preset", limit: :groups, callback_method: proc { |preset|
                     push_state(Dialog::NamePromptDialog, title: "Name Group", renaming: preset, accept_label: "Add", list: window.backend.config.groups, callback_method: proc { |group, name|
                       clone = TAC::Config::Group.from_json( JSON.parse( group.to_json, symbolize_names: true ))
@@ -119,7 +119,7 @@ module TAC
               @actions_menu = flow(width: 1.0, height: 36) do
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
                   if @active_group
                     push_state(TAC::Dialog::ActionDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
                   else
@@ -127,7 +127,7 @@ module TAC
                   end
                 end
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected action" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/button2.png"), image_width: THEME_ICON_SIZE, tip: "Clone currently selected action" do
                   if @active_group && @active_action
                     push_state(Dialog::ActionDialog, title: "Clone Action", action: @active_action, cloning: true, accept_label: "Clone", list: @active_group.actions, callback_method: proc { |action, name, comment|
                       clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
@@ -150,7 +150,7 @@ module TAC
                   end
                 end
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save action as preset" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/save.png"), image_width: THEME_ICON_SIZE, tip: "Save action as preset" do
                   if @active_action
                     push_state(Dialog::NamePromptDialog, title: "Save Action Preset", renaming: @active_action, accept_label: "Save", list: window.backend.config.presets.actions, callback_method: proc { |action, name|
                       clone = TAC::Config::Action.from_json( JSON.parse( @active_action.to_json, symbolize_names: true ))
@@ -167,7 +167,7 @@ module TAC
                   end
                 end
 
-                button get_image("#{TAC::ROOT_PATH}/media/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import action from preset" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import action from preset" do
                   if @active_group
                     push_state(Dialog::PickPresetDialog, title: "Pick Action Preset", limit: :actions, callback_method: proc { |preset|
                       push_state(Dialog::ActionDialog, title: "Name Action", action: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name, comment|
@@ -202,7 +202,7 @@ module TAC
             stack fill: true, height: 1.0, padding_left: 2, padding_right: 2 do
               @variables_menu = flow(width: 1.0, height: 36) do
                 label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
-                button get_image("#{TAC::ROOT_PATH}/media/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
                     push_state(TAC::Dialog::VariableDialog, title: "Create Variable", list: @active_action.variables, callback_method: method(:create_variable))
                   else
@@ -553,10 +553,10 @@ module TAC
             @variables_list.clear
           end
 
-          button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
+          button get_image("#{TAC::MEDIA_PATH}/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
             push_state(Dialog::NamePromptDialog, title: "Rename Group", renaming: group, list: window.backend.config.groups, callback_method: method(:update_group))
           end
-          button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
+          button get_image("#{TAC::MEDIA_PATH}/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
             push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete group and all of its actions and variables?", callback_method: proc { delete_group(group) })
           end
         end
@@ -586,11 +586,11 @@ module TAC
               window.backend.config_changed!
             end
 
-            button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
+            button get_image("#{TAC::MEDIA_PATH}/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
               push_state(Dialog::ActionDialog, title: "Edit Action", action: action, list: @active_group.actions, callback_method: method(:update_action))
             end
 
-            button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
+            button get_image("#{TAC::MEDIA_PATH}/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
               push_state(Dialog::ConfirmDialog, dangerous: true, title: "Are you sure?", message: "Delete action and all of its variables?", callback_method: proc { delete_action(action) })
             end
           end
@@ -612,7 +612,7 @@ module TAC
               push_state(Dialog::VariableDialog, title: "Edit Variable", variable: variable, list: @active_action.variables, callback_method: method(:update_variable))
             end
 
-            button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do
+            button get_image("#{TAC::MEDIA_PATH}/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete variable", **THEME_DANGER_BUTTON do
               push_state(Dialog::ConfirmDialog, title: "Are you sure?", message: "Delete variable?", callback_method: proc { delete_variable(variable) })
             end
           end

@@ -2,6 +2,8 @@ module TAC
   class Backend
     attr_reader :config, :settings, :tacnet
     def initialize
+      create_directories
+
       load_settings
       load_config(@settings.config) if @settings.config && File.exist?("#{TAC::CONFIGS_PATH}/#{@settings.config}.json")
       @tacnet = TACNET.new
@@ -111,6 +113,12 @@ module TAC
 
     def settings_changed?
       @settings_changed
+    end
+
+    def create_directories
+      FileUtils.mkdir_p(TAC::ROOT_PATH) unless File.exist?(TAC::ROOT_PATH)
+      FileUtils.mkdir_p(TAC::CONFIGS_PATH) unless File.exist?(TAC::CONFIGS_PATH)
+      # FileUtils.mkdir_p(TAC::SETTINGS_PATH) unless File.exist?(TAC::SETTINGS_PATH)
     end
 
     def load_settings

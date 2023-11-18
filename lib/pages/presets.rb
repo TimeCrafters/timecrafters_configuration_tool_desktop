@@ -118,7 +118,7 @@ module TAC
             page(TAC::Pages::Editor, { group: group, group_is_preset: true })
           end
 
-          button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
+          button get_image("#{TAC::MEDIA_PATH}/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit group" do
             push_state(
               Dialog::NamePromptDialog,
               title: "Rename Group Preset",
@@ -128,7 +128,7 @@ module TAC
             )
           end
 
-          button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
+          button get_image("#{TAC::MEDIA_PATH}/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete group", **THEME_DANGER_BUTTON do
             push_state(
               Dialog::ConfirmDialog,
               title: "Are you sure?",
@@ -151,7 +151,7 @@ module TAC
               page(TAC::Pages::Editor, { action: action, action_is_preset: true })
             end
 
-            button get_image("#{TAC::ROOT_PATH}/media/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
+            button get_image("#{TAC::MEDIA_PATH}/icons/gear.png"), image_width: THEME_ICON_SIZE, tip: "Edit action" do
               push_state(
                 Dialog::ActionDialog,
                 title: "Edit Action Preset",
@@ -161,7 +161,7 @@ module TAC
               )
             end
 
-            button get_image("#{TAC::ROOT_PATH}/media/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
+            button get_image("#{TAC::MEDIA_PATH}/icons/trashcan.png"), image_width: THEME_ICON_SIZE, tip: "Delete action", **THEME_DANGER_BUTTON do
               push_state(
                 Dialog::ConfirmDialog,
                 title: "Are you sure?",

@@ -1,6 +1,6 @@
 module TAC
-  THEME_FONT = "#{TAC::ROOT_PATH}/media/fonts/NotoSans-Bold.ttf"
-  THEME_BOLD_FONT = "#{TAC::ROOT_PATH}/media/fonts/NotoSans-Black.ttf"
+  THEME_FONT = "#{TAC::MEDIA_PATH}/fonts/NotoSans-Bold.ttf"
+  THEME_BOLD_FONT = "#{TAC::MEDIA_PATH}/fonts/NotoSans-Black.ttf"
   THEME = {
     TextBlock: {
       text_static: true,
@@ -27,7 +27,7 @@ module TAC
     },
     ToggleButton: {
       width: 18,
-      checkmark_image: "#{TAC::ROOT_PATH}/media/icons/checkmark.png",
+      checkmark_image: "#{TAC::MEDIA_PATH}/icons/checkmark.png",
     },
   }
 

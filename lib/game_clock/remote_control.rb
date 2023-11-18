@@ -149,48 +149,48 @@ module TAC
                 end
 
                 flow width: 1.0 do
-                  button get_image("#{ROOT_PATH}/media/icons/previous.png") do
+                  button get_image("#{MEDIA_PATH}/icons/previous.png") do
                     RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_previous_track)
                   end
 
-                  button get_image("#{ROOT_PATH}/media/icons/right.png") do |button|
+                  button get_image("#{MEDIA_PATH}/icons/right.png") do |button|
                     if @jukebox_playing
                       RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_pause)
-                      button.value = get_image("#{ROOT_PATH}/media/icons/right.png")
+                      button.value = get_image("#{MEDIA_PATH}/icons/right.png")
                       @jukebox_playing = false
                     else
                       RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_play)
-                      button.value = get_image("#{ROOT_PATH}/media/icons/pause.png")
+                      button.value = get_image("#{MEDIA_PATH}/icons/pause.png")
                       @jukebox_playing = true
                     end
                   end
 
-                  button get_image("#{ROOT_PATH}/media/icons/stop.png") do
+                  button get_image("#{MEDIA_PATH}/icons/stop.png") do
                     RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_stop)
                   end
 
-                  button get_image("#{ROOT_PATH}/media/icons/next.png") do
+                  button get_image("#{MEDIA_PATH}/icons/next.png") do
                     RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_next_track)
                   end
 
-                  button get_image("#{ROOT_PATH}/media/icons/minus.png"), margin_left: 20 do
+                  button get_image("#{MEDIA_PATH}/icons/minus.png"), margin_left: 20 do
                     @jukebox_volume -= 0.1
                     @jukebox_volume = 0.1 if @jukebox_volume < 0.1
                     RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_set_volume(@jukebox_volume))
                   end
 
-                  button get_image("#{ROOT_PATH}/media/icons/plus.png") do
+                  button get_image("#{MEDIA_PATH}/icons/plus.png") do
                     @jukebox_volume += 0.1
                     @jukebox_volume = 1.0 if @jukebox_volume > 1.0
                     RemoteControl.connection.puts(ClockNet::PacketHandler.packet_jukebox_set_volume(@jukebox_volume))
                   end
 
-                  button get_image("#{ROOT_PATH}/media/icons/musicOn.png"), margin_left: 20, tip: "Toggle Sound Effects" do |button|
+                  button get_image("#{MEDIA_PATH}/icons/musicOn.png"), margin_left: 20, tip: "Toggle Sound Effects" do |button|
                     if @jukebox_sound_effects
-                      button.value = get_image("#{ROOT_PATH}/media/icons/musicOff.png")
+                      button.value = get_image("#{MEDIA_PATH}/icons/musicOff.png")
                       @jukebox_sound_effects = false
                     else
-                      button.value = get_image("#{ROOT_PATH}/media/icons/musicOn.png")
+                      button.value = get_image("#{MEDIA_PATH}/icons/musicOn.png")
                       @jukebox_sound_effects = true
                     end
 
@@ -199,12 +199,12 @@ module TAC
                 end
 
                 button "Open Music Library", width: 1.0 do
-                  path = "#{ROOT_PATH}/media/music"
+                  path = "#{MEDIA_PATH}/music"
 
                   if RUBY_PLATFORM.match(/ming|msys|cygwin/)
                     system("explorer \"#{path.gsub("/", "\\")}\"")
                   elsif RUBY_PLATFORM.match(/linux/)
-                    system("xdg-open \"#{ROOT_PATH}/media/music\"")
+                    system("xdg-open \"#{MEDIA_PATH}/music\"")
                   else
                     # TODO.
                   end

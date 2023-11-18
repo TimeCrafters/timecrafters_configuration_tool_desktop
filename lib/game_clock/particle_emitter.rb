@@ -8,7 +8,7 @@ module TAC
         @z = -2
 
         @particles = []
-        @image_options = Dir.glob("#{ROOT_PATH}/media/particles/*.*")
+        @image_options = Dir.glob("#{MEDIA_PATH}/particles/*.*")
         @last_spawned = 0
         @clock_active = false
       end
