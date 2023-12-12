@@ -5,5 +5,5 @@ gem "gosu_notifications"
 
 group :packaging do
   gem "ocra"
-  gem "releasy"
+  gem "releasy", github: "gosu/releasy"
 end
