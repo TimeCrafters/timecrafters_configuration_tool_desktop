@@ -170,7 +170,7 @@ module TAC
                 button get_image("#{TAC::MEDIA_PATH}/icons/import.png"), image_width: THEME_ICON_SIZE, tip: "Import action from preset" do
                   if @active_group
                     push_state(Dialog::PickPresetDialog, title: "Pick Action Preset", limit: :actions, callback_method: proc { |preset|
-                      push_state(Dialog::ActionDialog, title: "Name Action", action: preset, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name, comment|
+                      push_state(Dialog::ActionDialog, title: "Name Action", action: preset, cloning: true, accept_label: "Add", list: @active_group.actions, callback_method: proc { |action, name, comment|
                         clone = TAC::Config::Action.from_json( JSON.parse( action.to_json, symbolize_names: true ))
                         clone.name = name.to_s
                         clone.comment = comment.to_s
