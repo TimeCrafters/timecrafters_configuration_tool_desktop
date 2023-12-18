@@ -45,7 +45,7 @@ module TAC
         @config_files_list = @config_files.map { |file| Dialog::NamePromptDialog::NameStub.new(File.basename(file, ".json")) }
 
         @configs_list.clear do
-          @config_files.each_with_index do |config_file, i|
+          @config_files.sort_by { |f| [f.downcase] }.each_with_index do |config_file, i|
             flow width: 1.0, height: 36, **THEME_ITEM_CONTAINER_PADDING do
               name = File.basename(config_file, ".json")
 
