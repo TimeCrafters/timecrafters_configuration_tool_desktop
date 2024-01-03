@@ -119,7 +119,22 @@ module TAC
               @actions_menu = flow(width: 1.0, height: 36) do
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
-                button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/up.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action up (and its children, if applicable)" do
+                  if @active_group && @active_action
+                    shift_action(@active_action, :up)
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, no action selected.")
+                  end
+                end
+                button get_image("#{TAC::MEDIA_PATH}/icons/down.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action down (and its children, if applicable)" do
+                  if @active_group && @active_action
+                    shift_action(@active_action, :down)
+                  else
+                    push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, no action selected.")
+                  end
+                end
+
+                button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add action", margin_left: 16 do
                   if @active_group
                     push_state(TAC::Dialog::ActionDialog, title: "Create Action", list: @active_group.actions, callback_method: method(:create_action))
                   else
@@ -565,7 +580,23 @@ module TAC
       def add_action_container(action)
         index = @active_group.actions.index(action)
 
-        stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING, tag: action.name do |container|
+        # Determine whether we should intent this action's container element because it is for a child state (i.e. 00-01)
+        indent = false
+        base, subbase = action.name.split("-", 2)
+        subbase_int = -1
+
+        if subbase
+          begin
+            Integer(base) # Convert to integer to verify that it is in fact, an integer.
+            subbase_int = Integer(subbase)
+          rescue ArgumentError
+            subbase_int = -1
+          end
+
+          indent = subbase_int > 0
+        end
+
+        stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING, margin_left: indent ? 72 : 0, tag: action.name do |container|
           background action == @active_action ? THEME_HIGHLIGHTED_COLOR : (index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
           @active_action_container = container if action == @active_action
 
@@ -620,6 +651,120 @@ module TAC
           caption "Type: #{variable.type}", tag: "type", fill: true
           caption "Value: #{variable.value}", tag: "value", fill: true
         end
+      end
+
+      def shift_action(action, direction)
+        # Determine whether this action is named as required for this operation
+        valid_name = false
+        am_child = false
+        base, subbase = action.name.split("-", 2)
+        base_int = -1
+        subbase_int = -1
+
+        if subbase
+          begin
+            base_int = Integer(base)
+            subbase_int = Integer(subbase)
+          rescue ArgumentError
+            base_int = -1
+            subbase_int = -1
+          end
+
+          valid_name = base_int >= 0
+          am_child = subbase_int > 0 # 00-00 is a 'base' action where as 00-01 is a 'subbase' action.
+
+          # Debug prints
+          # pp [base, subbase, base_int, subbase_int, valid_name, am_child]
+        end
+
+        unless valid_name
+          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, incorrectly formated name.")
+
+          return
+        end
+
+        if am_child
+          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, cannot yet shift child actions.")
+
+          return
+        end
+
+        if direction == :up && base_int.zero?
+          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action up, already first action.")
+
+          return
+        end
+
+        index = @active_group.actions.index(action)
+        index_before = index - 1 > 0 ? index - 1 : nil
+        index_next = index + 1 < @active_group.actions.size ? index + 1 : nil
+
+        mutated = false
+
+        case direction
+        when :up
+          if index_before
+            a_before = @active_group.actions[index_before]
+
+            old_name = action.name
+            new_name = a_before.name
+
+            action.name = a_before.name
+            a_before.name = old_name
+
+            action_container = find_element_by_tag(@actions_list, old_name)
+            action_label = find_element_by_tag(action_container, "label")
+
+            a_before_container = find_element_by_tag(@actions_list, new_name)
+            a_before_label = find_element_by_tag(a_before_container, "label")
+
+            action_container.style.tag = action.name
+            a_before_container.style.tag = a_before.name
+            action_label.value = action.name
+            a_before_label.value = a_before.name
+
+            mutated = true
+          else
+            push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action up, already last action.")
+          end
+        when :down
+          if index_next
+            a_next = @active_group.actions[index_next]
+
+            old_name = action.name
+            new_name = a_next.name
+
+            action.name = a_next.name
+            a_next.name = old_name
+
+            action_container = find_element_by_tag(@actions_list, old_name)
+            action_label = find_element_by_tag(action_container, "label")
+
+            a_next_container = find_element_by_tag(@actions_list, new_name)
+            a_next_label = find_element_by_tag(a_next_container, "label")
+
+            action_container.style.tag = action.name
+            a_next_container.style.tag = a_next.name
+            action_label.value = action.name
+            a_next_label.value = a_next.name
+
+            mutated = true
+          else
+            push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action down, already last action.")
+          end
+        end
+
+        return unless mutated
+
+        @active_group.actions.sort_by! { |a| a.name.downcase }
+
+        window.backend.config_changed!
+
+        @active_action_label.value = action.name
+
+        update_list_children(@actions_list)
+
+        scroll_into_view(action)
       end
 
       def draw
