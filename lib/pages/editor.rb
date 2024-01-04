@@ -396,6 +396,12 @@ module TAC
           comment_label.value = comment.to_s
         end
 
+        if action_is_child?(action)
+          action_container.style.default[:margin_left] = 72
+        else
+          action_container.style.default[:margin_left] = 0
+        end
+
         action_container.style.tag = name
 
         update_list_children(@actions_list)
