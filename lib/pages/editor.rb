@@ -119,6 +119,9 @@ module TAC
               @actions_menu = flow(width: 1.0, height: 36) do
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
+                button get_image("#{TAC::MEDIA_PATH}/icons/barsHorizontal.png"), image_width: THEME_ICON_SIZE, tip: "Auto renumber engine actions", margin_right: 16, enabled: false do
+                end
+
                 button get_image("#{TAC::MEDIA_PATH}/icons/up.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action up (and its children, if applicable)" do
                   if @active_group && @active_action
                     shift_action(@active_action, :up)
@@ -126,6 +129,7 @@ module TAC
                     push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, no action selected.")
                   end
                 end
+
                 button get_image("#{TAC::MEDIA_PATH}/icons/down.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action down (and its children, if applicable)" do
                   if @active_group && @active_action
                     shift_action(@active_action, :down)
@@ -581,20 +585,7 @@ module TAC
         index = @active_group.actions.index(action)
 
         # Determine whether we should intent this action's container element because it is for a child state (i.e. 00-01)
-        indent = false
-        base, subbase = action.name.split("-", 2)
-        subbase_int = -1
-
-        if subbase
-          begin
-            Integer(base) # Convert to integer to verify that it is in fact, an integer.
-            subbase_int = Integer(subbase)
-          rescue ArgumentError
-            subbase_int = -1
-          end
-
-          indent = subbase_int > 0
-        end
+        indent = action_is_child?(action)
 
         stack width: 1.0, height: action.comment.empty? ? 36 : 72, **THEME_ITEM_CONTAINER_PADDING, margin_left: indent ? 72 : 0, tag: action.name do |container|
           background action == @active_action ? THEME_HIGHLIGHTED_COLOR : (index.even? ? THEME_EVEN_COLOR : THEME_ODD_COLOR)
@@ -655,48 +646,22 @@ module TAC
 
       def shift_action(action, direction)
         # Determine whether this action is named as required for this operation
-        valid_name = false
-        am_child = false
-        base, subbase = action.name.split("-", 2)
-        base_int = -1
-        subbase_int = -1
-
-        if subbase
-          begin
-            base_int = Integer(base)
-            subbase_int = Integer(subbase)
-          rescue ArgumentError
-            base_int = -1
-            subbase_int = -1
-          end
-
-          valid_name = base_int >= 0
-          am_child = subbase_int > 0 # 00-00 is a 'base' action where as 00-01 is a 'subbase' action.
-
-          # Debug prints
-          # pp [base, subbase, base_int, subbase_int, valid_name, am_child]
-        end
+        valid_name = valid_engine_action_name?(action)
+        am_child = action_is_child?(action)
+        index = @active_group.actions.index(action)
 
         unless valid_name
-          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, incorrectly formated name.")
+          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, incorrectly formated name.\nExpected: name to be like '00-00' not '#{action.name}'")
 
           return
         end
 
-        if am_child
-          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, cannot yet shift child actions.")
+        base_int = valid_name[0]
+        subbase_int = valid_name[1]
 
-          return
-        end
+        return if direction == :up && index.zero?
 
-        if direction == :up && base_int.zero?
-          push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action up, already first action.")
-
-          return
-        end
-
-        index = @active_group.actions.index(action)
-        index_before = index - 1 > 0 ? index - 1 : nil
+        index_before = index - 1 >= 0 ? index - 1 : nil
         index_next = index + 1 < @active_group.actions.size ? index + 1 : nil
 
         mutated = false
@@ -704,53 +669,45 @@ module TAC
         case direction
         when :up
           if index_before
-            a_before = @active_group.actions[index_before]
+            other = @active_group.actions[index_before]
+            other_is_child = action_is_child?(other)
 
-            old_name = action.name
-            new_name = a_before.name
+            i = index
 
-            action.name = a_before.name
-            a_before.name = old_name
+            while(other && ((!am_child && other_is_child) || (am_child && !other_is_child)))
+              i -= 1
+              index_before = i - 1 >= 0 ? i - 1 : nil
 
-            action_container = find_element_by_tag(@actions_list, old_name)
-            action_label = find_element_by_tag(action_container, "label")
+              return unless index_before
+              return if am_child && valid_engine_action_name?(other).to_a[0].to_i != base_int
 
-            a_before_container = find_element_by_tag(@actions_list, new_name)
-            a_before_label = find_element_by_tag(a_before_container, "label")
+              other = @active_group.actions[index_before]
+              other_is_child = action_is_child?(other)
+            end
 
-            action_container.style.tag = action.name
-            a_before_container.style.tag = a_before.name
-            action_label.value = action.name
-            a_before_label.value = a_before.name
-
+            swap_action(action, other)
             mutated = true
-          else
-            push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action up, already last action.")
           end
         when :down
           if index_next
-            a_next = @active_group.actions[index_next]
+            other = @active_group.actions[index_next]
+            other_is_child = action_is_child?(other)
 
-            old_name = action.name
-            new_name = a_next.name
+            i = index
 
-            action.name = a_next.name
-            a_next.name = old_name
+            while(other && ((!am_child && other_is_child) || (am_child && !other_is_child)))
+              i += 1
+              index_next = i + 1 < @active_group.actions.size ? i + 1 : nil
 
-            action_container = find_element_by_tag(@actions_list, old_name)
-            action_label = find_element_by_tag(action_container, "label")
+              return unless index_next
+              return if am_child && valid_engine_action_name?(other).to_a[0].to_i != base_int
 
-            a_next_container = find_element_by_tag(@actions_list, new_name)
-            a_next_label = find_element_by_tag(a_next_container, "label")
+              other = @active_group.actions[index_next]
+              other_is_child = action_is_child?(other)
+            end
 
-            action_container.style.tag = action.name
-            a_next_container.style.tag = a_next.name
-            action_label.value = action.name
-            a_next_label.value = a_next.name
-
+            swap_action(action, other)
             mutated = true
-          else
-            push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action down, already last action.")
           end
         end
 
@@ -765,6 +722,63 @@ module TAC
         update_list_children(@actions_list)
 
         scroll_into_view(action)
+      end
+
+      def swap_action(action, other)
+        old_name = action.name
+        new_name = other.name
+
+        action.name = other.name
+        other.name = old_name
+
+        action_container = find_element_by_tag(@actions_list, old_name)
+        action_label = find_element_by_tag(action_container, "label")
+
+        other_container = find_element_by_tag(@actions_list, new_name)
+        other_label = find_element_by_tag(other_container, "label")
+
+        action_container.style.tag = action.name
+        other_container.style.tag = other.name
+        action_label.value = action.name
+        other_label.value = other.name
+      end
+
+      def valid_engine_action_name?(action)
+        base, subbase = action.name.split("-", 2)
+        base_int = -1
+        subbase_int = -1
+
+        if subbase
+          begin
+            base_int = Integer(base)
+            subbase_int = Integer(subbase)
+          rescue ArgumentError
+            base_int = -1
+            subbase_int = -1
+          end
+
+          return [base_int, subbase_int] if base_int >= 0 && subbase_int >= 0
+        end
+
+        return false
+      end
+
+      def action_is_child?(action)
+        base, subbase = action.name.split("-", 2)
+        subbase_int = -1
+
+        if subbase
+          begin
+            Integer(base)
+            subbase_int = Integer(subbase)
+          rescue ArgumentError
+            subbase_int = -1
+          end
+
+          return subbase_int > 0
+        end
+
+        return false
       end
 
       def draw
