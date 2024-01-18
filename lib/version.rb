@@ -1,5 +1,5 @@
 module TAC
   NAME = "TimeCrafters Configuration Tool"
-  VERSION = "0.7.2"
-  RELEASE_NAME = "Beta"
+  VERSION = "0.8.0"
+  RELEASE_NAME = "2024-01-18" # ISO 8601 Date of version release
 end

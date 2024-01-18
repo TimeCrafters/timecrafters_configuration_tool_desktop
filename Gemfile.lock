@@ -12,7 +12,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     cri (2.1.0)
-    cyberarm_engine (0.24.0)
+    cyberarm_engine (0.24.1)
       excon (~> 0.88)
       gosu (~> 1.1)
       gosu_more_drawables (~> 0.3)
@@ -33,4 +33,4 @@ DEPENDENCIES
   releasy!
 
 BUNDLED WITH
-   2.4.3
+   2.5.3
