@@ -119,10 +119,11 @@ module TAC
               @actions_menu = flow(width: 1.0, height: 36) do
                 label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
-                button get_image("#{TAC::MEDIA_PATH}/icons/barsHorizontal.png"), image_width: THEME_ICON_SIZE, tip: "Auto renumber engine actions", margin_right: 16, enabled: false do
-                end
+                # TODO: Implement this
+                # button get_image("#{TAC::MEDIA_PATH}/icons/barsHorizontal.png"), image_width: THEME_ICON_SIZE, tip: "Auto renumber engine actions", margin_right: 16, enabled: false do
+                # end
 
-                button get_image("#{TAC::MEDIA_PATH}/icons/up.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action up (and its children, if applicable)" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/up.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action up (and its children, if holding SHIFT)" do
                   if @active_group && @active_action
                     shift_action(@active_action, :up)
                   else
@@ -130,7 +131,7 @@ module TAC
                   end
                 end
 
-                button get_image("#{TAC::MEDIA_PATH}/icons/down.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action down (and its children, if applicable)" do
+                button get_image("#{TAC::MEDIA_PATH}/icons/down.png"), image_width: THEME_ICON_SIZE, tip: "Move selected action down (and its children, if holding SHIFT)" do
                   if @active_group && @active_action
                     shift_action(@active_action, :down)
                   else
@@ -655,6 +656,7 @@ module TAC
         valid_name = valid_engine_action_name?(action)
         am_child = action_is_child?(action)
         index = @active_group.actions.index(action)
+        move_children = shift_down? # require that a SHIFT key is down when moving childen with their current parent to prevent undesired relocations.
 
         unless valid_name
           push_state(TAC::Dialog::AlertDialog, title: "Error", message: "Unable to shift action, incorrectly formated name.\nExpected: name to be like '00-00' not '#{action.name}'")
@@ -691,6 +693,7 @@ module TAC
               other_is_child = action_is_child?(other)
             end
 
+            move_child_actions(other, action) if move_children
             swap_action(action, other)
             mutated = true
           end
@@ -712,6 +715,7 @@ module TAC
               other_is_child = action_is_child?(other)
             end
 
+            move_child_actions(action, other) if move_children
             swap_action(action, other)
             mutated = true
           end
@@ -749,42 +753,72 @@ module TAC
         other_label.value = other.name
       end
 
+      def move_child_actions(action, other)
+        # Ordered: OTHER, ACTION
+        children = [select_child_actions(other), select_child_actions(action)]
+
+        [action, other].each_with_index do |a, i|
+          new_base_int, _new_subbase_int = valid_engine_action_name?(a)
+
+          children[i].each do |child|
+            child_base_int, child_subbase_int = valid_engine_action_name?(child)
+
+            # puts format("MOVING CHILD: #{child.name} (#{child.comment}) from %02d-00 to %02d-00", child_base_int, new_base_int)
+            new_name = format("%02d-%02d", new_base_int, child_subbase_int)
+
+            action_container = find_element_by_tag(@actions_list, child.name)
+            action_label = find_element_by_tag(action_container, "label")
+
+            action_container.style.tag = new_name
+            action_label.value = new_name
+
+            child.name = new_name
+          end
+        end
+      end
+
+      def select_child_actions(action)
+        valid_name = valid_engine_action_name?(action)
+
+        @active_group.actions.select do |a|
+          child_base_int, _child_subbase_int = valid_engine_action_name?(a)
+
+          next unless child_base_int
+
+          child_base_int == valid_name[0] && action_is_child?(a)
+        end
+      end
+
       def valid_engine_action_name?(action)
         base, subbase = action.name.split("-", 2)
         base_int = -1
         subbase_int = -1
 
-        if subbase
-          begin
-            base_int = Integer(base)
-            subbase_int = Integer(subbase)
-          rescue ArgumentError
-            base_int = -1
-            subbase_int = -1
-          end
+        return false unless base && subbase
 
-          return [base_int, subbase_int] if base_int >= 0 && subbase_int >= 0
+        return false unless base.length == 2 && subbase.length == 2
+
+        # Work around bug in Ruby's `Integer("08")` parser
+        base = base[0] == "0" ? base[1] : base
+        subbase = subbase[0] == "0" ? subbase[1] : subbase
+
+        begin
+          base_int = Integer(base)
+          subbase_int = Integer(subbase)
+        rescue ArgumentError
+          base_int = -1
+          subbase_int = -1
         end
+
+        return [base_int, subbase_int] if base_int >= 0 && subbase_int >= 0
 
         return false
       end
 
       def action_is_child?(action)
-        base, subbase = action.name.split("-", 2)
-        subbase_int = -1
+        _base_int, subbase_int = valid_engine_action_name?(action)
 
-        if subbase
-          begin
-            Integer(base)
-            subbase_int = Integer(subbase)
-          rescue ArgumentError
-            subbase_int = -1
-          end
-
-          return subbase_int > 0
-        end
-
-        return false
+        return (subbase_int && subbase_int > 0) ? true : false
       end
 
       def draw
@@ -794,7 +828,7 @@ module TAC
           item = @highlight_item_container
 
           Gosu.draw_rect(
-            item.x, item.y,
+            item.x, item.y + (item&.parent&.scroll_top || 0),
             item.width, item.height,
             @highlight_animator.color_transition,
             item.z + 1
