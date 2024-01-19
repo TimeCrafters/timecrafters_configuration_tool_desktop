@@ -5,7 +5,7 @@ module TAC
     def initialize(**args)
       super(**args)
 
-      self.caption = "#{TAC::NAME} v#{TAC::VERSION} (#{TAC::RELEASE_NAME})"
+      self.caption = "#{TAC::NAME} v#{TAC::VERSION} (#{TAC::RELEASE_NAME}) [#{TAC::RELEASE_DATE}]"
       @backend = Backend.new
       @notification_manager = CyberarmEngine::NotificationManager.new(window: self, edge: :bottom)
 
