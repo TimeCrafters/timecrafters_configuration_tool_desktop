@@ -1,5 +1,5 @@
 begin
-  raise LoadError if defined?(Ocra)
+  raise LoadError if defined?(Ocra) || defined?(Ocran)
   require_relative "../cyberarm_engine/lib/cyberarm_engine"
 rescue LoadError
   require "cyberarm_engine"
@@ -73,7 +73,7 @@ require_relative "lib/game_clock/net/packet"
 USE_REDESIGN = ARGV.include?("--redesign")
 BORDERLESS = ARGV.include?("--borderless")
 
-if not defined?(Ocra)
+unless defined?(Ocra) || defined?(Ocran)
   TAC::Window.new(width: (Gosu.screen_width * 0.8).round, height: (Gosu.screen_height * 0.8).round, resizable: true, borderless: BORDERLESS).show
 end
 

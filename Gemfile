@@ -3,6 +3,6 @@ source "https://rubygems.org"
 gem "cyberarm_engine"
 
 group :packaging do
-  gem "ocra"
-  gem "releasy", github: "gosu/releasy"
+  gem "ocran"
+  # gem "releasy", path: "../releasy"
 end
