@@ -11,7 +11,7 @@ module TAC
         @titlebar.style.default[:background] = [ color, darken(color, 50) ]
 
         background Gosu::Color::GRAY
-        label @options[:message]
+        para @options[:message]
 
         flow width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           button "Cancel", width: 0.5 do

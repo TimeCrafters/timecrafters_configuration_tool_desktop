@@ -6,7 +6,7 @@ module TAC
         @titlebar.style.default[:background] = [ Palette::TACNET_PRIMARY, Palette::TACNET_SECONDARY ]
 
         background Gosu::Color::GRAY
-        label @options[:message], width: 1.0
+        para @options[:message], width: 1.0
 
         @sound = Gosu::Sample.new("#{TAC::MEDIA_PATH}/error_alarm.ogg").play(1, 1, true)
 

@@ -6,16 +6,16 @@ module TAC
 
         @type = @options[:variable].type if @options[:variable]
 
-        label "Name", width: 1.0, text_align: :center
-        @name_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
+        para "Name", width: 1.0, text_align: :center
+        @name_error = para "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @name_error.hide
         @name = edit_line @options[:variable] ? @options[:variable].name : "", filter: method(:name_filter), width: 1.0, autofocus: true, focus: true
         @name.subscribe(:changed) do |sender, value|
           valid?
         end
 
-        label "Type", width: 1.0, text_align: :center
-        @type_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
+        para "Type", width: 1.0, text_align: :center
+        @type_error = para "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
         @type_error.hide
 
         @var_type = list_box items: [:float, :double, :integer, :long, :string, :boolean], choose: @type ? @type : :double, width: 1.0 do |item|
@@ -35,8 +35,8 @@ module TAC
         @type ||= @var_type.value.to_sym
 
         @value_container = stack width: 1.0 do
-          label "Value", width: 1.0, text_align: :center
-          @value_error = label "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
+          para "Value", width: 1.0, text_align: :center
+          @value_error = para "Error", color: TAC::Palette::TACNET_CONNECTION_ERROR
           @value_error.hide
           @value = edit_line @options[:variable] ? @options[:variable].value : "", width: 1.0
           @value_boolean = check_box "Boolean", checked: @options[:variable] ? @options[:variable].value == "true" : false

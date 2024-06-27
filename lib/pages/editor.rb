@@ -30,13 +30,13 @@ module TAC
 
         status_bar.clear do
           flow(width: 0.3333) do
-            label "Active group:", margin_right: 20
-            @active_group_label = label ""
+            para "Active group:", margin_right: 20
+            @active_group_label = para ""
           end
 
           flow(width: 0.3333) do
-            label "Active action:", margin_right: 20
-            @active_action_label = label ""
+            para "Active action:", margin_right: 20
+            @active_action_label = para ""
           end
         end
 
@@ -44,7 +44,7 @@ module TAC
           flow(width: 1.0, height: 1.0) do
             stack fill: true, height: 1.0, padding_left: 2, padding_right: 2, border_thickness_right: 1, border_color: Gosu::Color::BLACK do
               @groups_menu = flow(width: 1.0, height: 36) do
-                label "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
+                para "Groups", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
                 button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add group" do
                   push_state(TAC::Dialog::NamePromptDialog, title: "Create Group", list: window.backend.config.groups, callback_method: method(:create_group))
@@ -117,7 +117,7 @@ module TAC
 
             stack fill: true, height: 1.0, padding_left: 2, padding_right: 2, border_thickness_right: 1, border_color: Gosu::Color::BLACK do
               @actions_menu = flow(width: 1.0, height: 36) do
-                label "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
+                para "Actions", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
 
                 # TODO: Implement this
                 # button get_image("#{TAC::MEDIA_PATH}/icons/barsHorizontal.png"), image_width: THEME_ICON_SIZE, tip: "Auto renumber engine actions", margin_right: 16, enabled: false do
@@ -221,7 +221,7 @@ module TAC
 
             stack fill: true, height: 1.0, padding_left: 2, padding_right: 2 do
               @variables_menu = flow(width: 1.0, height: 36) do
-                label "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
+                para "Variables", text_size: THEME_SUBHEADING_TEXT_SIZE, fill: true, text_align: :center
                 button get_image("#{TAC::MEDIA_PATH}/icons/plus.png"), image_width: THEME_ICON_SIZE, tip: "Add variable" do
                   if @active_action
                     push_state(TAC::Dialog::VariableDialog, title: "Create Variable", list: @active_action.variables, callback_method: method(:create_variable))
@@ -325,7 +325,7 @@ module TAC
         window.backend.config_changed!
 
         group_container = find_element_by_tag(@groups_list, old_name)
-        label = find_element_by_tag(group_container, "label")
+        para = find_element_by_tag(group_container, "label")
 
         label.value = name
 
@@ -382,7 +382,7 @@ module TAC
         window.backend.config_changed!
 
         action_container = find_element_by_tag(@actions_list, old_name)
-        label = find_element_by_tag(action_container, "label")
+        para = find_element_by_tag(action_container, "label")
         comment_container = find_element_by_tag(action_container, "comment_container")
         comment_label = find_element_by_tag(action_container, "comment")
 
@@ -454,7 +454,7 @@ module TAC
         window.backend.config_changed!
 
         variable_container = find_element_by_tag(@variables_list, old_name)
-        label = find_element_by_tag(variable_container, "label")
+        para = find_element_by_tag(variable_container, "label")
         type  = find_element_by_tag(variable_container, "type")
         value = find_element_by_tag(variable_container, "value")
 

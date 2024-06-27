@@ -27,8 +27,8 @@ module TAC
 
         status_bar.clear do
           flow(width: 1.0, max_width: 720, h_align: :center) do
-            label "Current Configuration: "
-            @config_label = label window.backend.settings.config
+            para "Current Configuration: "
+            @config_label = para window.backend.settings.config
           end
         end
 

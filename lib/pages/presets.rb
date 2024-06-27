@@ -201,7 +201,7 @@ module TAC
         window.backend.config_changed!
 
         group_container = find_element_by_tag(@group_presets, old_name)
-        label = find_element_by_tag(group_container, "label")
+        para = find_element_by_tag(group_container, "label")
 
         label.value = name
 
@@ -233,7 +233,7 @@ module TAC
         window.backend.config_changed!
 
         action_container = find_element_by_tag(@action_presets, old_name)
-        label = find_element_by_tag(action_container, "label")
+        para = find_element_by_tag(action_container, "label")
         comment_container = find_element_by_tag(action_container, "comment_container")
         comment_label = find_element_by_tag(action_container, "comment")
 

@@ -11,7 +11,7 @@ module TAC
         @titlebar = flow(width: 1.0, height: 36) do
           background [TAC::Palette::TIMECRAFTERS_PRIMARY, TAC::Palette::TIMECRAFTERS_SECONDARY]
 
-          label @title, text_size: THEME_SUBHEADING_TEXT_SIZE, font: TAC::THEME_BOLD_FONT, fill: true, text_align: :center, text_border: true, text_border_color: 0xaa_222222, text_border_size: 1
+          para @title, text_size: THEME_SUBHEADING_TEXT_SIZE, font: TAC::THEME_BOLD_FONT, fill: true, text_align: :center, text_border: true, text_border_color: 0xaa_222222, text_border_size: 1
 
           button get_image("#{TAC::MEDIA_PATH}/icons/cross.png"), image_height: 1.0, **THEME_DANGER_BUTTON do
             close

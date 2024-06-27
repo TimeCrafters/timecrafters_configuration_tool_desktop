@@ -29,7 +29,7 @@ module TAC
         end
 
         status_bar.clear do
-          @simulation_status = label ""
+          @simulation_status = para ""
         end
 
         body.clear do

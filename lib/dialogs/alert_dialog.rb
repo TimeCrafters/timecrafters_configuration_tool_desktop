@@ -3,7 +3,7 @@ module TAC
     class AlertDialog < Dialog
       def build
         background Gosu::Color::GRAY
-        label @options[:message]
+        para @options[:message]
 
         button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           try_commit

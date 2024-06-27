@@ -36,7 +36,7 @@ class Editor < CyberarmEngine::GuiState
     @header_bar = flow(width: 1.0, height: 36) do
       background 0xff_006000
 
-      @header_bar_label = label TAC::NAME, fill: true, text_align: :center, text_size: 32, font: TAC::THEME_BOLD_FONT, margin_left: BORDERLESS ? 36 * 3 : 0
+      @header_bar_label = para TAC::NAME, fill: true, text_align: :center, text_size: 32, font: TAC::THEME_BOLD_FONT, margin_left: BORDERLESS ? 36 * 3 : 0
 
       @window_controls = flow(width: 36 * 3, height: 1.0) do
         button get_image("#{TAC::MEDIA_PATH}/icons/minus.png"), tip: "Minimize", image_height: 1.0 do
@@ -62,7 +62,7 @@ class Editor < CyberarmEngine::GuiState
         end
 
         button get_image("#{TAC::MEDIA_PATH}/icons/menuList.png"), margin: 4, tip: "Editor", image_width: 1.0 do
-          page(TAC::Pages::Editor)
+          page(TAC::Pages::EditorV3)
         end
 
         @tacnet_button = button get_image("#{TAC::MEDIA_PATH}/icons/signal3.png"), margin: 4, tip: "TACNET", image_width: 1.0 do
@@ -107,7 +107,7 @@ class Editor < CyberarmEngine::GuiState
         end
       end
 
-      @content = stack(width: window.width - @navigation.style.width, height: 1.0) do
+      @content = stack(fill: true, height: 1.0) do
         @chrome = stack(width: 1.0, height: 96) do
           @menu_bar = flow(width: 1.0, height: 48, padding: 8) do
             background 0xff_008000

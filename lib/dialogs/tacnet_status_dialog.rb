@@ -3,7 +3,7 @@ module TAC
     class TACNETStatusDialog < Dialog
       def build
         background Gosu::Color::GRAY
-        @message_label = label CyberarmEngine::Window.instance.backend.tacnet.full_status
+        @message_label = para CyberarmEngine::Window.instance.backend.tacnet.full_status
 
         button "Close", width: 1.0, margin_top: THEME_DIALOG_BUTTON_PADDING do
           try_commit

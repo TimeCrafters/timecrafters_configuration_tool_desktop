@@ -95,13 +95,13 @@ module TAC
             background @menu_background
 
             flow(width: 1.0) do
-              label "♫ Now playing:"
-              @current_song_label = label "♫ ♫ ♫"
+              para "♫ Now playing:"
+              @current_song_label = para "♫ ♫ ♫"
             end
 
             flow(width: 1.0) do
-              label "Volume:"
-              @current_volume_label = label "100%"
+              para "Volume:"
+              @current_volume_label = para "100%"
             end
 
             flow(width: 1.0) do
