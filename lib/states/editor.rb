@@ -62,7 +62,7 @@ class Editor < CyberarmEngine::GuiState
         end
 
         button get_image("#{TAC::MEDIA_PATH}/icons/menuList.png"), margin: 4, tip: "Editor", image_width: 1.0 do
-          page(TAC::Pages::EditorV3)
+          page(TAC::Pages::Editor)
         end
 
         @tacnet_button = button get_image("#{TAC::MEDIA_PATH}/icons/signal3.png"), margin: 4, tip: "TACNET", image_width: 1.0 do

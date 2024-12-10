@@ -458,7 +458,7 @@ module TAC
         type  = find_element_by_tag(variable_container, "type")
         value = find_element_by_tag(variable_container, "value")
 
-        label.value = name
+        para.value = name
         type.value = "Type: #{variable.type}"
         value.value = "Value: #{variable.value}"
 
