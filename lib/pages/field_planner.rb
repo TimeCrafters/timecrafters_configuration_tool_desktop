@@ -63,7 +63,7 @@ module TAC
               background 0xff_111111
             end
 
-            @points_container = stack width: 0.5, height: 1.0 do
+            @points_container = stack width: 0.5, height: 1.0, scroll: true do
             end
           end
         end
@@ -97,7 +97,8 @@ module TAC
           x = (window.mouse_x - @field_container.x) / @field.scale - 72
           y = (window.mouse_y - @field_container.y) / @field.scale - 72
 
-          @font.text = "X: #{inches_to_unit(x).round(2)} Y: #{inches_to_unit(y).round(2)} (#{@unit.to_s})"
+
+          @font.text = "X: #{inches_to_unit(-y).round(2)} Y: #{inches_to_unit(-x).round(2)} (#{@unit.to_s})"
           @font.x = window.mouse_x + 6
           @font.y = window.mouse_y - (@font.height / 2.0 + 24)
           @font.z = 100_001
@@ -133,16 +134,20 @@ module TAC
           x = (window.mouse_x - @field_container.x) / @field.scale
           y = (window.mouse_y - @field_container.y) / @field.scale
 
+          field_x = -((window.mouse_y - @field_container.y) / @field.scale - 72)
+          field_y = -((window.mouse_x - @field_container.x) / @field.scale - 72)
+
           case id
           when Gosu::MS_LEFT # Add Node
-            @nodes << CyberarmEngine::Vector.new(x, y, 0)
+            @nodes << [CyberarmEngine::Vector.new(x, y, 0), CyberarmEngine::Vector.new(field_x, field_y, 0)]
 
             measure_path
 
             refresh_panel
 
           when Gosu::MS_RIGHT # Delete Node
-            result = @nodes.find do |node|
+            result = @nodes.find do |node_pair|
+              node = node_pair.first
               Gosu.distance(node.x, node.y, x, y) <= @node_radius * 0.25
             end
 
@@ -159,9 +164,10 @@ module TAC
         x = (window.mouse_x - @field_container.x) / @field.scale
         y = (window.mouse_y - @field_container.y) / @field.scale
 
-        last_node = @nodes.first
+        last_node = @nodes.first&.first
 
-        @nodes.each_with_index do |current_node, i|
+        @nodes.each_with_index do |current_node_pair, i|
+          current_node = current_node_pair.first
           mouse_near = Gosu.distance(current_node.x, current_node.y, x, y) <= @node_radius * 0.25
 
           Gosu.draw_circle(
@@ -199,9 +205,11 @@ module TAC
       def measure_path
         @total_distance = 0
 
-        v1 = @nodes.first
-        @nodes.each_with_index do |v2, i|
+        v1 = @nodes.first&.first
+        @nodes.each_with_index do |pair, i|
           next if i.zero?
+
+          v2 = pair.first
 
           @total_distance += Gosu.distance(
             v1.x + @field_container.x,
@@ -224,25 +232,10 @@ module TAC
         status_bar.recalculate
 
         # @points_container.clear do
-          # v1 = @nodes.first
-          # break unless v1
-
-          # para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - 0 #{@unit.to_s.capitalize}"
-
-          # @nodes.each_with_index do |v2, i|
-          #   next if i.zero?
-
-          #   distance = Gosu.distance(
-          #     v1.x + @field_container.x,
-          #     v1.y + @field_container.y,
-          #     v2.x + @field_container.x,
-          #     v2.y + @field_container.y
-          #   )
-
-            # para "Vector #{inches_to_unit(v1.x).round}:#{inches_to_unit(v1.y).round} - #{inches_to_unit(distance).round(2)} #{@unit.to_s.capitalize}"
-
-            # v1 = v2
-          # end
+        #   @nodes.each_with_index do |pair, i|
+        #     v = pair.last
+        #     para format("X: %.3f Y: %.3f", inches_to_unit(v.x), inches_to_unit(v.y))
+        #   end
         # end
       end
 
