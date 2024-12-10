@@ -12,7 +12,7 @@ module TAC
               background 0xff_006000
             end
 
-            if window.backend.settings.config.empty?
+            if window.backend.settings.config.empty? || window.backend.config.nil?
               para "TODO: Introduction"
               para "Get Started", text_size: 28
               button "1. Create a configuration" do
