@@ -42,7 +42,7 @@ module TAC
         end
 
         ### --- ###
-        # OVERRIDE: offical CenterStage game clock no longer has colors
+        # OVERRIDE: official CenterStage game clock no longer has colors
         ### --- ###
 
         out = Gosu::Color::WHITE
