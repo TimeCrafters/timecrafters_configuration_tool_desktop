@@ -38,7 +38,7 @@ module TAC
               refresh_panel
             end
 
-            list_box items: ["CENTERSTAGE", "Power Play", "Freight Frenzy", "Ultimate Goal", "Skystone"], width: 200, height: 1.0 do |item|
+            list_box items: ["Into the Deep", "CENTERSTAGE", "Power Play", "Freight Frenzy", "Ultimate Goal", "Skystone"], width: 200, height: 1.0 do |item|
               season = item.downcase.gsub(" ", "_").to_sym
               @field = TAC::Simulator::Field.new(container: @field_container, season: season, simulation: nil)
             end
@@ -68,7 +68,7 @@ module TAC
           end
         end
 
-        @field = TAC::Simulator::Field.new(container: @field_container, season: :centerstage, simulation: nil)
+        @field = TAC::Simulator::Field.new(container: @field_container, season: :into_the_deep, simulation: nil)
         @nodes ||= []
         @unit = :inches
         @total_distance = 0

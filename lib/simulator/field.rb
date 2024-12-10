@@ -336,9 +336,7 @@ module TAC
         end
       end
 
-      ###########################
-      ### --- CENTERSTAGE --- ###
-      ###########################
+
       def draw_field_centerstage
         # Corner TAPE
         2.times do |i|
@@ -439,6 +437,140 @@ module TAC
         Gosu.draw_rect(24 + 72, @field_size / 2 + 12 - 1, 24, 2, @red, @z)
         Gosu.draw_rect(46 + 72, @field_size / 2 + 12 + 2, 26, 2, @red, @z)
 
+      end
+
+      #############################
+      ### --- Into the Deep --- ###
+      #############################
+      def draw_field_into_the_deep
+        # Observation and net zones
+        2.times do |i|
+          Gosu.rotate(i * 180.0, 72, 72) do
+            Gosu.draw_quad(
+              24 - 2, 0,      i.odd? ? @red : @blue,
+              24,     0,      i.odd? ? @red : @blue,
+              0,      24 - 2, i.odd? ? @red : @blue,
+              0,      24,     i.odd? ? @red : @blue,
+              @z
+            )
+
+            Gosu.draw_rect(
+              12, 144 - 24,
+              2,  24,
+              i.odd? ? @red : @blue,
+              @z
+            )
+
+            Gosu.draw_quad(
+              12,     144 - 24, i.odd? ? @red : @blue,
+              14,     144 - 24, i.odd? ? @red : @blue,
+              0,      144 - 36, i.odd? ? @red : @blue,
+              0,      144 - 38, i.odd? ? @red : @blue,
+              @z
+            )
+          end
+        end
+
+        faint_white = Gosu::Color.rgb(240, 240, 240)
+
+        # spike marks, white
+        3.times do |i|
+          Gosu.draw_rect(
+            48 - 3.5, 22 - i * 10,
+            3.5, 2,
+            faint_white,
+            @z
+          )
+        end
+        #spike marks, red
+        3.times do |i|
+          Gosu.draw_rect(
+            (144 - 48), 22 - i * 10,
+            3.5, 2,
+            @red,
+            @z
+          )
+        end
+        # spike marks, blue
+        3.times do |i|
+          Gosu.draw_rect(
+            48 - 3.5, 144 - 24 + i * 10,
+            3.5, 2,
+            @blue,
+            @z
+          )
+        end
+        # spike marks, yellow
+        3.times do |i|
+          Gosu.draw_rect(
+            (144 - 48), 144 - 24 + i * 10,
+            3.5, 2,
+            faint_white,
+            @z
+          )
+        end
+
+        # Accent Zone Triangle TAPE
+        2.times do |i|
+          Gosu.rotate(i * 180.0, 72, 72) do
+            Gosu.draw_quad(
+              48,      48, faint_white,
+              72, 48 - 10, faint_white,
+              72, 49 - 10, faint_white,
+              50,      48, faint_white,
+              @z
+            )
+
+            Gosu.draw_quad(
+              96,      48, faint_white,
+              72, 48 - 10, faint_white,
+              72, 49 - 10, faint_white,
+              94,      48, faint_white,
+              @z
+            )
+          end
+        end
+
+        # submersible
+        bar_gray = 0xff_656565 #Gosu::Color.rgb(50, 50, 50)
+
+        2.times do |i|
+          # left and right edges of submersible
+          Gosu.draw_rect(
+            72 - 24 + i * 46, 72 - 24,
+            2, 48,
+            bar_gray,
+            @z
+          )
+
+          # top and bottom edges of submersible
+          Gosu.draw_rect(
+            72 - 24, 72 - 15 + i * 28,
+            48, 2,
+            bar_gray,
+            @z
+          )
+
+          # alliance rungs of submersible
+          Gosu.draw_rect(
+            72 - 24 + i * 46, 72 - 13,
+            2, 26,
+            i.even? ? @blue : @red,
+            @z
+          )
+        end
+
+        # alliance bar bars
+        2.times do |i|
+          3.times do |x|
+            Gosu.draw_rect(
+              72 - 21.5 + x * 21, 72 - 15 + i * 28,
+              1, 2,
+              i.even? ? @blue : @red,
+              @z
+            )
+          end
+        end
       end
 
       def draw_tile_box(color)

@@ -8,7 +8,7 @@ module TAC
         @field_container = field_container
 
         @robots = []
-        @field = Field.new(simulation: self, season: :centerstage, container: @field_container)
+        @field = Field.new(simulation: self, season: :into_the_deep, container: @field_container)
         @show_paths = false
 
         @last_milliseconds = Gosu.milliseconds
